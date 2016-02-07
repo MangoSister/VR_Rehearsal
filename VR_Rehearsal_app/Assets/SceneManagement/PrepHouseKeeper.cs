@@ -7,8 +7,9 @@ public class PrepHouseKeeper : MonoBehaviour
 {
     public InputField urlField;
     public InputField dbNumField;
+    public InputField commentField;
     public Button downloadBtn;
-
+    public GameObject uiManager;
     public Text findBtnTxt;
 
     public Text transitionTxt;
@@ -19,9 +20,15 @@ public class PrepHouseKeeper : MonoBehaviour
     public void StartDownload()
     {
         if (downloadManager == null)
+        {
+            Debug.Log("Nothing downloaded");
             return;
-        downloadManager.LaunchDownload(urlField.text, dbNumField.text);
-        downloadBtn.interactable = false;
+        }
+        else {
+            downloadManager.LaunchDownload(urlField.text, dbNumField.text);
+            downloadBtn.interactable = false;
+            Debug.Log("Something downloading");
+        }
     }
 
     public void FinishDownload(bool success, string targetLoc)
@@ -32,7 +39,9 @@ public class PrepHouseKeeper : MonoBehaviour
             dbNumField.gameObject.SetActive(false);
             downloadBtn.gameObject.SetActive(false);
             transitionTxt.gameObject.SetActive(true);
-            StartCoroutine(Transition_CR());
+            //StartCoroutine(Transition_CR());
+            uiManager.GetComponent<UIManager>().SetPowerPointData(commentField.text);
+            uiManager.GetComponent<UIManager>().ShowListPanel();
         }
         else
         {
@@ -77,4 +86,10 @@ public class PrepHouseKeeper : MonoBehaviour
         SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
     }
 
-}
+    // PPT button in List Panel
+    // At this time, change to present_0 scene
+    public void OnPPTSlideClick()
+    {
+        SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+    }
+ }

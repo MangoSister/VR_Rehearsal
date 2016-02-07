@@ -54,7 +54,7 @@ public class UIManager : MonoBehaviour {
 
 	}
 
-	void ShowLogoPanel(){
+	public void ShowLogoPanel(){
 		_logoPanel.SetActive(true);
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(false);
@@ -62,21 +62,21 @@ public class UIManager : MonoBehaviour {
 		StartCoroutine("ChangePanel");
 	}
 
-	void ShowLoginPanel(){
+    public void ShowLoginPanel(){
 		_logoPanel.SetActive(false);
 		_loginPanel.SetActive(true);
 		_listPanel.SetActive(false);
 		_urlPanel.SetActive(false);
 	}
 
-	void ShowListPanel(){
+    public void ShowListPanel(){
 		_logoPanel.SetActive(false);
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(true);
 		_urlPanel.SetActive(false);
 	}
 
-	void ShowUrlPanel(){
+    public void ShowUrlPanel(){
 		_logoPanel.SetActive(false);
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(false);
@@ -103,10 +103,10 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
-    void SetPowerPointData(string newStr)
+    public void SetPowerPointData(string newStr)
     {
-        GameObject pptPractice = (GameObject)_listPanel.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
-        GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
+       GameObject pptPractice = (GameObject)_listPanel.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
+       GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
 
         commentBox.GetComponent<Text>().text = string.Format("[{0}]", newStr); 
        
