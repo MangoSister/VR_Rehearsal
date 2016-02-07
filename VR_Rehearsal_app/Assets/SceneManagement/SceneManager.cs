@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public static class SceneManager
 {
     private static readonly string _PRELOAD_SCENE_NAME = "sc_preload";
-    private static readonly string _PREP_SCENE_NAME = "sc_prep";
+    private static readonly string _PREP_SCENE_NAME = "sc_UI";
 
     private static List<string> _presentSceneNames = new List<string> { "sc_present_0" };
 
