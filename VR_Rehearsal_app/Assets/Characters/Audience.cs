@@ -18,6 +18,10 @@ public class Audience : MonoBehaviour, IAgent
         Chatting = 2,
     }
 
+    [Range(0f, 1f)]
+    public float normalizedPos;
+
+
     public float[] stateMassFunction;
     public States currState;
 

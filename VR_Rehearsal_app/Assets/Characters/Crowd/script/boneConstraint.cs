@@ -16,8 +16,14 @@ public class boneConstraint : MonoBehaviour
 	private Quaternion _prevRotQuat;
 	//After attention, 
 	private Coroutine _constraintCR;
-	
-	void Update () 
+
+    void Start()
+    {
+        //_prevRotQuat Get original rotation 
+    }
+
+
+    void Update () 
 	{
 		
 		//boneTransform.LookAt(targetTransform );

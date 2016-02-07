@@ -21,7 +21,10 @@ public class AudienceStateNode : BaseNode<Audience>
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
         tick.target.currState = _state;
-        Debug.Log("tick state: " + _state.ToString());
+#if DEBUG
+        Debug.Log(string.Format("{0} ({1}): {2}",
+            tick.target.name, tick.target.agentId, _state.ToString()));
+#endif
         return NodeStatus.SUCCESS;
     }
 
