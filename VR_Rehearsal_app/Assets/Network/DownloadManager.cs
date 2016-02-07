@@ -158,7 +158,7 @@ public class PassData : ThreadedJob
         //1. send request
 		ServicePointManager.ServerCertificateValidationCallback = Validator;
 		
-		WebRequest request =  WebRequest.Create ("https://" + m_urlStr + ".localtunnel.me/unity/");
+		WebRequest request =  WebRequest.Create ("http://128.2.236.66:8080/unity/");
         request.Timeout = _timeOut;
         request.Method = "POST";
         string postData = string.Format("dbNumber={0}", m_dbStr);// "<@" +   + "@>";
