@@ -8,6 +8,9 @@
  * 
  * 
  */
+
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -203,3 +206,5 @@ public class spaceInfoExpoter : MonoBehaviour {
 
 
 }
+
+#endif
