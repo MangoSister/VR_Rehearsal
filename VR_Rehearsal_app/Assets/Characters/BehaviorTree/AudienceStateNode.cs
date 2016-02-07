@@ -22,8 +22,10 @@ public class AudienceStateNode : BaseNode<Audience>
     {
         tick.target.currState = _state;
 #if DEBUG
+		/*
         Debug.Log(string.Format("{0} ({1}): {2}",
             tick.target.name, tick.target.agentId, _state.ToString()));
+            */
 #endif
         return NodeStatus.SUCCESS;
     }

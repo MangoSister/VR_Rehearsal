@@ -29,46 +29,40 @@ public class FakeCrowdController : MonoBehaviour
             {
 				Debug.Log("Received: " + res);
                 //w.SendString("Hi there" + i++);
+				char[] delimiterChars = { ' ' ,'\t' };
+				string[] parseStr = res.Split(delimiterChars);
 
-				switch(res){
+				switch(parseStr[0]){
 					case "m+":{
-						float currMean = _crowdSim.globalAttentionMean;
-						_crowdSim.globalAttentionMean = currMean + 0.01f;
+					_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionMean, true, parseStr);
 						break;
 					}
 					case "m-":{
-						float currMean = _crowdSim.globalAttentionMean;
-						_crowdSim.globalAttentionMean = currMean - 0.01f;
+					_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionMean, false, parseStr);
 						break;
 					}
 					case "d+":{
-						float currDV = _crowdSim.globalAttentionStDev ;
-						_crowdSim.globalAttentionStDev  = currDV + 0.01f;
+					_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionStDev, true, parseStr);
 						break;
 					}
 					case "d-":{
-						float currDV = _crowdSim.globalAttentionStDev ;
-						_crowdSim.globalAttentionStDev  = currDV - 0.01f;
+						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionStDev, false, parseStr);
 						break;
 					}
 					case "u+":{
-						float posUp = _crowdSim.seatPosAttentionUpper;
-						_crowdSim.seatPosAttentionUpper = posUp + 0.01f;
+						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionUpper, true, parseStr);
 						break;
 					}
 					case "u-":{
-						float posUp = _crowdSim.seatPosAttentionUpper ;
-						_crowdSim.seatPosAttentionUpper  = posUp - 0.01f;
+						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionUpper, false, parseStr);
 						break;
 					}
 					case "l+":{
-						float posLow = _crowdSim.seatPosAttentionLower ;
-						_crowdSim.seatPosAttentionLower  = posLow + 0.01f;
+						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionLower, true, parseStr);
 						break;
 					}
 					case "l-":{
-						float posLow = _crowdSim.seatPosAttentionLower ;
-						_crowdSim.seatPosAttentionLower  = posLow - 0.01f;
+						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionLower, false, parseStr);
 						break;
 					}
 
@@ -90,4 +84,42 @@ public class FakeCrowdController : MonoBehaviour
         }
         w.Close();
     }
+
+	float SetValueFromString( float value, bool bIsPlus, string[] str){
+
+		float currVal = value;
+		if (str.Length > 1) {
+			float resNum = CheckNumberInParse (str [1]);
+
+			if (resNum != -1) {
+				if (bIsPlus){
+					currVal = currVal + resNum;
+				}else{
+					currVal = currVal - resNum;
+				}
+					
+			}else{
+				Debug.LogError( "Wrong Number");
+			}
+
+		} else {
+			if(bIsPlus){
+				currVal = currVal + 0.01f;
+			}else{
+				currVal = currVal - 0.01f;
+			}
+		}
+
+		return currVal;
+	}
+
+
+	float CheckNumberInParse(string _str){
+		float num = float.Parse(_str);
+		if (num.GetType () == typeof(float)) {
+			return num;
+		} else {
+			return -1;
+		}
+	}
 }
