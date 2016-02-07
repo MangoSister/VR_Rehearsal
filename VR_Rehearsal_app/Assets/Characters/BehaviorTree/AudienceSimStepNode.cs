@@ -25,13 +25,13 @@ public class AudienceSimStepNode : BaseNode<Audience>
         float pos = sim.seatPosAttentionFactor.Evaluate(target.normalizedPos);
         pos = Mathf.Clamp01(pos);
 
-        //target.stateMassFunction[(int)Audience.States.Focused] = global * pos;
-        //target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
-        //target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
+        target.stateMassFunction[(int)Audience.States.Focused] = global * pos;
+        target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
+        target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
 
-        target.stateMassFunction[(int)Audience.States.Focused] = 0f;
-        target.stateMassFunction[(int)Audience.States.Bored] = 0f;
-        target.stateMassFunction[(int)Audience.States.Chatting] = 1f;
+        //target.stateMassFunction[(int)Audience.States.Focused] = 0f;
+        //target.stateMassFunction[(int)Audience.States.Bored] = 0f;
+        //target.stateMassFunction[(int)Audience.States.Chatting] = 1f;
 
         float sum = 0f;
         foreach (var mass in target.stateMassFunction)

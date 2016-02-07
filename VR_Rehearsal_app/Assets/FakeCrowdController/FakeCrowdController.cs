@@ -32,53 +32,53 @@ public class FakeCrowdController : MonoBehaviour
 
 				switch(res){
 					case "m+":{
-						//float currMean = _crowdSim.globalAttentionMean;
-						//_crowdSim.globalAttentionMean = currMean + 0.01;
+						float currMean = _crowdSim.globalAttentionMean;
+						_crowdSim.globalAttentionMean = currMean + 0.01f;
 						break;
 					}
 					case "m-":{
-						//float currMean = _crowdSim.globalAttentionMean;
-						//_crowdSim.globalAttentionMean = currMean - 0.01;
+						float currMean = _crowdSim.globalAttentionMean;
+						_crowdSim.globalAttentionMean = currMean - 0.01f;
 						break;
 					}
 					case "d+":{
-						//float currDV = _crowdSim.globalAttentionStDev ;
-						//_crowdSim.globalAttentionStDev  = currDV + 0.01;
+						float currDV = _crowdSim.globalAttentionStDev ;
+						_crowdSim.globalAttentionStDev  = currDV + 0.01f;
 						break;
 					}
 					case "d-":{
-						//float currDV = _crowdSim.globalAttentionStDev ;
-						//_crowdSim.globalAttentionStDev  = currDV - 0.01;
+						float currDV = _crowdSim.globalAttentionStDev ;
+						_crowdSim.globalAttentionStDev  = currDV - 0.01f;
 						break;
 					}
 					case "u+":{
-						//float posUp = _crowdSim.seatPosAttentionUpper;
-						//_crowdSim.seatPosAttentionUpper = posUp + 0.01;
+						float posUp = _crowdSim.seatPosAttentionUpper;
+						_crowdSim.seatPosAttentionUpper = posUp + 0.01f;
 						break;
 					}
 					case "u-":{
-						//float posUp = _crowdSim.seatPosAttentionUpper ;
-						//_crowdSim.seatPosAttentionUpper  = posUp - 0.01;
+						float posUp = _crowdSim.seatPosAttentionUpper ;
+						_crowdSim.seatPosAttentionUpper  = posUp - 0.01f;
 						break;
 					}
 					case "l+":{
-						//float posLow = _crowdSim.seatPosAttentionLower ;
-						//_crowdSim.seatPosAttentionLower  = posLow + 0.01;
+						float posLow = _crowdSim.seatPosAttentionLower ;
+						_crowdSim.seatPosAttentionLower  = posLow + 0.01f;
 						break;
 					}
 					case "l-":{
-						//float posLow = _crowdSim.seatPosAttentionLower ;
-						//_crowdSim.seatPosAttentionLower  = posLow - 0.01;
+						float posLow = _crowdSim.seatPosAttentionLower ;
+						_crowdSim.seatPosAttentionLower  = posLow - 0.01f;
 						break;
 					}
 
 				}
-				/*
+			
 				w.SendString("|Unity> currStat: m=" + _crowdSim.globalAttentionMean + ", dev=" + _crowdSim.globalAttentionStDev 
 				             + ", A_up=" + _crowdSim.seatPosAttentionUpper + ", A_Low=" +  _crowdSim.seatPosAttentionLower + "." );
 
-				*/
-				w.SendString("|Unity> blar blar" + res);
+				
+				//w.SendString("|Unity> blar blar" + res);
 
             }
             if (w.Error != null)

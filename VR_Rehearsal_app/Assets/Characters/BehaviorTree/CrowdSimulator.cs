@@ -14,8 +14,29 @@ public class CrowdSimulator : MonoBehaviour
     public float globalAttentionMean { get; set; }
     public float globalAttentionStDev { get; set; }
     public AnimationCurve seatPosAttentionFactor;
-    public float seatPosAttentionUpper { get; set; }
-    public float seatPosAttentionLower { get; set; }
+    public float seatPosAttentionUpper
+    {
+        get
+        {
+            return seatPosAttentionFactor.keys[0].value;
+        }
+        set
+        {
+            seatPosAttentionFactor.keys[0].value = value;
+
+        }
+    }
+    public float seatPosAttentionLower
+    {
+        get
+        {
+            return seatPosAttentionFactor.keys[1].value;
+        }
+        set
+        {
+            seatPosAttentionFactor.keys[1].value = value;
+        }
+    }
     private List<Audience> audiences;
     public int audienceNum { get { return audiences.Count; } }
     //private BehaviorTree<Audience> _audienceBt = null;
