@@ -77,7 +77,7 @@ public class FakeCrowdController : MonoBehaviour
             }
             if (w.Error != null)
             {
-                Debug.LogError("Error: " + w.Error);
+                Debug.Log("Error: " + w.Error);
                 break;
             }
             yield return 0;

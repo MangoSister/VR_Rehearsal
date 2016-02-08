@@ -27,6 +27,7 @@ public class boneConstraint : MonoBehaviour
 	//Start Constarint mode
 	public void StartToFollow()
 	{
+		/*
 		// Get vector between Target and bone  
 		Vector3 relativePos = targetTransform.position - boneTransform.position;
 		// Get LookAt dir vector
@@ -35,14 +36,17 @@ public class boneConstraint : MonoBehaviour
 		_prevRotQuat = boneTransform.rotation;
 		// Start Quaternion Lerp Coroutine
 		StartCoroutine ( LerpRotBetweenAnB_CR (boneTransform.rotation, rotation, true));
+		*/
 	}
 	
 	//Stop Constarint mode
 	public void StopToFollow()
 	{
+		/*
         if (_constraintCR != null)
             StopCoroutine(_constraintCR);
 		StartCoroutine (LerpRotBetweenAnB_CR (boneTransform.rotation, _prevRotQuat, false));
+		*/
 	}
 	
 	// Lerp for moving smoothly
