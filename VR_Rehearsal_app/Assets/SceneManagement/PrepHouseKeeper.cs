@@ -90,6 +90,8 @@ public class PrepHouseKeeper : MonoBehaviour
     // At this time, change to present_0 scene
     public void OnPPTSlideClick()
     {
-        SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+       
+            SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+        
     }
  }
