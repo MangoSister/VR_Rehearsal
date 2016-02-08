@@ -55,7 +55,7 @@ public static class SceneManager
 #if UNITY_EDITOR
         Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
 #else
-        Application.LoadLevel("sc_prep");
+        Application.LoadLevel("sc_UI");
 #endif
     }
 

@@ -1,6 +1,7 @@
 ﻿/*
  * Phan Lee 
- * Updated:Jan 24, 2016
+ * modified by Yang
+ * Updated:Feb 07, 2016
  * 
  * Bone Constraint Function
  * later, i will add constraint angle limitation function
@@ -15,28 +16,16 @@ public class boneConstraint : MonoBehaviour
 	//save previous rotation for moving back to non-constraint mode
 	private Quaternion _prevRotQuat;
 	//After attention, 
-	private Coroutine _constraintCR;
+	private Coroutine _constraintCR = null;
 
     void Start()
     {
         //_prevRotQuat Get original rotation 
+        _prevRotQuat = boneTransform.rotation;
     }
-
-
-    void Update () 
-	{
-		
-		//boneTransform.LookAt(targetTransform );
-		if (Input.GetKeyDown(KeyCode.A)) {  /* Send Event */
-			StartToFollow();
-		}
-		if (Input.GetKeyDown(KeyCode.B)) {  /* Send Event */
-			StopToFollow();
-		}
-	}
 	
 	//Start Constarint mode
-	void StartToFollow()
+	public void StartToFollow()
 	{
 		// Get vector between Target and bone  
 		Vector3 relativePos = targetTransform.position - boneTransform.position;
@@ -49,9 +38,10 @@ public class boneConstraint : MonoBehaviour
 	}
 	
 	//Stop Constarint mode
-	void StopToFollow()
+	public void StopToFollow()
 	{
-		StopCoroutine (_constraintCR);
+        if (_constraintCR != null)
+            StopCoroutine(_constraintCR);
 		StartCoroutine (LerpRotBetweenAnB_CR (boneTransform.rotation, _prevRotQuat, false));
 	}
 	

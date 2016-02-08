@@ -21,8 +21,14 @@ public class AudienceStateNode : BaseNode<Audience>
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
         tick.target.currState = _state;
+        if (_state == State.Focused)
+        {
+            tick.target.GetComponentInChildren<boneConstraint>().StartToFollow();
+        }
+        else
+            tick.target.GetComponentInChildren<boneConstraint>().StopToFollow();
 #if DEBUG
-		/*
+        /*
         Debug.Log(string.Format("{0} ({1}): {2}",
             tick.target.name, tick.target.agentId, _state.ToString()));
             */

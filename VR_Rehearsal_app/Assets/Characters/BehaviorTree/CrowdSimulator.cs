@@ -22,7 +22,9 @@ public class CrowdSimulator : MonoBehaviour
         }
         set
         {
-            seatPosAttentionFactor.keys[0].value = value;
+            var keys = seatPosAttentionFactor.keys;
+            keys[0].value = value;
+            seatPosAttentionFactor = new AnimationCurve(keys);
 
         }
     }
@@ -34,7 +36,9 @@ public class CrowdSimulator : MonoBehaviour
         }
         set
         {
-            seatPosAttentionFactor.keys[1].value = value;
+            var keys = seatPosAttentionFactor.keys;
+            keys[1].value = value;
+            seatPosAttentionFactor = new AnimationCurve(keys);
         }
     }
     private List<Audience> audiences;
@@ -65,6 +69,7 @@ public class CrowdSimulator : MonoBehaviour
         {
             int rand = Random.Range(0, (audiencePrefabs.Length - 1));
             var ad = Instantiate(audiencePrefabs[rand], tx.seat_posVecs[i], Quaternion.identity) as Audience;
+            ad.gameObject.GetComponentInChildren<boneConstraint>().targetTransform = RoomCenter.currRoom.presenter.transform;
             ad.normalizedPos = (float)(i / tx.seat_ColNum) / (float)tx.seat_RowNum;
             ad.transform.parent = transform;
             audiences.Add(ad);

@@ -42,27 +42,27 @@ public class FakeCrowdController : MonoBehaviour
 						break;
 					}
 					case "d+":{
-					_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionStDev, true, parseStr);
+					_crowdSim.globalAttentionStDev = SetValueFromString(_crowdSim.globalAttentionStDev, true, parseStr);
 						break;
 					}
 					case "d-":{
-						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.globalAttentionStDev, false, parseStr);
+						_crowdSim.globalAttentionStDev = SetValueFromString(_crowdSim.globalAttentionStDev, false, parseStr);
 						break;
 					}
 					case "u+":{
-						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionUpper, true, parseStr);
+						_crowdSim.seatPosAttentionUpper = SetValueFromString(_crowdSim.seatPosAttentionUpper, true, parseStr);
 						break;
 					}
 					case "u-":{
-						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionUpper, false, parseStr);
+						_crowdSim.seatPosAttentionUpper = SetValueFromString(_crowdSim.seatPosAttentionUpper, false, parseStr);
 						break;
 					}
 					case "l+":{
-						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionLower, true, parseStr);
+						_crowdSim.seatPosAttentionLower = SetValueFromString(_crowdSim.seatPosAttentionLower, true, parseStr);
 						break;
 					}
 					case "l-":{
-						_crowdSim.globalAttentionMean = SetValueFromString(_crowdSim.seatPosAttentionLower, false, parseStr);
+						_crowdSim.seatPosAttentionLower = SetValueFromString(_crowdSim.seatPosAttentionLower, false, parseStr);
 						break;
 					}
 
