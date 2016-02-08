@@ -15,6 +15,7 @@ public class micManager : MonoBehaviour {
 	AudioSource _recordAudioSrc;
 	voiceActivityDetector _VAD;
 
+    [SerializeField]
     private bool _isSpeaking;
     public bool isSpeaking { get { return _isSpeaking; } }
 
@@ -29,19 +30,11 @@ public class micManager : MonoBehaviour {
 	
 	void FixedUpdate () 
 	{
-        //float startTime = Time.time;
         _isSpeaking = Microphone.IsRecording(null) && _VAD.CheckActivity();
-        //Debug.Log(_isSpeaking);
-        //Debug.Log(string.Format("time used: {0}", Time.time - startTime));
     }
 	// Mic Setup
 	bool InitializeMic()
 	{
-        //if (Microphone.GetPosition(null) <= 0)
-        //{
-        //    enabled = false;
-        //    return false;
-        //}
 
         foreach (string device in Microphone.devices){
 			Debug.Log("Name: " + device);

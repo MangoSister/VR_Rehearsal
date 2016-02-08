@@ -29,32 +29,73 @@ public class voiceActivityDetector  {
         _sampleBuffer = new float[_clip.frequency * ((int)_clip.length /*+ 1*/)];
     }
 
-    public bool CheckActivity()
-	{
-		//get volume, 1sec = FREQUENCY samples 
+    public bool CheckActivity() //have to check 1 frame before
+    {
+        //get volume, 1sec = FREQUENCY samples 
+        AudioClip rec = _clip;
+        if (rec == null)
+        {
+            UnityEngine.Debug.Log("Fail to fetch audio source");
+            return false;
+        }
 
-		int arrayLength = Convert.ToInt32(_clip.frequency * Time.deltaTime);
-		int startPoint = Convert.ToInt32(Microphone.GetPosition(null));
+        rec.GetData(_sampleBuffer, 0);
 
-        _clip.GetData(_sampleBuffer, 0);
+        //get average
+        float sum = 0f;
 
-		//get average
-		float sum = 0f;
-		for (int i = (startPoint - arrayLength > 0) ? (-arrayLength) : (-startPoint); i < arrayLength; i++)
-		{
-			sum += Mathf.Abs(_sampleBuffer[i + startPoint]);
-		}
-		float avg = 500.0f * sum / arrayLength;
+        //wrapped or not
+        int frameLength = Convert.ToInt32(_clip.frequency * Time.deltaTime);
+        int currentPoint = Convert.ToInt32(Microphone.GetPosition(null));
+        //UnityEngine.Debug.Log(currentPoint);
 
-		if (avg < THRESHOLD )
-		{
-			return false; // idle
-		}
-		else
-		{
-			return true; //speaking
-		}
-	}
+        if ((currentPoint - 2 * frameLength) > 0) //2nd last frame at (currentPoint-2frameLength ~ currentPoint-frameLength)
+        {
+            for (int i = currentPoint - 2 * frameLength; i < currentPoint - frameLength; i++)
+            {
+                sum += Mathf.Abs(_sampleBuffer[i]);
+            }
+        }
+        else
+        {
+            if (currentPoint - frameLength > 0)
+            {
+                int offsetTillEnd = 2 * frameLength - currentPoint;
+                int startIndex = _clip.frequency * (int)_clip.length - offsetTillEnd;
+                int endIndex = currentPoint - frameLength;
+                //UnityEngine.Debug.Log("(a) length = " + (FREQUENCY * LISTEN_INTERVAL - startIndex) + "+" + endIndex + ", frameLength = " + frameLength);
+                for (int i = startIndex; i < _clip.frequency * (int)_clip.length; i++)
+                {
+                    sum += Mathf.Abs(_sampleBuffer[i]);
+                }
+                for (int i = 0; i < endIndex; i++)
+                {
+                    sum += Mathf.Abs(_sampleBuffer[i]);
+                }
+            }
+            else
+            {
+                int offsetTillEnd = frameLength - currentPoint;
+                int startIndex = _clip.frequency * (int)_clip.length - offsetTillEnd - frameLength;
+                int endIndex = startIndex + frameLength;
+                //UnityEngine.Debug.Log("(b) length = " + (endIndex - startIndex) + ", frameLength = " + frameLength);
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    sum += Mathf.Abs(_sampleBuffer[i]);
+                }
+            }
 
+        }
+        float avg = 500.0f * sum / frameLength;
+       // volume.text = "Volume: " + avg.ToString("0.00");
+        if (avg < THRESHOLD)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 
 }
