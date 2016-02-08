@@ -11,8 +11,11 @@ public class SlidesPlayerTest : MonoBehaviour
 
     private void Start()
     {
-        RoomCenter.currRoom.presenter.OnPostMove += StartSlide;
-        RoomCenter.currRoom.presenter.OnPreMove += StopSlide;
+        //RoomCenter.currRoom.presenter.OnPostMove += StartSlide;
+        //RoomCenter.currRoom.presenter.OnPreMove += StopSlide;
+
+        _player.Play();
+        StartCoroutine(SwitchSlide_CR());
     }
 
     private void StartSlide(DestType dest)

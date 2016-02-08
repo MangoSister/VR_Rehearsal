@@ -18,7 +18,7 @@ public class boneConstraint : MonoBehaviour
 	//After attention, 
 	private Coroutine _constraintCR = null;
 
-    void Start()
+    void Awake()
     {
         //_prevRotQuat Get original rotation 
         _prevRotQuat = boneTransform.rotation;
@@ -48,10 +48,12 @@ public class boneConstraint : MonoBehaviour
 	// Lerp for moving smoothly
 	IEnumerator LerpRotBetweenAnB_CR(Quaternion quatA, Quaternion quatB, bool isConstraintMode)
 	{
-		float time = 0.0f;
-		while (time < 1.5f) {
-			time += Time.deltaTime;
-			boneTransform.rotation = Quaternion.Slerp (quatA, quatB, time);
+        float angle = Quaternion.Angle(quatA, quatB);
+		float totalTime = angle / 30f;
+        float currTime = 0f;
+		while (currTime < totalTime) {
+            currTime += Time.deltaTime;
+            boneTransform.rotation = Quaternion.Slerp(quatA, quatB, Mathf.Clamp01(currTime / totalTime));
 			yield return new WaitForEndOfFrame();
 		}
 		

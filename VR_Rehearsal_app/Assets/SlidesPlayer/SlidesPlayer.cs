@@ -6,6 +6,7 @@ using System.IO;
 [RequireComponent(typeof(MeshRenderer))]
 public class SlidesPlayer : MonoBehaviour
 {
+    public bool pptKaraoke;
     public float blendInterval = 1f;
 
     private List<Texture2D> _slides;
@@ -33,16 +34,22 @@ public class SlidesPlayer : MonoBehaviour
     private void Start()
     {
         Stop();
-
-        if (SceneManager.downloadManager != null)
+        if (!pptKaraoke)
         {
-            List<string> slidesNames = SceneManager.downloadManager.ExportExistedName();
-            if (slidesNames.Count > 0)
-                LoadSlidesFromDisk(slidesNames[slidesNames.Count - 1]);
-            else LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
+            if (SceneManager.downloadManager != null)
+            {
+                List<string> slidesNames = SceneManager.downloadManager.ExportExistedName();
+                if (slidesNames.Count > 0)
+                    LoadSlidesFromDisk(slidesNames[slidesNames.Count - 1]);
+                else LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
+            }
+            else
+                LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
         }
         else
+        {
             LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
+        }
     }
 
     public bool LoadSlides(List<Texture2D> slides)
@@ -95,8 +102,8 @@ public class SlidesPlayer : MonoBehaviour
         if (_isPlaying || _slides == null)
             return false;
 
-        foreach (Texture2D page in _slides)
-            Texture2D.Destroy(page);
+        //foreach (Texture2D page in _slides)
+        //    Texture2D.Destroy(page);
 
         _slides = null;
         return true;
