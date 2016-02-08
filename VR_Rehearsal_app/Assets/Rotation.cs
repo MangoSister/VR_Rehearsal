@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Rotation : MonoBehaviour {
 
-    private DownloadManager downloadManager
-    { get { return SceneManager.downloadManager; } }
+   
     // Use this for initialization
     void Start () {
 	

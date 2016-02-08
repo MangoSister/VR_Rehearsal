@@ -27,11 +27,13 @@ public class UIManager : MonoBehaviour {
 
 	public GameObject mainCanvas;
     public GameObject commentBox;
+    public GameObject prepHouse;
 
 	private GameObject _logoPanel;
 	private GameObject _loginPanel;
 	private GameObject _listPanel;
 	private GameObject _urlPanel;
+    private GameObject _rotationPanel;
     
 
 	private string _email;
@@ -40,6 +42,8 @@ public class UIManager : MonoBehaviour {
 	private string _comment;
 	private string empty = "";
 
+    public bool isRotate = false;
+    
     
 	void Start () {
 
@@ -47,12 +51,15 @@ public class UIManager : MonoBehaviour {
 		_loginPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LoginPanel").gameObject;
 		_listPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("ListPanel").gameObject;
 		_urlPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("UrlPanel").gameObject;
-
-		ShowLogoPanel();
+        _rotationPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("RotationPanel").gameObject;
+        ShowLogoPanel();
 	}
 	
 	void Update () {
-
+        if (isRotate == true)
+        {
+            IsRotate();
+        }
 	}
 
 	public void ShowLogoPanel(){
@@ -60,7 +67,8 @@ public class UIManager : MonoBehaviour {
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(false);
 		_urlPanel.SetActive(false);
-		StartCoroutine("ChangePanel");
+        _rotationPanel.SetActive(false);
+        StartCoroutine("ChangePanel");
 	}
 
     public void ShowLoginPanel(){
@@ -68,22 +76,34 @@ public class UIManager : MonoBehaviour {
 		_loginPanel.SetActive(true);
 		_listPanel.SetActive(false);
 		_urlPanel.SetActive(false);
-	}
+        _rotationPanel.SetActive(false);
+    }
 
     public void ShowListPanel(){
 		_logoPanel.SetActive(false);
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(true);
 		_urlPanel.SetActive(false);
-	}
+        _rotationPanel.SetActive(false);
+    }
 
     public void ShowUrlPanel(){
 		_logoPanel.SetActive(false);
 		_loginPanel.SetActive(false);
 		_listPanel.SetActive(false);
 		_urlPanel.SetActive(true);
-	}
+        _rotationPanel.SetActive(false);
+    }
+    public void ShowRotation()
+    {
+        _logoPanel.SetActive(false);
+        _loginPanel.SetActive(false);
+        _listPanel.SetActive(false);
+        _urlPanel.SetActive(false);
+        _rotationPanel.SetActive(true);
+        isRotate = true;
 
+    }
 	public void OnSignInButtonClick(){
 		//GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
 		//InputField inputField = inputObject.GetComponent<InputField>();
@@ -105,7 +125,10 @@ public class UIManager : MonoBehaviour {
 			ShowListPanel();
 		}
 	}
-
+    public void OnPPTClick()
+    {
+        ShowRotation();
+    }
     public void SetPowerPointData(string newStr)
     {
        GameObject pptPractice = (GameObject)_listPanel.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
@@ -134,4 +157,14 @@ public class UIManager : MonoBehaviour {
 	public string GetEmailAccount(){
 		return _email;
 	}
+
+    void IsRotate()
+    {
+        if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
+        {
+            prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
+            // SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+            // Application.LoadLevel("sc_present_0");
+        }
+    }
 }
