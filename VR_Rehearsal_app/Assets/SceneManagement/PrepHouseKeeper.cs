@@ -88,9 +88,8 @@ public class PrepHouseKeeper : MonoBehaviour
 
     // PPT button in List Panel
     // At this time, change to present_0 scene
-    public void OnPPTSlideClick()
+    public void NextScene()
     {
-
         //   SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
         SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_rotation"));
     }
