@@ -3,24 +3,13 @@ using System.Collections;
 
 public class clockTimer : MonoBehaviour {
 
-	public float maxSecond;
-	private float _currTime;
-	public TextMesh textMesh;
 
+	public TextMesh textMesh;
+	public float maxSecond = 60f; 
 
 	// Use this for initialization
 	void Start () {
-		maxSecond = 20;
-	}
-
-	void SetTime_Countdown(int maxSec){
-		maxSecond = maxSec;
-	}
-
-
-	void Initialize(){
-
-
+	
 	}
 
 
@@ -33,21 +22,20 @@ public class clockTimer : MonoBehaviour {
 			int minutes = (int)maxSecond/60;
 			int seconds = (int)maxSecond%60;
 
-			if(minutes == 0 && seconds < 30.0){
+			if(minutes == 0 && seconds < 10.0){
 				textMesh.color= Color.red;
 			}
 
 			textMesh.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 		
 		} else {
-
+			textMesh.color= Color.black;
+			maxSecond = 60f;
 		}
-
-
 	
-
-
-
-
 	}
+
+
+
+
 }

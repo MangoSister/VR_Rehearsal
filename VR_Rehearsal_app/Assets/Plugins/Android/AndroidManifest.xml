@@ -19,7 +19,7 @@
                  android:label="@string/app_name">
         <activity android:name="com.google.unity.GoogleUnityActivity"
                   android:label="@string/app_name"
-                  android:screenOrientation="landscape"
+                  android:screenOrientation="landscape"           
                   android:launchMode="singleTask"
                   android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale">
             <intent-filter>
