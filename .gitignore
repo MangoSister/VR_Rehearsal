@@ -9,7 +9,7 @@ VR_Rehearsal_app/Library/
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
-ExportedObj/
+VR_Rehearsal_app/Assets/UnityVS/
 *.svd
 *.userprefs
 *.csproj
