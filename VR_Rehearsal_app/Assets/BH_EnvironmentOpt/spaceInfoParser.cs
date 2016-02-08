@@ -30,11 +30,12 @@ public static class spaceInfoParser
 		using(var r = new BinaryReader(File.OpenRead(loadPath))){
 
 		#elif UNITY_ANDROID 
-		string loadPath = Application.persistentDataPath + "/BH_EnvironmentOpt/Resources/" + mapName + ".bhm";
-		TextAsset asset = Resources.Load(loadPath) as TextAsset;
-		Stream s = new MemoryStream(asset.bytes);
+		//string loadPath = Application.persistentDataPath + "/BH_EnvironmentOpt/Resources/" + mapName + ".bhm";
+			string loadPath = mapName + ".bhm";
+			TextAsset asset = Resources.Load(loadPath) as TextAsset;
+			byte[] bytes  = asset.bytes;
 		
-		using(var r = new BinaryReader(s)){
+			using(var r = new BinaryReader(bytes)){
 		#endif
 
 			// 1. Retrieving Seats position and rotations
