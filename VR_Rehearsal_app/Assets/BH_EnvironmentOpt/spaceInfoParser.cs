@@ -21,23 +21,12 @@ public static class spaceInfoParser
 
 	public static parsedData_spaceInfo Parse(string mapName){
 
-
 		int numOfSeat;
 		parsedData_spaceInfo parsedData = new parsedData_spaceInfo ();
+		TextAsset obj = Resources.Load("MapInfo/" + mapName) as TextAsset;;
+		Stream s = new MemoryStream(obj.bytes);
 
-		#if UNITY_EDITOR
-		string loadPath = Application.dataPath + "/BH_EnvironmentOpt/Resources/" + mapName + ".bhm";
-		using(var r = new BinaryReader(File.OpenRead(loadPath))){
-
-		#elif UNITY_ANDROID 
-		//string loadPath = Application.persistentDataPath + "/BH_EnvironmentOpt/Resources/" + mapName + ".bhm";
-			string loadPath = mapName + ".bhm";
-			TextAsset asset = Resources.Load(loadPath) as TextAsset;
-			byte[] bytes  = asset.bytes;
-		
-			using(var r = new BinaryReader(bytes)){
-		#endif
-
+		using(var r = new BinaryReader(s)){
 			// 1. Retrieving Seats position and rotations
 			parsedData.seat_RowNum = r.ReadInt32();
 			parsedData.seat_ColNum = r.ReadInt32();
@@ -61,6 +50,7 @@ public static class spaceInfoParser
 			
 		}
 		Debug.Log("Load complete");
+		return parsedData;
 
 
 

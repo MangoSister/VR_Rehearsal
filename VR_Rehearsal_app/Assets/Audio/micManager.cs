@@ -43,6 +43,13 @@ public class micManager : MonoBehaviour {
 		// 1. null means default microphone
 		// 2. if we need to record entire rehearsal, it should be changed
 		_recordAudioSrc = GetComponent<AudioSource> ();
+
+		int minFreq = 0;
+		int maxFreq = 0;
+		Microphone.GetDeviceCaps (null, out minFreq, out maxFreq);
+
+		Debug.Log (minFreq + maxFreq);
+
 		_recordAudioSrc.clip = Microphone.Start( null ,true, recordLengthSec, FREQUENCY);
 
 		// Set the AudioClip to loop
