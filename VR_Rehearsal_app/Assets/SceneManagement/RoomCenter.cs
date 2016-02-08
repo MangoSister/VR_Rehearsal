@@ -18,6 +18,9 @@ public class RoomCenter : MonoBehaviour
 
     void Start ()
     {
+#if UNITY_ANDROID
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+#endif 
         if (SceneManager.screenTransition != null)
             SceneManager.screenTransition.Fade(true, 1.0f);
 
