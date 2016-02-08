@@ -40,6 +40,7 @@ public class UIManager : MonoBehaviour {
 	private string _comment;
 	private string empty = "";
 
+    
 	void Start () {
 
 		_logoPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LogoPanel").gameObject;
@@ -86,11 +87,13 @@ public class UIManager : MonoBehaviour {
 	public void OnSignInButtonClick(){
 		GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
 		InputField inputField = inputObject.GetComponent<InputField>();
-
-		if(inputField.text != empty){
-			ShowListPanel();
-		}
-	}
+        ShowListPanel();
+        /*
+                if(inputField.text != empty){
+                    ShowListPanel();
+                }
+                */
+    }
 
 	public void OnOkButtonClick(){
 		InputField urlInputField = GameObject.FindGameObjectWithTag("INPUT_URL").GetComponent<InputField>();
