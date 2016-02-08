@@ -22,7 +22,9 @@ public class CrowdSimulator : MonoBehaviour
         }
         set
         {
-            seatPosAttentionFactor.keys[0].value = value;
+            var keys = seatPosAttentionFactor.keys;
+            keys[0].value = value;
+            seatPosAttentionFactor = new AnimationCurve(keys);
 
         }
     }
@@ -34,7 +36,9 @@ public class CrowdSimulator : MonoBehaviour
         }
         set
         {
-            seatPosAttentionFactor.keys[1].value = value;
+            var keys = seatPosAttentionFactor.keys;
+            keys[1].value = value;
+            seatPosAttentionFactor = new AnimationCurve(keys);
         }
     }
     private List<Audience> audiences;
