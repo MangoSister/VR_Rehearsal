@@ -11,6 +11,7 @@ public class RoomCenter : MonoBehaviour
     public Transform roomDoorOut;
 
     public PresenterMovement presenter;
+    public Transform presenterHead;
     public micManager mic;
     public Stage stage;
 
