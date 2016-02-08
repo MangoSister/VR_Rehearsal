@@ -87,9 +87,9 @@ public class UIManager : MonoBehaviour {
 		GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
 		InputField inputField = inputObject.GetComponent<InputField>();
 
-		if(inputField.text != empty){
-			ShowListPanel();
-		}
+		//if(inputField.text != empty){
+		ShowListPanel();
+		//}
 	}
 
 	public void OnOkButtonClick(){
