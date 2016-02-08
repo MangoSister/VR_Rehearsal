@@ -85,8 +85,8 @@ public class UIManager : MonoBehaviour {
 	}
 
 	public void OnSignInButtonClick(){
-		GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
-		InputField inputField = inputObject.GetComponent<InputField>();
+		//GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
+		//InputField inputField = inputObject.GetComponent<InputField>();
         ShowListPanel();
         /*
                 if(inputField.text != empty){
