@@ -1,26 +1,44 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿/* SimpleGazeCollision.cs
+ * Yang Zhou, last modified on Feb 08, 2016
+ * SimpleGazeCollision provides a simple but fast way to detect presenter's gazing behavior
+ * and evaluate its influence on audience.
+ * 1. Project virtual audiences' head position on a collision plane
+ * 2. Perform a raycast from presenter's head to the collision plane and calculate contact point
+ * 3. Presenter's gazing influence follows a 2d gaussian distribution centered at contact
+ * 4. Each audience then query the influence
+ * now collision plane is manually placed, may consider auto fit later (least squared error?)
+ * may also considered more sophisticated collision surface shape (quadratic, hyperpola?)
+ * Dependencies: need PresenterHead transform in unity scene
+ */
+
+using UnityEngine;
 
 public class SimpleGazeCollision : MonoBehaviour
 {
-    public Plane collisionPlane
+    //utility plane property
+    private Plane collisionPlane
     { get { return new Plane(collisionPlaneNormal, collisionPlaneCenter); } }
+
+    //use transform.position and transform.up to define the collision plane
     public Vector3 collisionPlaneCenter { get { return transform.position; } }
     public Vector3 collisionPlaneNormal { get { return transform.up; } }
 
+    //transform of presenter's head (dragged it in Unity Editor)
     public Transform presenterHead;
 
-    public float peak = 1.0f;
-    public float range = 1.0f;
+    //define gaussian distribution for gazing power
+    public float peak = 1.0f; //amplitude of distribution
+    public float range = 1.0f; //variance of distribution
 
+    //contact point is stored here
     public Vector3? _lastContactPoint { get; private set; }
 
 #if UNITY_EDITOR
+    //for debug, visualization range of collision plane
     public float debugPlaneRange = 1.0f;
 #endif
 
+    //Use this to update gaze contact point
     public void UpdateGazeContact()
     {
         Ray ray = new Ray(presenterHead.position, presenterHead.forward);
@@ -30,6 +48,8 @@ public class SimpleGazeCollision : MonoBehaviour
         else _lastContactPoint = null;
     }
 
+    //Use this to evaluate gaze influence for each audience
+    //audiencePos: HEAD position of audience
     public float EvaluateGazePower(Vector3 audiencePos)
     {
         if (presenterHead == null || !_lastContactPoint.HasValue)
@@ -47,7 +67,6 @@ public class SimpleGazeCollision : MonoBehaviour
     {
         DrawPlane(collisionPlaneCenter, collisionPlaneNormal);
     }
-#endif
 
     private void DrawPlane(Vector3 pos, Vector3 normal)
     {
@@ -96,4 +115,7 @@ public class SimpleGazeCollision : MonoBehaviour
         }
         UnityEditor.Handles.color = oldColor;
     }
+#endif
+
+
 }
