@@ -8,19 +8,21 @@ using MangoBehaviorTree;
 [RequireComponent(typeof(AudienceAnimHandler))]
 public class Audience : MonoBehaviour, IAgent
 {
-    [Range(0f, 1f)]
-    public float attention = 1.0f;
-
     public enum States
     {
-        Focused = 0, 
+        Focused = 0,
         Bored = 1,
         Chatting = 2,
     }
 
     [Range(0f, 1f)]
-    public float normalizedPos;
+    public float attention = 1.0f;
 
+    [Range(0f, 1f)]
+    public float normalizedPos = 0.0f;
+
+    [Range(0f, 1f)]
+    public float gazeFactor = 0.0f;
 
     public float[] stateMassFunction;
     public States currState;
@@ -39,6 +41,8 @@ public class Audience : MonoBehaviour, IAgent
             }
         }
     }
+
+    public Transform headTransform;
 
     private void Awake()
     {

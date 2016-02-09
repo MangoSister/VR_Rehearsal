@@ -29,6 +29,9 @@ public class AudienceSimStepNode : BaseNode<Audience>
         target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
         target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
 
+        target.gazeFactor = Mathf.Max(target.gazeFactor - sim.gazeCumulativeIntensity, 0f);
+        target.gazeFactor += sim.gazeCollision.EvaluateGazePower(target.headTransform.position);
+        target.gazeFactor = Mathf.Clamp01(target.gazeFactor);
         //target.stateMassFunction[(int)Audience.States.Focused] = 0f;
         //target.stateMassFunction[(int)Audience.States.Bored] = 0f;
         //target.stateMassFunction[(int)Audience.States.Chatting] = 1f;

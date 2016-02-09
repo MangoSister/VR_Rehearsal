@@ -41,6 +41,12 @@ public class CrowdSimulator : MonoBehaviour
             seatPosAttentionFactor = new AnimationCurve(keys);
         }
     }
+
+    public SimpleGazeCollision gazeCollision;
+
+    [Range(0f,1f)]
+    public float gazeCumulativeIntensity;
+
     private List<Audience> audiences;
     public int audienceNum { get { return audiences.Count; } }
     //private BehaviorTree<Audience> _audienceBt = null;
@@ -102,6 +108,7 @@ public class CrowdSimulator : MonoBehaviour
         float stepPerAudience = stepInterval / audienceNum;
         while (true)
         {
+            gazeCollision.UpdateGazeContact();
             Shuffle(audiences);
             for (int i = 0; i < audiences.Count; ++i)
             {
