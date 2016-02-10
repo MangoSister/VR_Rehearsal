@@ -90,7 +90,7 @@ public class PrepHouseKeeper : MonoBehaviour
     // At this time, change to present_0 scene
     public void NextScene()
     {
-        //   SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
-        SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_rotation"));
+         SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+        //SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_rotation"));
     }
  }
