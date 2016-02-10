@@ -20,13 +20,12 @@ public class AudienceStateNode : BaseNode<Audience>
 
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
+        if (tick.target.currState != _state && _state == State.Focused && RoomCenter.currRoom != null)
+            tick.target.GetComponentInChildren<AudienceAnimHandler>().StartToFollow(RoomCenter.currRoom.presenterHead);
+        else if (tick.target.currState == State.Focused && _state != State.Focused && RoomCenter.currRoom != null)
+            tick.target.GetComponentInChildren<AudienceAnimHandler>().StopToFollow();
+
         tick.target.currState = _state;
-        if (_state == State.Focused)
-        {
-            tick.target.GetComponentInChildren<boneConstraint>().StartToFollow();
-        }
-        else
-            tick.target.GetComponentInChildren<boneConstraint>().StopToFollow();
 #if DEBUG
         /*
         Debug.Log(string.Format("{0} ({1}): {2}",

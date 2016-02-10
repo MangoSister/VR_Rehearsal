@@ -19,22 +19,28 @@ public class AudienceSimStepNode : BaseNode<Audience>
     {
         CrowdSimulator sim = Object.FindObjectOfType<CrowdSimulator>();
         Audience target = tick.target;
-
+        
         float global = GaussianRandom(sim.globalAttentionMean, sim.globalAttentionStDev);
         global = Mathf.Clamp01(global);
         float pos = sim.seatPosAttentionFactor.Evaluate(target.normalizedPos);
         pos = Mathf.Clamp01(pos);
 
-        target.stateMassFunction[(int)Audience.States.Focused] = global * pos;
-        target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
-        target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
-
         target.gazeFactor = Mathf.Max(target.gazeFactor - sim.gazeCumulativeIntensity, 0f);
         target.gazeFactor += sim.gazeCollision.EvaluateGazePower(target.headTransform.position);
         target.gazeFactor = Mathf.Clamp01(target.gazeFactor);
-        //target.stateMassFunction[(int)Audience.States.Focused] = 0f;
-        //target.stateMassFunction[(int)Audience.States.Bored] = 0f;
-        //target.stateMassFunction[(int)Audience.States.Chatting] = 1f;
+
+        if (target.gazeFactor > 0.7f)
+        {
+            target.stateMassFunction[(int)Audience.States.Focused] = 1f;
+            target.stateMassFunction[(int)Audience.States.Bored] = 0f;
+            target.stateMassFunction[(int)Audience.States.Chatting] = 0f;
+        }
+        else
+        {
+            target.stateMassFunction[(int)Audience.States.Focused] = global * pos;
+            target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
+            target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
+        }
 
         float sum = 0f;
         foreach (var mass in target.stateMassFunction)

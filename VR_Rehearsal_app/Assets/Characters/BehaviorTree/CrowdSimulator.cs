@@ -75,7 +75,6 @@ public class CrowdSimulator : MonoBehaviour
         {
             int rand = Random.Range(0, (audiencePrefabs.Length - 1));
             var ad = Instantiate(audiencePrefabs[rand], tx.seat_posVecs[i], Quaternion.identity) as Audience;
-            ad.gameObject.GetComponentInChildren<boneConstraint>().targetTransform = RoomCenter.currRoom.presenterHead;
             ad.normalizedPos = (float)(i / tx.seat_ColNum) / (float)tx.seat_RowNum;
             ad.transform.parent = transform;
             audiences.Add(ad);
