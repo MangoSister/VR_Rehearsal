@@ -35,7 +35,7 @@ public class RoomCenter : MonoBehaviour
     private void OperateAmbient(bool enable)
     {
         if (enable)
-            AudioManager.currAudioManager.Play3dSound("Unrest", 1.0f, transform, Vector3.zero, 2.0f, ref _ambientUnit);
+            AudioManager.currAudioManager.Play3dSound("Unrest", 1.0f, transform, Vector3.zero, 2.0f, true, ref _ambientUnit);
         else
         {
             _ambientUnit.Stop(2.0f);

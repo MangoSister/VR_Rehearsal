@@ -30,7 +30,8 @@ public class AudioUnit : MonoBehaviour
             return;
 
         source.Play();
-        StartCoroutine(MaintainAndRecycle(source.clip.length, fadeTime));
+        if (!source.loop)
+            StartCoroutine(MaintainAndRecycle(source.clip.length, fadeTime));
     }
 
     public void Play(float lifeSpan, float fadeTime)

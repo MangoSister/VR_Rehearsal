@@ -5,7 +5,7 @@ public class clockTimer : MonoBehaviour {
 
 
 	public TextMesh textMesh;
-	public float maxSecond = 60f; 
+	public float maxSecond = 30f; 
 
 	// Use this for initialization
 	void Start () {
@@ -30,7 +30,7 @@ public class clockTimer : MonoBehaviour {
 		
 		} else {
 			textMesh.color= Color.black;
-			maxSecond = 60f;
+			maxSecond = 30f;
 		}
 	
 	}

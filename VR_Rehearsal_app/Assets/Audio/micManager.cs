@@ -55,7 +55,7 @@ public class micManager : MonoBehaviour {
 		// Set the AudioClip to loop
 		_recordAudioSrc.loop = true; 
 		// Mute the sound, we don't want the player to hear it
-		_recordAudioSrc.mute = false;
+		_recordAudioSrc.mute = true;
 
         // @@ ?? Wait until the recording has started
         // if it Keep failing?? 

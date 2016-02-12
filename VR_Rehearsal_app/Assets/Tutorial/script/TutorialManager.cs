@@ -14,14 +14,14 @@ public class TutorialManager : MonoBehaviour {
 	//------------------------------------------------------------------------------------------------
 	public class TutSlide{
 		//Slide Textures
-		public Sprite[] sprites;
+		public Sprite[] _sprites;
 		//when we set a playtime without event, it means entirle play time.
 		//but if we set this with event, it means animation interval time.
-		public float playTime;
+		public float _playTime;
 		//Flag for having animation or not
-		public bool isAnimation;
+		public bool _isAnimation;
 		//Flag for checking Event signal
-		public bool eventFlag;
+		public bool _eventFlag;
 		//nullable type for enumurator 
 		public VRInputManager.TutorialInputType? _inputType = null;
 		
@@ -30,18 +30,18 @@ public class TutorialManager : MonoBehaviour {
 			LoadSlides (slideName);
 			if (_type != null) {
 				_inputType = _type;
-			} 
-			isAnimation = isAnimation;   playTime = playTime;  eventFlag = false;
+			}
+            _isAnimation = isAnimation; _playTime = playTime; _eventFlag = false;
 		}
 		
 		//Load slides from Asset/Resources folder.
 		void LoadSlides(string[] slideName){
-			sprites = new Sprite[slideName.Length];
+            _sprites = new Sprite[slideName.Length];
 			for (int i = 0; i < slideName.Length; ++i) {
 				Sprite tempSprite = Resources.Load<Sprite>( slideName[i]);
 				
 				if(tempSprite != null){
-					sprites[i] = tempSprite;
+                    _sprites[i] = tempSprite;
 				}else{
 					Debug.LogError("[Error] There is no such a texture file");
 				}
@@ -49,11 +49,15 @@ public class TutorialManager : MonoBehaviour {
 		}
 		
 		public void SetOnEventFlag(){
-			eventFlag = true;
+            _eventFlag = true;
 		}
 	}
-	//---------------------------------------------------------------------------------------------------
-	private SpriteRenderer spriteRend;
+    //---------------------------------------------------------------------------------------------------
+
+    public SlidesPlayerTest slidePlayer;
+    public clockTimer timerPlayer;
+
+    private SpriteRenderer spriteRend;
 	public string tutorialName;
 	private TutSlide[] _slides;
 	private int _currIdx;
@@ -66,12 +70,17 @@ public class TutorialManager : MonoBehaviour {
 		spriteRend = this.gameObject.GetComponent<SpriteRenderer> ();
 		tutorialName = "pptKaraoke";
 
-		_slides = new TutSlide[9];
+        //Configuration
+        slidePlayer.enabled = false;
+        timerPlayer.enabled = false;
+
+
+
+        _slides = new TutSlide[8];
 
 		_slides[0] = new TutSlide();
 		string[] arr1 = new string[] { "pptKaraoke/t1" };
 		_slides[0].Initialize( arr1, null, false, 3.0f);
-
 
 		_slides[1] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t2"};
@@ -82,28 +91,24 @@ public class TutorialManager : MonoBehaviour {
 		_slides[2].Initialize( arr1, VRInputManager.TutorialInputType.LookAtScreen, false, 0);
 
 		_slides[3] = new TutSlide();
-		arr1 = new string[] { "pptKaraoke/t4"};
-		_slides[3].Initialize( arr1, null, false, 3.0f);
+		arr1 = new string[] { "pptKaraoke/t5", "pptKaraoke/t5_1"};
+		_slides[3].Initialize( arr1, null, true, 3.0f);
 
 		_slides[4] = new TutSlide();
-		arr1 = new string[] { "pptKaraoke/t5", "pptKaraoke/t5_1"};
-		_slides[4].Initialize( arr1, null, true, 3.0f);
+		arr1 = new string[] { "pptKaraoke/t7"};
+		_slides[4].Initialize( arr1, null, false, 3.0f);
 
 		_slides[5] = new TutSlide();
-		arr1 = new string[] { "pptKaraoke/t7"};
+		arr1 = new string[] { "pptKaraoke/t8"};
 		_slides[5].Initialize( arr1, null, false, 3.0f);
 
 		_slides[6] = new TutSlide();
-		arr1 = new string[] { "pptKaraoke/t8"};
+		arr1 = new string[] { "pptKaraoke/t9"};
 		_slides[6].Initialize( arr1, null, false, 3.0f);
 
 		_slides[7] = new TutSlide();
-		arr1 = new string[] { "pptKaraoke/t9"};
-		_slides[7].Initialize( arr1, null, false, 3.0f);
-
-		_slides[8] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t10"};
-		_slides[8].Initialize( arr1, null, false, 3.0f);
+		_slides[7].Initialize( arr1, null, false, 3.0f);
 
 		Draw (_slides [_currIdx]);
 	}
@@ -114,19 +119,25 @@ public class TutorialManager : MonoBehaviour {
 	
 	public void GoNextSlide(){
 		if (++_currIdx < _slides.Length) {
-			Draw (_slides [_currIdx]);
+            Draw(_slides[_currIdx]);
+           
 		} else {
 			ChangeSlide(null);
-		}
+
+            //Configuration
+            slidePlayer.enabled = true;
+            timerPlayer.enabled = true;
+
+        }
 	}
 	
 	//Change Slide and Draw 
 	public void Draw(TutSlide slide){
 		
 		if (slide._inputType.HasValue == false) { /* Non Event Type */
-			if (!slide.isAnimation) {
+			if (!slide._isAnimation) {
 				// Default Draw slide
-				ChangeSlide (slide.sprites[0]);
+				ChangeSlide (slide._sprites[0]);
 				StartCoroutine (DrawDefalut_CR (slide));
 				
 			} else {
@@ -134,8 +145,8 @@ public class TutorialManager : MonoBehaviour {
 				StartCoroutine (DrawAnimation_CR (slide));
 			}
 		} else { /* Event Type */
-			if (!slide.isAnimation) {
-				ChangeSlide (slide.sprites [0]);
+			if (!slide._isAnimation) {
+				ChangeSlide (slide._sprites[0]);
 				StartCoroutine (DrawDefalutUnitlEvent_CR (slide));
 			} else {
 				//	Animation Slides play loop
@@ -148,7 +159,7 @@ public class TutorialManager : MonoBehaviour {
 	// Type of play each slide 
 	// 1. default draw -> change slide from sprite and then wait for a second and, go next page
 	IEnumerator DrawDefalut_CR(TutSlide slide){
-		yield return new WaitForSeconds (slide.playTime);
+		yield return new WaitForSeconds (slide._playTime);
 		GoNextSlide ();
 	}
 	// 2. animation -> change slide sequentially and then go next page.
@@ -157,16 +168,17 @@ public class TutorialManager : MonoBehaviour {
 		float currTime = 0;
 		float totalTime = 0;
 		int idx = 0;
-		float intervalTime = (slide.playTime / slide.sprites.Length) /2;
-		ChangeSlide(slide.sprites[idx]);
+		float intervalTime = (slide._playTime / slide._sprites.Length) /2;
+		ChangeSlide(slide._sprites[idx]);
 
-		while(totalTime < slide.playTime){
+		while(totalTime < slide._playTime)
+        {
 			currTime += Time.deltaTime;
 			totalTime +=  Time.deltaTime;
 			if(currTime > intervalTime ){
 				currTime = 0;
-				idx = (idx + 1) % ( slide.sprites.Length );
-				ChangeSlide(slide.sprites[idx]);
+				idx = (idx + 1) % ( slide._sprites.Length );
+				ChangeSlide(slide._sprites[idx]);
 			}
 			yield return null;
 		}
@@ -183,7 +195,7 @@ public class TutorialManager : MonoBehaviour {
 		
 		while(true){
 			yield return null;
-			if(slide.eventFlag == true){
+			if(slide._eventFlag == true){
 				break;
 			}
 			
@@ -200,19 +212,20 @@ public class TutorialManager : MonoBehaviour {
 		
 		float currTime = 0;
 		int idx = 0;
-		ChangeSlide(slide.sprites[idx]);
+		ChangeSlide(slide._sprites[idx]);
 		VRInputManager.currTutInputManager.RegisterEvent (slide._inputType.Value, slide.SetOnEventFlag);
 		
 		while(true){
 			currTime += Time.deltaTime;
 
-			if(currTime > slide.playTime ){
+			if(currTime > slide._playTime)
+            {
 				currTime = 0;
-				idx = (idx + 1) % ( slide.sprites.Length  );
-				ChangeSlide(slide.sprites[idx]);
+				idx = (idx + 1) % ( slide._sprites.Length  );
+				ChangeSlide(slide._sprites[idx]);
 			}
 			yield return null;
-			if(slide.eventFlag == true){
+			if(slide._eventFlag == true){
 				break;
 			}
 			

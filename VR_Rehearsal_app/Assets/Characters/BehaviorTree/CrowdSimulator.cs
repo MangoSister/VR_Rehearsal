@@ -75,7 +75,7 @@ public class CrowdSimulator : MonoBehaviour
         {
             int rand = Random.Range(0, (audiencePrefabs.Length - 1));
             var ad = Instantiate(audiencePrefabs[rand], tx.seat_posVecs[i], Quaternion.identity) as Audience;
-            ad.normalizedPos = (float)(i / tx.seat_ColNum) / (float)tx.seat_RowNum;
+            ad.normalizedPos = (float)(i / tx.seat_RowNum) / (float)tx.seat_ColNum;
             ad.transform.parent = transform;
             audiences.Add(ad);
         }
@@ -99,7 +99,11 @@ public class CrowdSimulator : MonoBehaviour
     private void Start()
     {
         if (dummy && _dummyAudienceBt != null)
+        {
+            for (int i = 0; i < audiences.Count; ++i)
+                audiences[i].GetComponent<AudienceAnimHandler>().StartToFollow(RoomCenter.currRoom.presenterHead);
             StartCoroutine(Simulate_CR());
+        }
     }
 
     private IEnumerator Simulate_CR()

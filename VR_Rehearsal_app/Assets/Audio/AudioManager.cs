@@ -100,21 +100,21 @@ public class AudioManager : MonoBehaviour
         RecycleAll();
     }
 
-    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade)
+    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade, bool loop)
     {
         AudioClip clip;
         if (_clipDict.TryGetValue(clipName, out clip))
-            Play3dSound(clip, volume, parent, pos, fade);
+            Play3dSound(clip, volume, parent, pos, fade, loop);
     }
 
-    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade, ref AudioUnit unit)
+    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade, bool loop, ref AudioUnit unit)
     {
         AudioClip clip;
         if (_clipDict.TryGetValue(clipName, out clip))
-            Play3dSound(clip, volume, parent, pos, fade, ref unit);
+            Play3dSound(clip, volume, parent, pos, fade, loop, ref unit);
     }
 
-    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade)
+    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade, bool loop)
     {
         AudioUnit unit;
         if (!AllocateUnit(out unit))
@@ -123,13 +123,14 @@ public class AudioManager : MonoBehaviour
         unit.source.spatialBlend = 1.0f;
         unit.source.clip = clip;
         unit.source.volume = Mathf.Clamp01(volume);
+        unit.source.loop = loop;
         unit.gameObject.transform.parent = parent != null ? parent : transform;
         unit.gameObject.transform.localPosition = pos;
 
         unit.Play(fade);
     }
 
-    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade, ref AudioUnit unit)
+    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade, bool loop, ref AudioUnit unit)
     {
         if (!AllocateUnit(out unit))
             return;
@@ -137,20 +138,21 @@ public class AudioManager : MonoBehaviour
         unit.source.spatialBlend = 1.0f;
         unit.source.clip = clip;
         unit.source.volume = Mathf.Clamp01(volume);
+        unit.source.loop = loop;
         unit.gameObject.transform.parent = parent != null ? parent : transform;
         unit.gameObject.transform.localPosition = pos;
 
         unit.Play(fade);
     }
 
-    public void Play2dSound(string clipName, float volume, float fade)
+    public void Play2dSound(string clipName, float volume, float fade, bool loop)
     {
         AudioClip clip;
         if (_clipDict.TryGetValue(clipName, out clip))
-            Play2dSound(clip, volume, fade);
+            Play2dSound(clip, volume, fade, loop);
     }
 
-    public void Play2dSound(AudioClip clip, float volume, float fade)
+    public void Play2dSound(AudioClip clip, float volume, float fade, bool loop)
     {
         AudioUnit unit;
         if (!AllocateUnit(out unit))
@@ -159,6 +161,7 @@ public class AudioManager : MonoBehaviour
         unit.source.spatialBlend = 0.0f;
         unit.source.clip = clip;
         unit.source.volume = Mathf.Clamp01(volume);
+        unit.source.loop = loop;
 
         unit.Play(fade);
     }
