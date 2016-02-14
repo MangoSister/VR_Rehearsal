@@ -118,7 +118,7 @@ public class micManager : MonoBehaviour {
 			Microphone.End(null);
 		}
 
-		_audioObj[_index].clip = Microphone.Start(null, true, recordLengthSec, FREQUENCY);
+        _audioObj[_index].clip = Microphone.Start(null, true, recordLengthSec, FREQUENCY);
 		_VAD = new voiceActivityDetector(	_audioObj[_index].clip);
 		/*
      the longer the mic recording time, the less often there are "hiccups" in game performance
@@ -158,10 +158,11 @@ public class micManager : MonoBehaviour {
 
 
 		StartCoroutine (CheckVAD (_index));
-		//_audioObj[Mathf.Abs((_index % 2) - 1)].player.audio.Stop();
+        //_audioObj[Mathf.Abs((_index % 2) - 1)].player.audio.Stop();
 
 
-		_index = (++_index) % 2;	
+       _index = (++_index) % 2;	
+       
 	}
 
 	private IEnumerator CheckVAD(int idx){
