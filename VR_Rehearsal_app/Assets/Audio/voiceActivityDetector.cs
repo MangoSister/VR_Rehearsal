@@ -17,7 +17,7 @@ public class voiceActivityDetector  {
 #if UNITY_EDITOR
     private const float THRESHOLD = 5.0f;
 #elif UNITY_ANDROID
-    private const float THRESHOLD = 75.0f;
+    private const float THRESHOLD = 65.0f;
 #endif
     private AudioClip _clip;
 
@@ -29,10 +29,10 @@ public class voiceActivityDetector  {
         _sampleBuffer = new float[_clip.frequency * ((int)_clip.length /*+ 1*/)];
     }
 
-    public bool CheckActivity() //have to check 1 frame before
+    public bool CheckActivity(AudioClip clip) //have to check 1 frame before
     {
         //get volume, 1sec = FREQUENCY samples 
-        AudioClip rec = _clip;
+		AudioClip rec = clip;
         if (rec == null)
         {
             UnityEngine.Debug.Log("Fail to fetch audio source");
