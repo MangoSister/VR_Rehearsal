@@ -10,6 +10,7 @@ VR_Rehearsal_app/Library/
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
 VR_Rehearsal_app/Assets/UnityVS/
+VR_Rehearsal_app/ProjectSettings/ProjectVersion.txt
 *.svd
 *.userprefs
 *.csproj
