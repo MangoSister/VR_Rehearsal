@@ -6,6 +6,17 @@ using CrowdConfigInfo = spaceInfoParser.parsedData_spaceInfo;
 
 public class CrowdSimulator : MonoBehaviour
 {
+    private static CrowdSimulator _currSim = null;
+    public static CrowdSimulator currSim
+    {
+        get
+        {
+            if (_currSim == null)
+                _currSim = FindObjectOfType<CrowdSimulator>();
+            return _currSim;
+        }
+    }
+
     public Audience[] audiencePrefabs;
     public string crowdConfigFileName;
     public bool dummy = true;

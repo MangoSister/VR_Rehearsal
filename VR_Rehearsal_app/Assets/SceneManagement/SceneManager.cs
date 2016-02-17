@@ -32,8 +32,11 @@ public static class SceneManager
             return gBhv;
         else
         {
-            Debug.LogError("failed to find global behavior");
-            throw new UnityException("failed to find global behavior");
+#if UNITY_EDITOR
+            Debug.Log("failed to find global behavior");
+#endif
+            //throw new UnityException("failed to find global behavior");
+            return null;
         }
     }
 
@@ -51,7 +54,10 @@ public static class SceneManager
 
     public static void Init()
     {
+#if UNITY_EDITOR
         Debug.Log("SceneManager Initialized");
+#endif
+
 #if UNITY_EDITOR
         Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
 #else

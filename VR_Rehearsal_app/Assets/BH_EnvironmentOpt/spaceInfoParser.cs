@@ -49,8 +49,10 @@ public static class spaceInfoParser
 			}
 			
 		}
-		Debug.Log("Load complete");
-		return parsedData;
+#if UNITY_EDITOR
+        Debug.Log("Load complete");
+#endif
+        return parsedData;
 
 
 

@@ -1,6 +1,6 @@
 ﻿/*
- * Chris sun, Brandon Kang 
- * update: jan 24, 2016
+ * Chris sun, Brandon Kang, Yang Zhou
+ * last update: Feb 15, 2016
  * 
  * 
 */
@@ -51,7 +51,14 @@ public class micManager : MonoBehaviour {
 
 
 	void Start () 
-	{	
+	{
+        //Device connection check by Yang 2.15.2016
+        if (Microphone.devices.Length <= 0)
+        {
+            print("No Microphone connected");
+            return;
+        }
+
 		/*
         if (!InitializeMic())
             return;
@@ -78,8 +85,10 @@ public class micManager : MonoBehaviour {
 	{
 
         foreach (string device in Microphone.devices){
-			Debug.Log("Name: " + device);
-		}
+#if UNITY_EDITOR
+            Debug.Log("Name: " + device);
+#endif
+        }
 		// @@ microphone.Start(device name, loop, length second, frequency)
 		// 1. null means default microphone
 		// 2. if we need to record entire rehearsal, it should be changed
@@ -88,10 +97,10 @@ public class micManager : MonoBehaviour {
 		int minFreq = 0;
 		int maxFreq = 0;
 		Microphone.GetDeviceCaps (null, out minFreq, out maxFreq);
-
-		Debug.Log (minFreq + maxFreq);
-
-		_recordAudioSrc.clip = Microphone.Start( null ,true, recordLengthSec, FREQUENCY);
+#if UNITY_EDITOR
+        Debug.Log (minFreq + maxFreq);
+#endif
+        _recordAudioSrc.clip = Microphone.Start( null ,true, recordLengthSec, FREQUENCY);
 		
 		// Set the AudioClip to loop
 		_recordAudioSrc.loop = true; 
@@ -172,13 +181,13 @@ public class micManager : MonoBehaviour {
 		{
 			currTime += Time.deltaTime;
 			bool ore = _VAD.CheckActivity(_audioObj [idx].clip);
+#if UNITY_EDITOR
+            Debug.Log(ore);
+#endif
 
-			Debug.Log(ore);
 
 
-
-
-			yield return null;
+            yield return null;
 		}
 	}
 

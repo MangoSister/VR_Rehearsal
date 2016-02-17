@@ -43,8 +43,10 @@ public class TutorialManager : MonoBehaviour {
 				if(tempSprite != null){
                     _sprites[i] = tempSprite;
 				}else{
-					Debug.LogError("[Error] There is no such a texture file");
-				}
+#if UNITY_EDITOR
+                    Debug.LogError("[Error] There is no such a texture file");
+#endif
+                }
 			}
 		}
 		

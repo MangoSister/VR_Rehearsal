@@ -3,8 +3,16 @@ using System.Collections;
 
 public class RoomCenter : MonoBehaviour
 {
+    private static RoomCenter _currRoom = null;
     public static RoomCenter currRoom
-    { get { return FindObjectOfType<RoomCenter>(); } }
+    {
+        get
+        {
+            if (_currRoom == null)
+                _currRoom = FindObjectOfType<RoomCenter>();
+            return _currRoom;
+        }
+    }
 
     public Transform presentDest;
     public Transform roomDoorIn;

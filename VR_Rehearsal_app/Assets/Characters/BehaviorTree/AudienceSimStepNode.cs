@@ -17,7 +17,7 @@ public class AudienceSimStepNode : BaseNode<Audience>
 
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
-        CrowdSimulator sim = Object.FindObjectOfType<CrowdSimulator>();
+        CrowdSimulator sim = CrowdSimulator.currSim;
         Audience target = tick.target;
         
         float global = GaussianRandom(sim.globalAttentionMean, sim.globalAttentionStDev);

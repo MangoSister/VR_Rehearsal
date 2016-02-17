@@ -5,7 +5,16 @@ using System.Collections.Generic;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager currAudioManager { get { return FindObjectOfType<AudioManager>(); } }
+    private static AudioManager _currAudioManager = null;
+    public static AudioManager currAudioManager
+    {
+        get
+        {
+            if (_currAudioManager == null)
+                _currAudioManager = FindObjectOfType<AudioManager>();
+            return _currAudioManager;
+        }
+    }
 
     [SerializeField]
     public List<ClipNamePair> clips;
