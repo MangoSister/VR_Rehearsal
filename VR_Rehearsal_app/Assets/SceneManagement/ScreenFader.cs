@@ -39,6 +39,7 @@ public sealed class ScreenFader : ImageEffectBase
 
     private IEnumerator Fade_CR(bool fadeIn, float length)
     {
+        enabled = true;
         _isFade = true;
         float initIntensity = fadeIn ? 1.0f : 0.0f;
         float time = 0.0f;
@@ -50,5 +51,6 @@ public sealed class ScreenFader : ImageEffectBase
         }
         fadeIntensity = 1.0f - initIntensity;
         _isFade = false;
+        enabled = false;
     }
 }

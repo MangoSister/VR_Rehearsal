@@ -25,7 +25,20 @@ public class Audience : MonoBehaviour, IAgent
     public float gazeFactor = 0.0f;
 
     public float[] stateMassFunction;
-    public States currState;
+    private States _currState;
+    public States currState
+    {
+        get { return _currState; }
+        set
+        {
+            if (value != _currState && OnStateChange != null)
+                OnStateChange();
+            _currState = value;
+        }
+    }
+
+    public delegate void StateChange_Handler();
+    public StateChange_Handler OnStateChange;
 
     private int? _agentId;
     public int agentId
@@ -48,6 +61,8 @@ public class Audience : MonoBehaviour, IAgent
     {
         int num = Enum.GetNames(typeof(States)).Length;
         stateMassFunction = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
+        if (OnStateChange == null)
+            OnStateChange += GetComponent<AudienceAnimHandler>().UpdateStateAnim;
     }
 
 }

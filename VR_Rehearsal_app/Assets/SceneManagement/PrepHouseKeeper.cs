@@ -21,13 +21,17 @@ public class PrepHouseKeeper : MonoBehaviour
     {
         if (downloadManager == null)
         {
+#if UNITY_EDITOR
             Debug.Log("Nothing downloaded");
+#endif
             return;
         }
         else {
             downloadManager.LaunchDownload(urlField.text, dbNumField.text);
             downloadBtn.interactable = false;
+#if UNITY_EDITOR
             Debug.Log("Something downloading");
+#endif
         }
     }
 

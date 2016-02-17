@@ -141,17 +141,12 @@ public class AudienceAnimHandler : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(Attention_CR());
         StartCoroutine(Repeat_CR());
     }
 
-    private IEnumerator Attention_CR()
+    public void UpdateStateAnim()
     {
-        while (true)
-        {
-            anim.SetInteger("state", (int)_audience.currState);
-            yield return null;
-        }
+        anim.SetInteger("state", (int)_audience.currState);
     }
 
     private IEnumerator Repeat_CR()

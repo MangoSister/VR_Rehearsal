@@ -27,9 +27,11 @@ public class FakeCrowdController : MonoBehaviour
             string res = w.RecvString();
 			if (res != null)
             {
-				Debug.Log("Received: " + res);
+#if UNITY_EDITOR
+                Debug.Log("Received: " + res);
+#endif
                 //w.SendString("Hi there" + i++);
-				char[] delimiterChars = { ' ' ,'\t' };
+                char[] delimiterChars = { ' ' ,'\t' };
 				string[] parseStr = res.Split(delimiterChars);
 
 				switch(parseStr[0]){
@@ -77,7 +79,9 @@ public class FakeCrowdController : MonoBehaviour
             }
             if (w.Error != null)
             {
+#if UNITY_EDITOR
                 Debug.Log("Error: " + w.Error);
+#endif
                 break;
             }
             yield return 0;
@@ -99,8 +103,10 @@ public class FakeCrowdController : MonoBehaviour
 				}
 					
 			}else{
-				Debug.LogError( "Wrong Number");
-			}
+#if UNITY_EDITOR
+                Debug.LogError( "Wrong Number");
+#endif
+            }
 
 		} else {
 			if(bIsPlus){

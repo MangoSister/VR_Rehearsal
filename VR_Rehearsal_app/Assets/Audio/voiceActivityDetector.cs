@@ -35,7 +35,9 @@ public class voiceActivityDetector  {
 		AudioClip rec = clip;
         if (rec == null)
         {
+#if UNITY_EDITOR
             UnityEngine.Debug.Log("Fail to fetch audio source");
+#endif
             return false;
         }
 

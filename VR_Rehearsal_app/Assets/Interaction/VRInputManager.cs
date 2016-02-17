@@ -11,9 +11,18 @@ using System.Collections;
 
 public class VRInputManager : MonoBehaviour
 {
+    private static VRInputManager _currInput = null;
+
     //convenient way to get input manager
     public static VRInputManager currTutInputManager
-    { get { return FindObjectOfType<VRInputManager>(); } }
+    {
+        get
+        {
+            if(_currInput == null)
+                _currInput = FindObjectOfType<VRInputManager>();
+            return _currInput;
+        }
+    }
 
     //delegate type for input manager
     public delegate void TutorialInput_Handler();

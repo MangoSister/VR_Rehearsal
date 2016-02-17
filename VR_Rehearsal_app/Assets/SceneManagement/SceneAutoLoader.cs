@@ -75,7 +75,9 @@ static class SceneAutoLoader
             {
                 if (!EditorApplication.OpenScene(MasterScene))
                 {
+#if UNITY_EDITOR
                     Debug.LogError(string.Format("error: scene not found: {0}", MasterScene));
+#endif
                     EditorApplication.isPlaying = false;
                 }
             }
@@ -90,7 +92,9 @@ static class SceneAutoLoader
             // User pressed stop -- reload previous scene.
             if (!EditorApplication.OpenScene(PreviousScene))
             {
+#if UNITY_EDITOR
                 Debug.LogError(string.Format("error: scene not found: {0}", PreviousScene));
+#endif
             }
         }
     }
