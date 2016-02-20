@@ -50,6 +50,12 @@ public class CardboardPostRender : MonoBehaviour {
   private float yScale;
   private Matrix4x4 xfm;
 
+    public bool _aaOn;
+    [SerializeField]
+    private Material _aaMat;
+    [SerializeField]
+    private RenderTexture _aaTex;
+
   void Reset() {
 #if UNITY_EDITOR
     // Member variable 'cam' not always initialized when this method called in Editor.
@@ -74,7 +80,15 @@ public class CardboardPostRender : MonoBehaviour {
     if (!Application.isEditor) {
       ComputeUIMatrix();
     }
+
+        _aaMat = new Material(Shader.Find("Hidden/SSAA"));
   }
+
+    void OnDestroy()
+    {
+        if (_aaTex.IsCreated() )
+            _aaTex.Release();
+    }
 
 #if UNITY_EDITOR
   private float aspectComparison;
@@ -88,31 +102,59 @@ public class CardboardPostRender : MonoBehaviour {
   }
 #endif
 
-  void OnRenderObject() {
-    if (Camera.current != cam)
-      return;
-    Cardboard.SDK.UpdateState();
-    var correction = Cardboard.SDK.DistortionCorrection;
-    RenderTexture stereoScreen = Cardboard.SDK.StereoScreen;
-    if (stereoScreen == null || correction == Cardboard.DistortionCorrectionMethod.None) {
-      return;
+    void OnRenderObject()
+    {
+        RenderTexture stereoScreen = Cardboard.SDK.StereoScreen;
+        if (_aaOn)
+        {
+            if (_aaTex == null)
+            {
+                _aaTex = new RenderTexture(stereoScreen.width, stereoScreen.height, 0, stereoScreen.format);
+                _aaTex.anisoLevel = stereoScreen.anisoLevel;
+                _aaTex.antiAliasing = stereoScreen.antiAliasing;
+                _aaTex.Create();
+            }
+            GL.Clear(true, false, Color.black);
+            Graphics.Blit(stereoScreen, _aaTex, _aaMat);
+            RenderTexture.active = null;
+           
+        }
+        else _aaTex = stereoScreen;
     }
-    if (correction == Cardboard.DistortionCorrectionMethod.Native
-        && Cardboard.SDK.NativeDistortionCorrectionSupported) {
-      Cardboard.SDK.PostRender();
-    } else {
-      if (distortionMesh == null || Cardboard.SDK.ProfileChanged) {
-        RebuildDistortionMesh();
-      }
-      meshMaterial.mainTexture = stereoScreen;
-      meshMaterial.SetPass(0);
-      Graphics.DrawMeshNow(distortionMesh, transform.position, transform.rotation);
+
+    void OnPostRender()
+    {
+        if (Camera.current != cam)
+            return;
+        Cardboard.SDK.UpdateState();
+        var correction = Cardboard.SDK.DistortionCorrection;
+        RenderTexture stereoScreen = Cardboard.SDK.StereoScreen;
+        if (stereoScreen == null || correction == Cardboard.DistortionCorrectionMethod.None)
+        {
+            return;
+        }
+        if (correction == Cardboard.DistortionCorrectionMethod.Native
+            && Cardboard.SDK.NativeDistortionCorrectionSupported)
+        {
+            Cardboard.SDK.PostRender();
+        }
+        else
+        {
+            if (distortionMesh == null || Cardboard.SDK.ProfileChanged)
+            {
+                RebuildDistortionMesh();
+            }
+            meshMaterial.mainTexture = _aaTex;
+            meshMaterial.SetPass(0);
+            Graphics.DrawMeshNow(distortionMesh, transform.position, transform.rotation);
+            _aaTex.DiscardContents();
+        }
+        //stereoScreen.DiscardContents();
+        if (!Cardboard.SDK.NativeUILayerSupported && Cardboard.SDK.UILayerEnabled)
+        {
+            DrawUILayer();
+        }
     }
-    stereoScreen.DiscardContents();
-    if (!Cardboard.SDK.NativeUILayerSupported && Cardboard.SDK.UILayerEnabled) {
-      DrawUILayer();
-    }
-  }
 
   private void RebuildDistortionMesh() {
     distortionMesh = new Mesh();

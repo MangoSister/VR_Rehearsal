@@ -9,7 +9,7 @@ using System.Collections;
 
 public class AudienceAnimHandler : MonoBehaviour
 {
-    private Audience _audience { get { return GetComponent<Audience>(); } }
+    private Audience _audience;
     public Animator anim;
 
     //Random period to switch animation for variation
@@ -136,6 +136,7 @@ public class AudienceAnimHandler : MonoBehaviour
 
     private void Awake()
     {
+        _audience = GetComponent<Audience>();
         anim.SetLayerWeight(defaultLayerIdx, 1f);
     }
 

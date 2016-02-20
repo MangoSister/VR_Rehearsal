@@ -17,7 +17,12 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
-    public Audience[] audiencePrefabs;
+    public Audience[] prefabsVLFullAnim;
+    public Audience[] prefabsBumpFullAnim;
+    public Audience[] prefabsVLPoseAnim;
+    public Audience[] prefabsBillboard;
+
+    public Transform crowdParent;
     public string crowdConfigFileName;
     public bool dummy = true;
     public float stepInterval;
@@ -84,10 +89,17 @@ public class CrowdSimulator : MonoBehaviour
         audiences = new List<Audience>();
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
-            int rand = Random.Range(0, (audiencePrefabs.Length - 1));
-            var ad = Instantiate(audiencePrefabs[rand], tx.seat_posVecs[i], Quaternion.identity) as Audience;
-            ad.normalizedPos = (float)(i / tx.seat_RowNum) / (float)tx.seat_ColNum;
-            ad.transform.parent = transform;
+            int rand = Random.Range(0, (prefabsVLFullAnim.Length - 1));
+            Audience ad;
+            ad = Instantiate(prefabsVLFullAnim[rand], Vector3.zero, Quaternion.identity) as Audience;
+            ad.detailLevel = Audience.DetailLevel.VL_FullAnim;
+            ad.followingTransform = RoomCenter.currRoom.presenterHead;
+            
+
+            //to Phan: fix the layout here
+            ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;
+            ad.transform.parent = crowdParent;
+            ad.transform.localPosition = tx.seat_posVecs[i];
             audiences.Add(ad);
         }
     }
@@ -111,8 +123,6 @@ public class CrowdSimulator : MonoBehaviour
     {
         if (dummy && _dummyAudienceBt != null)
         {
-            for (int i = 0; i < audiences.Count; ++i)
-                audiences[i].GetComponent<AudienceAnimHandler>().StartToFollow(RoomCenter.currRoom.presenterHead);
             StartCoroutine(Simulate_CR());
         }
     }

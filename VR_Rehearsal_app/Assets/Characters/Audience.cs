@@ -8,6 +8,16 @@ using MangoBehaviorTree;
 [RequireComponent(typeof(AudienceAnimHandler))]
 public class Audience : MonoBehaviour, IAgent
 {
+    private AudienceAnimHandler _animHandler;
+
+    public enum DetailLevel
+    {
+        Bump_FullAnim = 0,
+        VL_FullAnim = 1,       
+        VL_PoseAnim = 2,
+        Billboard = 3,
+    }
+
     public enum States
     {
         Focused = 0,
@@ -25,20 +35,25 @@ public class Audience : MonoBehaviour, IAgent
     public float gazeFactor = 0.0f;
 
     public float[] stateMassFunction;
+
+    public DetailLevel detailLevel;
+
+    [SerializeField]
     private States _currState;
     public States currState
     {
         get { return _currState; }
         set
         {
-            if (value != _currState && OnStateChange != null)
-                OnStateChange();
             _currState = value;
+
+            _animHandler.UpdateStateAnim();
+
+            if (_currState == States.Focused && followingTransform != null)
+                _animHandler.StartToFollow(followingTransform);
+            else _animHandler.StopToFollow();
         }
     }
-
-    public delegate void StateChange_Handler();
-    public StateChange_Handler OnStateChange;
 
     private int? _agentId;
     public int agentId
@@ -55,14 +70,15 @@ public class Audience : MonoBehaviour, IAgent
         }
     }
 
+    public Transform followingTransform;
     public Transform headTransform;
 
     private void Awake()
     {
+        _animHandler = GetComponent<AudienceAnimHandler>();
+
         int num = Enum.GetNames(typeof(States)).Length;
         stateMassFunction = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
-        if (OnStateChange == null)
-            OnStateChange += GetComponent<AudienceAnimHandler>().UpdateStateAnim;
     }
 
 }
