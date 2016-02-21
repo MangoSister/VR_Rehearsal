@@ -22,6 +22,8 @@ public class RoomCenter : MonoBehaviour
     public Transform presenterHead;
     public micManager mic;
     public Stage stage;
+    public HeatmapTracker heatmapTracker;
+
 
     private AudioUnit _ambientUnit = null;
 
