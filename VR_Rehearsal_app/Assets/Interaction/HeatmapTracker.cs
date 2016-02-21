@@ -21,7 +21,7 @@ public class HeatmapTracker : MonoBehaviour
     public AnimationCurve heatmapColorCurve;
 
     //heatmaptracker works similar to a camera, i.e., projects the presenter's view direction on a XY plane at z = 1
-    //vertical "field of view" of heatmap, horizontal FOV can be computed with it and (screen) aspect
+    //vertical "field of view" (in degrees) of heatmap, horizontal FOV can be computed with it and (screen) aspect
     //view direction outside FOV would contribute to "out of bound" component
     public float verticalFOVDeg = 60f;
 
