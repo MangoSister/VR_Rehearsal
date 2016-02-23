@@ -17,10 +17,10 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
-    public Audience[] prefabsVLFullAnim;
-    public Audience[] prefabsBumpFullAnim;
-    public Audience[] prefabsVLPoseAnim;
-    public Audience[] prefabsBillboard;
+    public Audience[] prefabsL0;
+    public Audience[] prefabsL1;
+    public Audience[] prefabsL2;
+    public Audience[] prefabsL3;
 
     public Transform crowdParent;
     public string crowdConfigFileName;
@@ -89,10 +89,18 @@ public class CrowdSimulator : MonoBehaviour
         audiences = new List<Audience>();
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
-            int rand = Random.Range(0, (prefabsVLFullAnim.Length - 1));
+            int rand = Random.Range(0, (prefabsL1.Length - 1));
             Audience ad;
-            ad = Instantiate(prefabsVLFullAnim[rand], Vector3.zero, Quaternion.identity) as Audience;
-            ad.detailLevel = Audience.DetailLevel.VL_FullAnim;
+            if (i % tx.seat_ColNum < 2)
+            {
+                ad = Instantiate(prefabsL1[rand], Vector3.zero, Quaternion.identity) as Audience;
+                ad.detailLevel = Audience.DetailLevel.FullSize_VL_FullAnim;
+            }
+            else
+            {
+                ad = Instantiate(prefabsL2[rand], Vector3.zero, Quaternion.identity) as Audience;
+                ad.detailLevel = Audience.DetailLevel.HalfSize_VL_FullAnim;
+            }
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
             
 

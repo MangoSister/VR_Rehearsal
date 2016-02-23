@@ -24,6 +24,7 @@ public class AudienceAnimHandler : MonoBehaviour
     private bool _isFollowing = false;
     private bool _isTransiting = false;
     private Quaternion _defaultHeadLocalRotation;
+    private Coroutine _currLookAtCR = null;
 
     //Animator layer index, must be consistent with the actual animator
     private const int neckConstraintLayerIdx = 0;
@@ -81,13 +82,19 @@ public class AudienceAnimHandler : MonoBehaviour
 
         _currTarget = target;
         _isFollowing = true;
-
+        if (_currTarget != null)
+           _currLookAtCR = StartCoroutine(LookAt_CR());
         _isTransiting = false;
     }
 
     private IEnumerator StopToFollow_CR()
     {
         _isTransiting = true;
+        if (_currLookAtCR != null)
+        {
+            StopCoroutine(_currLookAtCR);
+            _currLookAtCR = null;
+        }
 
         _currTarget = null;
         _isFollowing = false;
@@ -120,19 +127,14 @@ public class AudienceAnimHandler : MonoBehaviour
         _isTransiting = false;
     }
 
-    private void Update()
-    {
-        if (_isFollowing && _currTarget != null)
-        {
-            _audience.headTransform.LookAt(_currTarget);
-        }
-
-        //sample usage
-        //if (Input.GetKeyDown(KeyCode.O))
-        //    StartToFollow(GameObject.Find("Target").transform);
-        //if (Input.GetKeyDown(KeyCode.P))
-        //    StopToFollow();
-    }
+    //private void Update()
+    //{
+    //    //sample usage
+    //    //if (Input.GetKeyDown(KeyCode.O))
+    //    //    StartToFollow(GameObject.Find("Target").transform);
+    //    //if (Input.GetKeyDown(KeyCode.P))
+    //    //    StopToFollow();
+    //}
 
     private void Awake()
     {
@@ -158,6 +160,15 @@ public class AudienceAnimHandler : MonoBehaviour
             yield return new WaitForSeconds(repeatWaitTime);
             if(Random.value > 0.5f)
                 anim.SetTrigger("switchPose");
+        }
+    }
+
+    private IEnumerator LookAt_CR()
+    {
+        while (true)
+        {
+            _audience.headTransform.LookAt(_currTarget);
+            yield return null;
         }
     }
 }

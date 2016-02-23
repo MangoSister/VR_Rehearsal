@@ -12,9 +12,9 @@ public class Audience : MonoBehaviour, IAgent
 
     public enum DetailLevel
     {
-        Bump_FullAnim = 0,
-        VL_FullAnim = 1,       
-        VL_PoseAnim = 2,
+        FullSize_Bump_FullAnim = 0,
+        FullSize_VL_FullAnim = 1,       
+        HalfSize_VL_FullAnim = 2,
         Billboard = 3,
     }
 
@@ -48,10 +48,12 @@ public class Audience : MonoBehaviour, IAgent
             _currState = value;
 
             _animHandler.UpdateStateAnim();
-
-            if (_currState == States.Focused && followingTransform != null)
-                _animHandler.StartToFollow(followingTransform);
-            else _animHandler.StopToFollow();
+            if (detailLevel == DetailLevel.FullSize_Bump_FullAnim || detailLevel == DetailLevel.FullSize_VL_FullAnim)
+            {
+                if (_currState == States.Focused && followingTransform != null)
+                    _animHandler.StartToFollow(followingTransform);
+                else _animHandler.StopToFollow();
+            }
         }
     }
 
