@@ -272,7 +272,7 @@ public class HeatmapTracker : MonoBehaviour
             _replayOverlay = true;
 #else
             _currReplayCR = null;
-            return;
+            return false;
 #endif
         }
 
@@ -302,15 +302,15 @@ public class HeatmapTracker : MonoBehaviour
 
     //Replay sample usage
 
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.R))
-    //        Replay(0f, Time.time, null);
-    //}
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            Replay(0f, Time.time, null);
+    }
 
 #if UNITY_EDITOR
-        //screen overlay routine in editor ONLY
-        //need to be plugged to Cardboard post render object
+    //screen overlay routine in editor ONLY
+    //need to be plugged to Cardboard post render object
     public void RenderOverlay()
     {
         if (!_replayOverlay)
