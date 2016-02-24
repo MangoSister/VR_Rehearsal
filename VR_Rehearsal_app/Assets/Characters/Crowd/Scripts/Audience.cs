@@ -9,6 +9,7 @@ using MangoBehaviorTree;
 public class Audience : MonoBehaviour, IAgent
 {
     private AudienceAnimHandler _animHandler;
+    public AudienceAnimHandler animHandler { get { return _animHandler; } }
 
     public enum DetailLevel
     {
@@ -46,14 +47,7 @@ public class Audience : MonoBehaviour, IAgent
         set
         {
             _currState = value;
-
             _animHandler.UpdateStateAnim();
-            if (detailLevel == DetailLevel.FullSize_Bump_FullAnim || detailLevel == DetailLevel.FullSize_VL_FullAnim)
-            {
-                if (_currState == States.Focused && followingTransform != null)
-                    _animHandler.StartToFollow(followingTransform);
-                else _animHandler.StopToFollow();
-            }
         }
     }
 
@@ -74,6 +68,8 @@ public class Audience : MonoBehaviour, IAgent
 
     public Transform followingTransform;
     public Transform headTransform;
+
+    public SocialGroup socialGroup;
 
     private void Awake()
     {

@@ -19,21 +19,16 @@ namespace MangoBehaviorTree
 
         protected abstract NodeStatus Tick(Tick<T> tick);
 
-        protected abstract void Close(Tick<T> tick);
+        public abstract void Close(Tick<T> tick);
 
         protected abstract void Exit(Tick<T> tick);
 
         public NodeStatus Execute(Tick<T> tick)
         {
-            if (!isOpenDict.ContainsKey(tick.target.agentId))
+            if (!tick.openNodes.Contains(this))
             {
-                isOpenDict.Add(tick.target.agentId, true);
+                tick.openNodes.Add(this);
                 Open(tick);
-            }
-            else if (!isOpenDict[tick.target.agentId])
-            {
-                isOpenDict[tick.target.agentId] = true;
-                Open(tick); 
             }
 
             Enter(tick);
@@ -45,18 +40,13 @@ namespace MangoBehaviorTree
             if (status != NodeStatus.RUNNING)
             { 
                 Close(tick);
-                isOpenDict[tick.target.agentId] = false;
+                tick.openNodes.Remove(this);
             }
 
             return status;
         }
 
-        public Dictionary<int, bool> isOpenDict { get; private set; }
-
-        public BaseNode()
-        {
-            isOpenDict = new Dictionary<int, bool>();
-        }
+        public BaseNode() { }
 
         //may define custom node execution data (per agent) as
         //Dictionary<int, customStruct> customNodeInfo 

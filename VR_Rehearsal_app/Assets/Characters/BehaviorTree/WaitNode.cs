@@ -33,7 +33,7 @@ namespace MangoBehaviorTree
             else return NodeStatus.RUNNING;
         }
 
-        protected override void Close(Tick<T> tick)
+        public override void Close(Tick<T> tick)
         {
             _timer = 0f;
         }
