@@ -76,9 +76,12 @@ public class CrowdSimulator : MonoBehaviour
                 new AudienceStateSelectorNode(1,
                     new List<BaseNode<Audience>>
                     {
-                        new AudienceStateNode(Audience.States.Focused),
-                        new AudienceStateNode(Audience.States.Bored),
-                        new AudienceStateNode(Audience.States.Chatting)
+                        //new AudienceStateNode(Audience.States.Focused),
+                        //new AudienceStateNode(Audience.States.Bored),
+                        //new AudienceStateNode(Audience.States.Chatting)
+                        new AudienceFocusStateNode(),
+                        new AudienceBoredStateNode(),
+                        new AudienceChatStateNode()
                     })
                 ));
     }

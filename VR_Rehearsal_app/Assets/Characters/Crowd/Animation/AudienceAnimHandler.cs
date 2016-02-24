@@ -152,6 +152,12 @@ public class AudienceAnimHandler : MonoBehaviour
         anim.SetInteger("state", (int)_audience.currState);
     }
 
+    public void UpdateChatDirection(Vector2 dir)
+    {
+        anim.SetFloat("faceDirX", dir.x);
+        anim.SetFloat("faceDirZ", dir.y);
+    }
+
     private IEnumerator Repeat_CR()
     {
         while (true)
