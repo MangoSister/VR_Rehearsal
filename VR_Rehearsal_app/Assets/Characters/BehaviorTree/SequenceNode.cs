@@ -36,7 +36,7 @@ namespace MangoBehaviorTree
             return NodeStatus.SUCCESS;
         }
 
-        protected override void Close(Tick<T> tick)
+        public override void Close(Tick<T> tick)
         {
             return;
         }
