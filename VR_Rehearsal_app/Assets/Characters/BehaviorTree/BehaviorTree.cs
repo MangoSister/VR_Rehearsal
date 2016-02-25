@@ -32,7 +32,7 @@ namespace MangoBehaviorTree
                 var closedNodes = Enumerable.Except(lastOpenNodes, currOpenNodes);
                 foreach (BaseNode<T> node in closedNodes)
                     node.Close(tick);
-                lastOpenNodes = currOpenNodes;
+                _openNodes[target.agentId] = currOpenNodes;
             }
             else _openNodes.Add(target.agentId, tick.openNodes);
         } 

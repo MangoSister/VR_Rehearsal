@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SocialGroup : MonoBehaviour
+public class SocialGroup
 {
+    //public int groupId;
     public List<Audience> members;
     public Vector3 centerPos
     {
@@ -19,4 +21,24 @@ public class SocialGroup : MonoBehaviour
             return output;
         }
     }
+
+    public bool isComputed = false;
+    public bool requestChat = false;
+
+    public SocialGroup(List<Audience> members)
+    {
+        this.members = members;
+       // groupId = NextGlobalId;
+    }
+
+    //private static int _globalId = 0;
+    //public static int NextGlobalId
+    //{
+    //    get
+    //    {
+    //        if (_globalId == int.MaxValue)
+    //            throw new Exception("cannot assign id anymore");
+    //        return _globalId++;
+    //    }
+    //}
 }

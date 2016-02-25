@@ -65,6 +65,8 @@ public class CrowdSimulator : MonoBehaviour
 
     private List<Audience> audiences;
     public int audienceNum { get { return audiences.Count; } }
+    private List<SocialGroup> socialGroups;
+
     //private BehaviorTree<Audience> _audienceBt = null;
     private BehaviorTree<Audience> _dummyAudienceBt;
 
@@ -88,8 +90,10 @@ public class CrowdSimulator : MonoBehaviour
 
     private void CreateCrowd()
     {
+        //instantiate audience
         CrowdConfigInfo tx = spaceInfoParser.Parse(crowdConfigFileName);
         audiences = new List<Audience>();
+
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
             int rand = Random.Range(0, (prefabsL1.Length - 1));
@@ -112,6 +116,51 @@ public class CrowdSimulator : MonoBehaviour
             ad.transform.parent = crowdParent;
             ad.transform.localPosition = tx.seat_posVecs[i];
             audiences.Add(ad);
+        }
+
+        //create social group
+        socialGroups = new List<SocialGroup>();
+        for (int i = 0; i < audiences.Count; i++)
+        {
+            if (Random.value > 0.3f)
+                continue;
+
+            int z = i % tx.seat_ColNum;
+            int x = i / tx.seat_ColNum;
+            int idx = z + x * tx.seat_ColNum;
+
+            if (audiences[idx].socialGroup != null)
+                continue;
+
+            List<Audience> neighbors = new List<Audience>();
+            //randomly create social groups for now, 8 connectivity neighbors
+            if (idx + 1 >= 0 && idx + 1 < audiences.Count && audiences[idx + 1].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx + 1]);
+            if (idx - 1 >= 0 && idx - 1 < audiences.Count && audiences[idx - 1].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx - 1]);
+            if (idx + tx.seat_ColNum >= 0 && idx + tx.seat_ColNum < audiences.Count && audiences[idx + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx + tx.seat_ColNum]);
+            if (idx - tx.seat_ColNum >= 0 && idx - tx.seat_ColNum < audiences.Count && audiences[idx - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx - tx.seat_ColNum]);
+
+            if (idx + 1 + tx.seat_ColNum >= 0 && idx + 1 + tx.seat_ColNum < audiences.Count && audiences[idx + 1 + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx + 1 + tx.seat_ColNum]);
+            if (idx - 1 + tx.seat_ColNum >= 0 && idx - 1 + tx.seat_ColNum < audiences.Count && audiences[idx - 1 + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx - 1 + tx.seat_ColNum]);
+            if (idx + 1 - tx.seat_ColNum >= 0 && idx + 1 - tx.seat_ColNum < audiences.Count && audiences[idx + 1 - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx + 1 - tx.seat_ColNum]);
+            if (idx - 1 - tx.seat_ColNum >= 0 && idx - 1 - tx.seat_ColNum < audiences.Count && audiences[idx - 1 - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+                neighbors.Add(audiences[idx - 1 - tx.seat_ColNum]);
+
+            if (neighbors.Count > 0)
+            {
+                neighbors.Add(audiences[idx]);
+                SocialGroup group = new SocialGroup(neighbors);
+                socialGroups.Add(group);
+                foreach (Audience person in neighbors)
+                    person.socialGroup = group;
+            }
+
         }
     }
 
@@ -144,6 +193,9 @@ public class CrowdSimulator : MonoBehaviour
         while (true)
         {
             gazeCollision.UpdateGazeContact();
+            foreach (SocialGroup group in socialGroups)
+                group.isComputed = false;
+
             Shuffle(audiences);
             for (int i = 0; i < audiences.Count; ++i)
             {

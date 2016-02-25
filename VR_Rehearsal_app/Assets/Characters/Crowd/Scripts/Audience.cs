@@ -60,16 +60,18 @@ public class Audience : MonoBehaviour, IAgent
                 return _agentId.Value;
             else
             {
-                _agentId = UniqueIdGenerator.Next;
+                _agentId = NextGlobalId;
                 return _agentId.Value;
             }
         }
     }
 
+    //public int agentId { get; set;}
+    //public int id;
     public Transform followingTransform;
     public Transform headTransform;
 
-    public SocialGroup socialGroup;
+    public SocialGroup socialGroup = null;
 
     private void Awake()
     {
@@ -77,6 +79,19 @@ public class Audience : MonoBehaviour, IAgent
 
         int num = Enum.GetNames(typeof(States)).Length;
         stateMassFunction = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
+        //agentId = NextGlobalId;
+        //id = agentId;
     }
 
+
+    private static int _globalId = 0;
+    public static int NextGlobalId
+    {
+        get
+        {
+            if (_globalId == int.MaxValue)
+                throw new Exception("cannot assign id anymore");
+            return _globalId++;
+        }
+    }
 }

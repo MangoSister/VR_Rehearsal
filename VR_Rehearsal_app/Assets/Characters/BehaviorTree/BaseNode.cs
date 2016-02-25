@@ -51,19 +51,5 @@ namespace MangoBehaviorTree
         //may define custom node execution data (per agent) as
         //Dictionary<int, customStruct> customNodeInfo 
     }
-
-    internal static class UniqueIdGenerator
-    {
-        private static int _count = 0;
-        public static int Next
-        {
-            get
-            {
-                if (_count == int.MaxValue)
-                    throw new Exception("cannot assign id anymore");
-                return _count++;
-            }
-        }
-    }
 }
 
