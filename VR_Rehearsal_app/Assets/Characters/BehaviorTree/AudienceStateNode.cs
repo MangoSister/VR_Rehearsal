@@ -33,6 +33,6 @@ public class AudienceStateNode : BaseNode<Audience>
     protected override void Exit(Tick<Audience> tick)
     { return; }
 
-    protected override void Close(Tick<Audience> tick)
+    public override void Close(Tick<Audience> tick)
     { return; }
 }

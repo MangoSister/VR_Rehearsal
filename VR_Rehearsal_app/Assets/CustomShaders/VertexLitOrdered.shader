@@ -41,7 +41,7 @@
 			{
 				half4 pos : SV_POSITION;
 				half2 uv : TEXCOORD0;
-				fixed3 vertexLighting : TEXCOORD1;
+				fixed4 vLightingFog : TEXCOORD1; //xyz: vertex light color; w: vertex fog data
 			};
 
 			uniform sampler2D _MainTex;
@@ -54,7 +54,7 @@
 
 				output.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				output.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
-				output.vertexLighting = UNITY_LIGHTMODEL_AMBIENT.xyz;
+				output.vLightingFog.xyz = UNITY_LIGHTMODEL_AMBIENT.xyz;
 
 				half3 posView =  mul (UNITY_MATRIX_MV, v.vertex).xyz;
 				//MODEL space vertex light computation
@@ -66,14 +66,17 @@
 					half atten = 1.0 / (1.0 + lengthSq * unity_LightAtten[idx].z);
 					fixed3 lightDir = normalize(mul( (float3x3)UNITY_MATRIX_T_MV, v2light ));
 					fixed intensity = max(0, dot(v.normal, lightDir));
-					output.vertexLighting += unity_LightColor[idx].rgb * intensity * atten;
+					output.vLightingFog.xyz += unity_LightColor[idx].rgb * intensity * atten;
 				}
+
+				output.vLightingFog.w = exp(-length(posView) * unity_FogParams.x);
 				return output;
 			}
 
 			fixed4 frag(v2f input) : SV_TARGET
 			{
-				return tex2D(_MainTex, input.uv) * fixed4(input.vertexLighting, 1.0);
+				fixed4 col = tex2D(_MainTex, input.uv) * fixed4(input.vLightingFog.xyz, 1.0);
+				return lerp(unity_FogColor, col, input.vLightingFog.w);
 			}
 			ENDCG
 

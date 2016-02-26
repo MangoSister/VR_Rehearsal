@@ -1,0 +1,145 @@
+fileFormatVersion: 2
+guid: 74d89a01a6940694e92d2cf2060ff9c5
+timeCreated: 1456190759
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Armature
+    100002: default
+    100004: mixamorig_Head
+    100006: mixamorig_HeadTop_End
+    100008: mixamorig_Hips
+    100010: mixamorig_LeftArm
+    100012: mixamorig_LeftForeArm
+    100014: mixamorig_LeftHand
+    100016: mixamorig_LeftHandIndex1
+    100018: mixamorig_LeftHandIndex2
+    100020: mixamorig_LeftHandIndex3
+    100022: mixamorig_LeftHandIndex4
+    100024: mixamorig_LeftHandThumb1
+    100026: mixamorig_LeftHandThumb2
+    100028: mixamorig_LeftHandThumb3
+    100030: mixamorig_LeftHandThumb4
+    100032: mixamorig_LeftShoulder
+    100034: mixamorig_Neck
+    100036: mixamorig_RightArm
+    100038: mixamorig_RightForeArm
+    100040: mixamorig_RightHand
+    100042: mixamorig_RightHandIndex1
+    100044: mixamorig_RightHandIndex2
+    100046: mixamorig_RightHandIndex3
+    100048: mixamorig_RightHandIndex4
+    100050: mixamorig_RightHandThumb1
+    100052: mixamorig_RightHandThumb2
+    100054: mixamorig_RightHandThumb3
+    100056: mixamorig_RightHandThumb4
+    100058: mixamorig_RightShoulder
+    100060: mixamorig_Spine
+    100062: mixamorig_Spine1
+    100064: mixamorig_Spine2
+    100066: Shoes
+    100068: //RootNode
+    400000: Armature
+    400002: default
+    400004: mixamorig_Head
+    400006: mixamorig_HeadTop_End
+    400008: mixamorig_Hips
+    400010: mixamorig_LeftArm
+    400012: mixamorig_LeftForeArm
+    400014: mixamorig_LeftHand
+    400016: mixamorig_LeftHandIndex1
+    400018: mixamorig_LeftHandIndex2
+    400020: mixamorig_LeftHandIndex3
+    400022: mixamorig_LeftHandIndex4
+    400024: mixamorig_LeftHandThumb1
+    400026: mixamorig_LeftHandThumb2
+    400028: mixamorig_LeftHandThumb3
+    400030: mixamorig_LeftHandThumb4
+    400032: mixamorig_LeftShoulder
+    400034: mixamorig_Neck
+    400036: mixamorig_RightArm
+    400038: mixamorig_RightForeArm
+    400040: mixamorig_RightHand
+    400042: mixamorig_RightHandIndex1
+    400044: mixamorig_RightHandIndex2
+    400046: mixamorig_RightHandIndex3
+    400048: mixamorig_RightHandIndex4
+    400050: mixamorig_RightHandThumb1
+    400052: mixamorig_RightHandThumb2
+    400054: mixamorig_RightHandThumb3
+    400056: mixamorig_RightHandThumb4
+    400058: mixamorig_RightShoulder
+    400060: mixamorig_Spine
+    400062: mixamorig_Spine1
+    400064: mixamorig_Spine2
+    400066: Shoes
+    400068: //RootNode
+    4300000: default
+    4300002: Shoes
+    7400000: Default Take
+    9500000: //RootNode
+    13700000: default
+    13700002: Shoes
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

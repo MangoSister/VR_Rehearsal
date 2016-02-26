@@ -270,11 +270,9 @@ public class HeatmapTracker : MonoBehaviour
                 _overLayMat = new Material(Shader.Find("VR_Rehearsal_app/ScreenOverlay"));
             _overLayMat.mainTexture = heatmap;
             _replayOverlay = true;
-            yield return null;
 #else
             _currReplayCR = null;
-             yield return null;
-            //return;
+            return false;
 #endif
         }
 
@@ -304,15 +302,15 @@ public class HeatmapTracker : MonoBehaviour
 
     //Replay sample usage
 
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.R))
-    //        Replay(0f, Time.time, null);
-    //}
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            Replay(0f, Time.time, null);
+    }
 
 #if UNITY_EDITOR
-        //screen overlay routine in editor ONLY
-        //need to be plugged to Cardboard post render object
+    //screen overlay routine in editor ONLY
+    //need to be plugged to Cardboard post render object
     public void RenderOverlay()
     {
         if (!_replayOverlay)

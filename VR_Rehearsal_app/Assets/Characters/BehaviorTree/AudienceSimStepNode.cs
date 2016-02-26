@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using MangoBehaviorTree;
+using State = Audience.States;
 
 public class AudienceSimStepNode : BaseNode<Audience>
 {
@@ -31,16 +32,44 @@ public class AudienceSimStepNode : BaseNode<Audience>
 
         if (target.gazeFactor > 0.7f)
         {
-            target.stateMassFunction[(int)Audience.States.Focused] = 1f;
-            target.stateMassFunction[(int)Audience.States.Bored] = 0f;
-            target.stateMassFunction[(int)Audience.States.Chatting] = 0f;
+            target.stateMassFunction[(int)State.Focused] = 1f;
+            target.stateMassFunction[(int)State.Bored] = 0f;
+            target.stateMassFunction[(int)State.Chatting] = 0f;
         }
         else
         {
-            target.stateMassFunction[(int)Audience.States.Focused] = global * pos;
-            target.stateMassFunction[(int)Audience.States.Bored] = (1f - global) * (1f - pos);
-            target.stateMassFunction[(int)Audience.States.Chatting] = (1f - global) * (1f - pos);
+            target.stateMassFunction[(int)State.Focused] = global * pos;
+            target.stateMassFunction[(int)State.Bored] = (1f - global) * (1f - pos);
+            target.stateMassFunction[(int)State.Chatting] = (1f - global) * (1f - pos);
         }
+
+        if (target.socialGroup == null)
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+        else if (!target.socialGroup.isComputed)
+        {
+            if (Random.value < target.stateMassFunction[(int)State.Chatting])
+            {
+                target.socialGroup.requestChat = true;
+                target.stateMassFunction[(int)State.Focused] = 0f;
+                target.stateMassFunction[(int)State.Bored] = 0f;
+                target.stateMassFunction[(int)State.Chatting] = 1f;
+            }
+            else
+            {
+                target.socialGroup.requestChat = false;
+                target.stateMassFunction[(int)State.Chatting] = 0f;
+            }
+            target.socialGroup.isComputed = true;
+
+        }
+        else if (target.socialGroup.isComputed && target.socialGroup.requestChat)
+        {
+            target.stateMassFunction[(int)State.Focused] = 0f;
+            target.stateMassFunction[(int)State.Bored] = 0f;
+            target.stateMassFunction[(int)State.Chatting] = 1f;
+        }
+        else target.stateMassFunction[(int)State.Chatting] = 0f;
+
 
         float sum = 0f;
         foreach (var mass in target.stateMassFunction)
@@ -56,7 +85,7 @@ public class AudienceSimStepNode : BaseNode<Audience>
         return;
     }
 
-    protected override void Close(Tick<Audience> tick)
+    public override void Close(Tick<Audience> tick)
     {
         return;
     }
