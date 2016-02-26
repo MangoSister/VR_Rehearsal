@@ -3,6 +3,8 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+
 /// <summary>
 /// Scene auto loader.
 /// </summary>
@@ -70,7 +72,7 @@ static class SceneAutoLoader
         if (!EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
         {
             // User pressed play -- autoload master scene.
-            PreviousScene = EditorSceneManager.GetActiveScene().name /*EditorApplication.currentScene*/;
+            PreviousScene = EditorSceneManager.GetActiveScene().path /*EditorApplication.currentScene*/;
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 if (!EditorSceneManager.OpenScene(MasterScene).IsValid())
@@ -87,10 +89,11 @@ static class SceneAutoLoader
                 EditorApplication.isPlaying = false;
             }
         }
-        if (EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
+        if (!EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             // User pressed stop -- reload previous scene.
-            if (!EditorApplication.OpenScene(PreviousScene))
+            //SceneManager.LoadScene(PreviousScene);
+            if (!EditorSceneManager.OpenScene(PreviousScene).IsValid())
             {
 #if UNITY_EDITOR
                 Debug.LogError(string.Format("error: scene not found: {0}", PreviousScene));
@@ -118,7 +121,7 @@ static class SceneAutoLoader
 
     private static string PreviousScene
     {
-        get { return EditorPrefs.GetString(cEditorPrefPreviousScene, EditorSceneManager.GetActiveScene().name /*EditorApplication.currentScene*/); }
+        get { return EditorPrefs.GetString(cEditorPrefPreviousScene, EditorSceneManager.GetActiveScene().path /*EditorApplication.currentScene*/); }
         set { EditorPrefs.SetString(cEditorPrefPreviousScene, value); }
     }
 }

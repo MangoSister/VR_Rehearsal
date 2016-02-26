@@ -7,7 +7,7 @@ public class PreloadTransition : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        SceneManager.Init();
+        GlobalObjManager.Init();
 	}
 
 }

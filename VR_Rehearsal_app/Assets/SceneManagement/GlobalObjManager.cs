@@ -3,8 +3,9 @@
 using UnityEditor;
 #endif
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
-public static class SceneManager
+public static class GlobalObjManager
 {
     private static readonly string _PRELOAD_SCENE_NAME = "sc_preload";
     private static readonly string _PREP_SCENE_NAME = "sc_UI";
@@ -17,7 +18,7 @@ public static class SceneManager
     public static VRSceneTransition screenTransition;
     public static DownloadManager downloadManager;
 
-    static SceneManager()
+    static GlobalObjManager()
     {
         globalBehaviorCleaner = FindGlobalBehavior<GlobalBehaviorCleaner>();
         globalBehaviorTest = FindGlobalBehavior<GlobalBehaviorTest>();
@@ -42,15 +43,15 @@ public static class SceneManager
 
     public static void LaunchPresentationScene(PresentationInitParam param)
     {
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
-            UnityEngine.SceneManagement.SceneManager.LoadScene(param.sceneName);
+        if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
+            SceneManager.LoadScene(param.sceneName);
             //Application.LoadLevel(param.sceneName);
     }
 
     public static void LaunchPreparationScene()
     {
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != _PREP_SCENE_NAME)
-            UnityEngine.SceneManagement.SceneManager.LoadScene(_PREP_SCENE_NAME);
+        if (SceneManager.GetActiveScene().name != _PREP_SCENE_NAME)
+            SceneManager.LoadScene(_PREP_SCENE_NAME);
             //Application.LoadLevel(_PREP_SCENE_NAME);
     }
 
@@ -62,10 +63,10 @@ public static class SceneManager
 
 #if UNITY_EDITOR
         //Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
-        UnityEngine.SceneManagement.SceneManager.LoadScene(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
+        SceneManager.LoadScene(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
 #else
         Application.LoadLevel("sc_UI");
-        UnityEngine.SceneManagement.SceneManager.LoadScene("sc_UI");
+        SceneManager.LoadScene("sc_UI");
 #endif
     }
 
