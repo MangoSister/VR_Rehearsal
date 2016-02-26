@@ -1,0 +1,38 @@
+# =============== #
+# Unity generated #
+# =============== #
+VR_Rehearsal_app/Temp/
+VR_Rehearsal_app/Obj/
+VR_Rehearsal_app/UnityGenerated/
+VR_Rehearsal_app/Library/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+VR_Rehearsal_app/Assets/UnityVS/
+VR_Rehearsal_app/.vs/
+VR_Rehearsal_app/ProjectSettings/ProjectVersion.txt
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+*.swp
+
+Output/
