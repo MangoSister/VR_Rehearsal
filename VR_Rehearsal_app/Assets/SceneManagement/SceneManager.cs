@@ -42,14 +42,16 @@ public static class SceneManager
 
     public static void LaunchPresentationScene(PresentationInitParam param)
     {
-        if (Application.loadedLevelName == _PREP_SCENE_NAME)
-            Application.LoadLevel(param.sceneName);
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
+            UnityEngine.SceneManagement.SceneManager.LoadScene(param.sceneName);
+            //Application.LoadLevel(param.sceneName);
     }
 
     public static void LaunchPreparationScene()
     {
-        if (Application.loadedLevelName != _PREP_SCENE_NAME)
-            Application.LoadLevel(_PREP_SCENE_NAME);
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != _PREP_SCENE_NAME)
+            UnityEngine.SceneManagement.SceneManager.LoadScene(_PREP_SCENE_NAME);
+            //Application.LoadLevel(_PREP_SCENE_NAME);
     }
 
     public static void Init()
@@ -59,9 +61,11 @@ public static class SceneManager
 #endif
 
 #if UNITY_EDITOR
-        Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
+        //Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
+        UnityEngine.SceneManagement.SceneManager.LoadScene(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
 #else
         Application.LoadLevel("sc_UI");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("sc_UI");
 #endif
     }
 
