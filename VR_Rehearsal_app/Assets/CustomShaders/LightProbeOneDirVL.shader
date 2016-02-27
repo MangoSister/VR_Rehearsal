@@ -11,17 +11,16 @@
 			"RenderType"="Opaque" 
 			"Queue" = "Geometry"
 			"IgnoreProjector" = "True"
-
+			"BW"="TrueProbes"
 		}
 		LOD 100
 
 		Pass
 		{
-			Name "FORWARD"
+			Name "LightProbe"
 			Tags
 			{
 				"LightMode" = "ForwardBase"
-				"BW" = "TrueProbes"
 			}
 			Fog
 			{ Mode Global }
@@ -89,5 +88,4 @@
 	
 	FallBack Off
 	//FallBack "Mobile/VertexLit"
-	CustomEditor "VertexLitOrderedInspector"
 }
