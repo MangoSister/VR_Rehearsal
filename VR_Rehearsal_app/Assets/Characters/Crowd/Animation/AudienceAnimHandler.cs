@@ -9,6 +9,19 @@ using System.Collections;
 
 public class AudienceAnimHandler : MonoBehaviour
 {
+    private static int _paramIdState;
+    private static int _paramIdFaceDirX;
+    private static int _paramIdFaceDirZ;
+    private static int _paramIdSwitchPose;
+
+    AudienceAnimHandler()
+    {
+        _paramIdState = Animator.StringToHash("state");
+        _paramIdFaceDirX = Animator.StringToHash("faceDirX");
+        _paramIdFaceDirZ = Animator.StringToHash("faceDirZ");
+        _paramIdSwitchPose = Animator.StringToHash("switchPose");
+    }
+
     private Audience _audience;
     public Animator anim;
 
@@ -149,13 +162,14 @@ public class AudienceAnimHandler : MonoBehaviour
 
     public void UpdateStateAnim()
     {
-        anim.SetInteger("state", (int)_audience.currState);
+        
+        anim.SetInteger(_paramIdState, (int)_audience.currState);
     }
 
     public void UpdateChatDirection(Vector2 dir)
     {
-        anim.SetFloat("faceDirX", dir.x);
-        anim.SetFloat("faceDirZ", dir.y);
+        anim.SetFloat(_paramIdFaceDirX, dir.x);
+        anim.SetFloat(_paramIdFaceDirZ, dir.y);
     }
 
     private IEnumerator Repeat_CR()
@@ -165,7 +179,7 @@ public class AudienceAnimHandler : MonoBehaviour
             float repeatWaitTime = Mathf.Lerp(repeatPeriodBound.x, repeatPeriodBound.y, Random.value);
             yield return new WaitForSeconds(repeatWaitTime);
             if(Random.value > 0.5f)
-                anim.SetTrigger("switchPose");
+                anim.SetTrigger(_paramIdSwitchPose);
         }
     }
 

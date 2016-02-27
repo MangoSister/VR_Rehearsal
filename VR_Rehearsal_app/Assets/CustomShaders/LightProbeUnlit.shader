@@ -1,4 +1,4 @@
-﻿Shader "VR_Rehearsal_app/LightProbeOneDirVL" 
+﻿Shader "VR_Rehearsal_app/LightProbeUnlit" 
 {
 	Properties 
 	{
@@ -56,20 +56,12 @@
 
 				output.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				output.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
-				output.vLightingFog.xyz = UNITY_LIGHTMODEL_AMBIENT.xyz;
+
 				half3 worldPos = mul((float3x3)_Object2World, v.vertex.xyz);
 				fixed3 worldN = mul((float3x3)_Object2World, v.normal);
-
-				//one directional light
-					//world space
-				half3 v2light = _WorldSpaceLightPos0.xyz - worldPos * _WorldSpaceLightPos0.w;
-				half lengthSq = dot(v2light, v2light);
-				fixed3 lightDir = normalize(v2light);
-				fixed intensity = max(0, dot(worldN, lightDir));
-				output.vLightingFog.xyz += intensity * _LightColor0;
 				
 				//light probe	
-				output.vLightingFog.xyz += ShadeSH9 (float4(worldN,1.0));
+				output.vLightingFog.xyz = ShadeSH9 (float4(worldN,1.0));
 
 				output.vLightingFog.w = exp(-length(_WorldSpaceCameraPos - worldPos) * unity_FogParams.x);
 				return output;
