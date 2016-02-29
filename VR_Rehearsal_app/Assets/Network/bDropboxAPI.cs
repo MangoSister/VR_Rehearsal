@@ -387,8 +387,8 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	}
 
-	protected override void GetAPItoken(string token){
-		_token = token;
+	public override string GetAPItoken(){
+		return _token;
 	}
 
 
