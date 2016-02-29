@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using SimpleJSON;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour {
 
@@ -35,20 +37,9 @@ public class UIManager : MonoBehaviour {
     public GameObject urlCanvas;
     public GameObject rotationCanvas;
 	public GameObject okButton;
-    /*
-    private GameObject _logoCanvas;
-    private GameObject _loginCanvas;
-    private GameObject _listCanvas;
-    private GameObject _urlCanvas;
-    private GameObject _rotationCanvas;
-    */
-    /*
-	private GameObject _logoPanel;
-	private GameObject _loginPanel;
-	private GameObject _listPanel;
-	private GameObject _urlPanel;
-    private GameObject _rotationPanel;
-    */
+
+    public RectTransform setTopButton;
+
    	private string _email;
 	private string _url;
 	private string _dbNumber;
@@ -58,23 +49,41 @@ public class UIManager : MonoBehaviour {
     private InputField _dbInputField;
     private InputField _commentField;
 
+    private bhClowdDriveAPI bDriveAPI;
+    public  float offset;
+
+    public GameObject CreateInstance;
+
+    public RectTransform RootRect;
+    public RectTransform RootCanvas;
+
+    public RectTransform fixedButton;
+    private List<GameObject> CreatedButton = new List<GameObject>();
+
+    private Vector2 InitialCanvasScrollSize;
+    private float totalWidth = 0f;
 
     public bool isRotate = false;
-    
-    
-	void Start () {
-      
-        /*
-		_logoPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LogoPanel").gameObject;
-		_loginPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LoginPanel").gameObject;
-		_listPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("ListPanel").gameObject;
-		_urlPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("UrlPanel").gameObject;
-        _rotationPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("RotationPanel").gameObject;
-        */
+
+    public Vector3 StartAnim;
+    public Vector3 EndAnim;
+
+    public ButtonType bType;
+    private ButtonType _bType;
+
+    void Start () {
+        InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
+        bDriveAPI = new bDropboxAPI();
+        bDriveAPI.StartAuthentication();
         ShowLogoPanel();
+        _bType = bType;
+
 	}
-	
-	void Update () {
+
+  
+    void Update () {
+        bDriveAPI.Update();
+
         if (isRotate == true)
         {
             IsRotate();
@@ -85,7 +94,9 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-	public void ShowLogoPanel(){
+    #region _Panel
+
+    public void ShowLogoPanel(){
         /*
         _logoPanel.GetComponent<RectTransform>().SetAsLastSibling();
         _logoPanel.SetActive(true);
@@ -174,18 +185,90 @@ public class UIManager : MonoBehaviour {
         isRotate = true;
 
     }
-	public void OnSignInButtonClick(){
-		//GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
-		//InputField inputField = inputObject.GetComponent<InputField>();
+    #endregion 
+    public void OnSignInButtonClick(){
+        //GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
+        //InputField inputField = inputObject.GetComponent<InputField>();
+
+        
         ShowListPanel();
+        CreateButtons("/");
         /*
                 if(inputField.text != empty){
                     ShowListPanel();
                 }
                 */
     }
+    public void CreateButtons(string _folder)
+    {
+        bDriveAPI.GetFileListFromPath(_folder, CreatePanels__);
+    }
 
-	public void OnOkButtonClick(){
+    public void UpdateButtons(string _folderName) {
+        bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels__);
+    }
+
+    public void Download() {
+        //string str = bDriveAPI.GetRecentPath();
+        //bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
+        //{
+        //    Debug.Log("fileDownLoad Complete");
+        //});
+
+        Debug.Log(Application.persistentDataPath);
+    }
+
+    
+
+    private void CreatePanels__(string fileList)
+    {
+        Vector3 InstancePosition = EndAnim;
+        Debug.Log(fileList);
+        var parseResult = JSON.Parse(fileList);
+     
+        for (int index = 0; index < parseResult["entries"].Count; index++)
+        {
+            GameObject createInstance = Instantiate(CreateInstance) as GameObject;
+
+            Text[] tempObject = createInstance.GetComponentsInChildren<Text>();
+            foreach(Text go in tempObject) {
+                if (go.name == "pptName") {
+                    go.text = parseResult["entries"][index]["name"];
+                } else if (go.name == "Date") {
+                    go.text = parseResult["entries"][index][".tag"];
+                }
+
+            }
+
+
+            createInstance.GetComponentInChildren<Text>().text = parseResult["entries"][index]["name"];
+            
+            //parseResult["entries"][index][".tag"]
+            /*
+            if("file")
+            else if("folder")    
+            */
+            // + "/" + parseResult["entries"][index][".tag"];
+
+            createInstance.transform.SetParent(RootRect, false);
+
+            CreatedButton.Add(createInstance);
+
+            RectTransform nextRect = setTopButton;
+            offset = 3.5f * (nextRect.rect.height);
+            CreatedButton[index].GetComponent<RectTransform>().localScale = setTopButton.localScale;
+            CreatedButton[index].GetComponent<RectTransform>().position = new Vector2(nextRect.position.x, nextRect.position.y - offset);
+            setTopButton = CreatedButton[index].GetComponent<RectTransform>();
+
+          //  InstancePosition.y += offset;
+            //totalWidth += offset;
+        }
+        bDriveAPI.JobDone();
+    }
+
+    
+
+    public void OnOkButtonClick(){
 
         _urlInputField = GameObject.FindGameObjectWithTag("INPUT_URL").GetComponent<InputField>();
         _dbInputField = GameObject.FindGameObjectWithTag("INPUT_DB").GetComponent<InputField>();
@@ -203,20 +286,17 @@ public class UIManager : MonoBehaviour {
     public void SetPowerPointData(string newStr)
     {
         GameObject pptPractice =listCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
-        // GameObject pptPractice = (GameObject)_listPanel.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
         GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
 
         commentBox.GetComponent<Text>().text = string.Format("[{0}]", newStr); 
-       
+      
         Text dateText = date.GetComponent<Text>();
         dateText.text = string.Format("{0:yyyy.MM.dd HH:mm:ss}",System.DateTime.Now);
      
     }
 
 	public void OnAddButtonClick(){
-
 		ShowUrlPanel();
-
 	}
 
 	public IEnumerator ChangePanel(){
@@ -237,8 +317,20 @@ public class UIManager : MonoBehaviour {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
-            // SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
-            // Application.LoadLevel("sc_present_0");
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
     }
+
+    void GetTypeFromButton()
+    {
+        string buttonType = _bType.returnType();
+        Debug.Log("__BUTOTON" + buttonType);
+
+    }
+   
+      
+
 }

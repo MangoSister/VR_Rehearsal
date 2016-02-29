@@ -57,9 +57,12 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 		currentActivity.Call ("start_Dropbox_Authentication");
+<<<<<<< HEAD
 		_token = currentActivity.Call<string> ("getTokenFromNative");
 		#endif
 
+=======
+>>>>>>> origin/master
 		Initalize ();
 	}
 
