@@ -109,7 +109,7 @@ public static class PresentationData
 
     public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
     {
-        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_2", "lightprobes") }
+        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_1", "lightprobes") }
     };
 
     //Input
