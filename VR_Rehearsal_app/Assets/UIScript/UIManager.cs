@@ -204,6 +204,11 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.GetFileListFromPath(_folder, CreatePanels__);
     }
 
+    public void Refresh()
+    {
+        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+    }
+
     public void UpdateButtons(string _folderName) {
         bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels__);
     }
