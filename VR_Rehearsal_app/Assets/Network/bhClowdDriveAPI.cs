@@ -28,7 +28,7 @@ public abstract class bhClowdDriveAPI{
 
 	public abstract void JobDone ();
 
-	protected abstract void GetAPItoken (string token);
+	public abstract string GetAPItoken ();
 
 	public abstract void Update (); 
 	public abstract string GetRecentPath ();
