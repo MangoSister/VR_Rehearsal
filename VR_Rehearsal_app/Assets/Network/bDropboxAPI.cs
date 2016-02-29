@@ -50,9 +50,19 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	int processIdx = 0;
 
 	public override void StartAuthentication (){
+
+		#if UNITY_EDITOR
+		_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
+		#elif UNITY_ANDROID
 		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 		currentActivity.Call ("start_Dropbox_Authentication");
+<<<<<<< HEAD
+		_token = currentActivity.Call<string> ("getTokenFromNative");
+		#endif
+
+=======
+>>>>>>> origin/master
 		Initalize ();
 	}
 
@@ -74,7 +84,10 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	}
 
-
+	public override string GetRecentPath (){
+		return _recentPath;
+	}
+		
 	public override bool GetCurrParentFileList ( fileList_Callback callback){ 
 		if (_status == JobStatus.Started)
 			return false;
