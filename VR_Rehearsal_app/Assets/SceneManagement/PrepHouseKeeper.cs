@@ -15,7 +15,7 @@ public class PrepHouseKeeper : MonoBehaviour
     public Text transitionTxt;
 
     private DownloadManager downloadManager
-    { get { return GlobalObjManager.downloadManager; } }
+    { get { return GlobalManager.downloadManager; } }
 
     public void StartDownload()
     {
@@ -82,19 +82,19 @@ public class PrepHouseKeeper : MonoBehaviour
             yield return null;
         }
 
-        if (GlobalObjManager.screenTransition != null)
-            GlobalObjManager.screenTransition.Fade(false, 1.0f);
+        if (GlobalManager.screenTransition != null)
+            GlobalManager.screenTransition.Fade(false, 1.0f);
 
         yield return new WaitForSeconds(1.0f);
 
-        GlobalObjManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+        GlobalManager.EnterPresentation();
     }
 
     // PPT button in List Panel
     // At this time, change to present_0 scene
     public void NextScene()
     {
-         GlobalObjManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
+         GlobalManager.EnterPresentation();
         //SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_rotation"));
     }
  }

@@ -36,9 +36,9 @@ public class SlidesPlayer : MonoBehaviour
         Stop();
         if (!pptKaraoke)
         {
-            if (GlobalObjManager.downloadManager != null)
+            if (GlobalManager.downloadManager != null)
             {
-                List<string> slidesNames = GlobalObjManager.downloadManager.ExportExistedName();
+                List<string> slidesNames = GlobalManager.downloadManager.ExportExistedName();
                 if (slidesNames.Count > 0)
                     LoadSlidesFromDisk(slidesNames[slidesNames.Count - 1]);
                 else LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));

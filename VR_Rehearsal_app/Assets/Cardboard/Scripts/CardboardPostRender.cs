@@ -125,10 +125,6 @@ public class CardboardPostRender : MonoBehaviour
             DrawUILayer();
         }
 
-#if UNITY_EDITOR
-        if (RoomCenter.currRoom != null)
-            RoomCenter.currRoom.heatmapTracker.RenderOverlay();
-#endif
     }
 
     private void RebuildDistortionMesh()
