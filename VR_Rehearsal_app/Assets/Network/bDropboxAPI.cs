@@ -57,12 +57,9 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 		currentActivity.Call ("start_Dropbox_Authentication");
-<<<<<<< HEAD
+
 		_token = currentActivity.Call<string> ("getTokenFromNative");
 		#endif
-
-=======
->>>>>>> origin/master
 		Initalize ();
 	}
 
@@ -198,7 +195,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			_isDownloadFileDone = false;
 			_downloadFile_callback = callback;
 
-			_downloadFile_bw.RunWorkerAsync (new downloadFile_argData(_token,filePath, saveName, savePath ));
+			_downloadFile_bw.RunWorkerAsync (new downloadFile_argData(_token,filePath,savePath, saveName ));
 			return true;
 		} else {
 			return false;
@@ -217,7 +214,11 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		_downloadMultipleFile_callback = callback;
 
 		if (_recentPath != loadFolderPath) {
-			GetFileListFromPath_internal (loadFolderPath, DonwloadAllFilesInFolder_refreshCallback);
+			GetFileListFromPath_internal (loadFolderPath, delegate(string resJson) {
+				_updateList_result = resJson;
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
+			});
+			return true;
 		}
 
 		if (!Directory.Exists (saveFolderPath)) {
@@ -229,8 +230,14 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		if (processIdx < parseResult ["entries"].Count) {
 			//Ignore the folder
-			if ( parseResult ["entries"] [processIdx] [".tag"].Value == "file") {
-				DownloadFile_internal (parseResult ["entries"] [processIdx] ["id"].Value, saveFolderPath,  parseResult ["entries"] [processIdx] ["name"].Value, DonwloadAllFilesInFolder_SignleFileDownloadDoneCallback);
+			if (parseResult ["entries"] [processIdx] [".tag"].Value == "file") {
+				DownloadFile_internal (parseResult ["entries"] [processIdx] ["id"].Value, saveFolderPath, parseResult ["entries"] [processIdx] ["name"].Value, delegate() {
+					processIdx++;
+					DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
+				});
+			} else {
+				processIdx++;
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
 			}
 
 		} else {
@@ -238,13 +245,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			_isDownloadMultipleFilesDone = true;
 			processIdx = 0;
 		}
-		processIdx++;
+
 		return true;
 	}
 
 	private void DonwloadAllFilesInFolder_refreshCallback(string json){
 		_updateList_result = json;
-		DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadFile_callback);
+		DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
 	}
 	private void DonwloadAllFilesInFolder_SignleFileDownloadDoneCallback(){
 		DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
@@ -279,7 +286,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		request.Method = "POST";
 		request.Headers.Add("Authorization: Bearer " + arg._token);
 		//request.Headers.Add("Dropbox-API-Arg: {\"path\": \"/"+ arg._filePath + "\"}" );
-		request.Headers.Add("Dropbox-API-Arg: {\"path\": \"" + arg._filePath + "\\"  + arg._saveName + "\"}" );
+		request.Headers.Add("Dropbox-API-Arg: {\"path\": \"" + arg._filePath + "\"}" );
 
 		WebResponse response = request.GetResponse ();
 		Stream responseStream = response.GetResponseStream();
@@ -300,7 +307,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		result = memoryStream.ToArray();
 	
-		FileStream fs = new FileStream (arg._savePath, FileMode.Create);
+		FileStream fs = new FileStream (arg._savePath + "\\" + arg._saveName, FileMode.Create);
 		fs.Write(result, 0, result.Length);
 	}
 
