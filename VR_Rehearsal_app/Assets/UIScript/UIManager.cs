@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour {
 	 *  7. In the ListPanel, use rcan show latest ppt.
 	 *  8. When use click ppt icon, goes to gameplay scene.
 	 */
-
+    
 	public GameObject mainCanvas;
     public GameObject commentBox;
     public GameObject prepHouse;
@@ -77,7 +77,7 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.StartAuthentication();
         ShowLogoPanel();
         _bType = bType;
-
+        Debug.Log("InitialCanvasScrollSize" + InitialCanvasScrollSize);
 	}
 
   
@@ -327,7 +327,7 @@ public class UIManager : MonoBehaviour {
     void GetTypeFromButton()
     {
         string buttonType = _bType.returnType();
-        Debug.Log("__BUTOTON" + buttonType);
+     //   Debug.Log("__BUTOTON" + buttonType);
 
     }
    
