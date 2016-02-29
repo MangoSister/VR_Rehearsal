@@ -12,6 +12,8 @@ public class test : MonoBehaviour {
 	void Start () {
 		clowdAPI = new bDropboxAPI ();
 		clowdAPI.StartAuthentication ();
+
+		/*
 		bool res1 = clowdAPI.GetFileListFromPath ("/", delegate(string resJson){
 				Debug.Log (resJson);
 				Debug.Log ("Update Complete");
@@ -32,6 +34,7 @@ public class test : MonoBehaviour {
 			});
 
 		Debug.Log(res1);
+		*/
 	}
 	
 	// Update is called once per frame

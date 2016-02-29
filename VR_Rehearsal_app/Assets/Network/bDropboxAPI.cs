@@ -50,10 +50,15 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	int processIdx = 0;
 
 	public override void StartAuthentication (){
+
+		#if UNITY_EDITOR
+		_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
+		#elif UNITY_ANDROID
 		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 		currentActivity.Call ("start_Dropbox_Authentication");
 		_token = currentActivity.Call<string> ("getTokenFromNative");
+		#endif
 
 		Initalize ();
 	}
