@@ -209,11 +209,11 @@ public class UIManager : MonoBehaviour {
     }
 
     public void Download() {
-        string str = bDriveAPI.GetRecentPath();
-        bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
-        {
-            Debug.Log("fileDownLoad Complete");
-        });
+        //string str = bDriveAPI.GetRecentPath();
+        //bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
+        //{
+        //    Debug.Log("fileDownLoad Complete");
+        //});
 
         Debug.Log(Application.persistentDataPath);
     }
