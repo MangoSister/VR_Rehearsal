@@ -71,6 +71,8 @@ public class UIManager : MonoBehaviour {
     public ButtonType bType;
     private ButtonType _bType;
 
+    public Text token;
+
     void Start () {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
         bDriveAPI = new bDropboxAPI();
@@ -207,6 +209,8 @@ public class UIManager : MonoBehaviour {
     public void Refresh()
     {
         bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+
+        token.text = bDriveAPI.GetAPItoken();
     }
 
     public void UpdateButtons(string _folderName) {
