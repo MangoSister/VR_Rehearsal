@@ -81,7 +81,10 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	}
 
-
+	public override string GetRecentPath (){
+		return _recentPath;
+	}
+		
 	public override bool GetCurrParentFileList ( fileList_Callback callback){ 
 		if (_status == JobStatus.Started)
 			return false;
