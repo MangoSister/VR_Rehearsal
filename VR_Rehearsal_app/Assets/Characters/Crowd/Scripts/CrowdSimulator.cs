@@ -109,7 +109,7 @@ public class CrowdSimulator : MonoBehaviour
                 ad.detailLevel = Audience.DetailLevel.HalfSize_VL_FullAnim;
             }
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
-            
+            ad.GetComponent<AudienceAnimHandler>().repeatPeriodBound = new Vector2(10f, 20f);
 
             //to Phan: fix the layout here
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;

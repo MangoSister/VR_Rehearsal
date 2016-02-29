@@ -5,12 +5,12 @@ using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public static class GlobalObjManager
+public static class GlobalManager
 {
-    private static readonly string _PRELOAD_SCENE_NAME = "sc_preload";
-    private static readonly string _PREP_SCENE_NAME = "sc_UI";
-
-    private static List<string> _presentSceneNames = new List<string> { "sc_present_0" };
+    public static readonly string _PRELOAD_SCENE_NAME = "sc_preload";
+    public static readonly string _PREP_SCENE_NAME = "sc_UI";
+    public static readonly string _PRESENT_SCENE_NAME = "sc_present_0";
+    public static readonly string _EVAL_SCENE_NAME = "sc_evalutation";
 
     // global-wide monohehaviour, make sure they are in preload scene
     public static GlobalBehaviorCleaner globalBehaviorCleaner;
@@ -18,7 +18,7 @@ public static class GlobalObjManager
     public static VRSceneTransition screenTransition;
     public static DownloadManager downloadManager;
 
-    static GlobalObjManager()
+    static GlobalManager()
     {
         globalBehaviorCleaner = FindGlobalBehavior<GlobalBehaviorCleaner>();
         globalBehaviorTest = FindGlobalBehavior<GlobalBehaviorTest>();
@@ -41,11 +41,31 @@ public static class GlobalObjManager
         }
     }
 
-    public static void LaunchPresentationScene(PresentationInitParam param)
+    public static void EnterPresentation
+        (
+            PresentationData.EnvType envType = PresentationData.EnvType.RPIS
+        )
     {
+        PresentationData.in_EnvType = envType;
+
         if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
-            SceneManager.LoadScene(param.sceneName);
+            SceneManager.LoadScene(_PRESENT_SCENE_NAME);
             //Application.LoadLevel(param.sceneName);
+    }
+
+    public static void EndPresentation
+        (
+            float HGVertFOVDeg,
+            float HGAspect,
+            List<GazeSnapshot> HGGazeData
+        )
+    {
+        PresentationData.out_HGVertFOVDeg = HGVertFOVDeg;
+        PresentationData.out_HGAspect = HGAspect;
+        PresentationData.out_HGGazeData = HGGazeData;
+
+        if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
+            SceneManager.LoadScene(_EVAL_SCENE_NAME);
     }
 
     public static void LaunchPreparationScene()
@@ -60,7 +80,6 @@ public static class GlobalObjManager
 #if UNITY_EDITOR
         Debug.Log("SceneManager Initialized");
 #endif
-
 #if UNITY_EDITOR
         //Application.LoadLevel(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
         SceneManager.LoadScene(System.IO.Path.GetFileNameWithoutExtension(EditorPrefs.GetString("SceneAutoLoader.PreviousScene")));
@@ -72,12 +91,32 @@ public static class GlobalObjManager
 
 }
 
-public class PresentationInitParam
+public static class PresentationData
 {
-    public string sceneName;
-
-    public PresentationInitParam(string name)
+    public enum EnvType
     {
-        sceneName = name;
+        RPIS,
     }
+
+    public struct LightingInfo
+    {
+        public string near;
+        public string far;
+        public string probes;
+        public LightingInfo(string near, string far, string probes)
+        { this.near = near; this.far = far; this.probes = probes; }
+    }
+
+    public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
+    {
+        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_1", "lightprobes") }
+    };
+
+    //Input
+    public static EnvType in_EnvType;
+
+    //Output
+    public static float out_HGVertFOVDeg;
+    public static float out_HGAspect;
+    public static List<GazeSnapshot> out_HGGazeData;
 }

@@ -25,7 +25,9 @@ public class EyegazeCube : MonoBehaviour
     {
         _mat.color = Color.Lerp(_initColor, Color.white, progress);
         if (progress >= 1f)
-            RoomCenter.currRoom.presenter.MoveTo(dest);
+        {
+           //RoomCenter.currRoom.presenter.MoveTo(dest);
+        }
     }
 
 }
