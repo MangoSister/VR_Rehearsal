@@ -19,6 +19,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	private List<bItem> _listofFileNames;
 	private int _timeOut;
 	private JobStatus _status = JobStatus.NotStarted;
+	private bool _isGetToken = false;
 
 	/* Get List update variable */
 	BackgroundWorker _updateList_bw; 
@@ -52,18 +53,32 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	public override void StartAuthentication (){
 
 		#if UNITY_EDITOR
-		_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
+			_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
 		#elif UNITY_ANDROID
-		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
-		currentActivity.Call ("start_Dropbox_Authentication");
-
-		_token = currentActivity.Call<string> ("getTokenFromNative");
+			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+			AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+			currentActivity.Call ("start_Dropbox_Authentication");
 		#endif
 		Initalize ();
 	}
 
 	public override void Update (){
+
+		if (!_isGetToken) {
+			#if UNITY_EDITOR
+				_isGetToken = true;
+			#elif UNITY_ANDROID
+				AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+				AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+				_token = currentActivity.Call<string> ("getTokenFromNative");
+
+				if(_token.Length > 0){
+				_isGetToken = true;
+				}
+			#endif
+		}
+
+
 		/* Message System */
 		if (_isUpdateListDone) {
 			_updateList_callback (_updateList_result);
