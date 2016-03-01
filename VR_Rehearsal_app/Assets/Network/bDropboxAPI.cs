@@ -16,7 +16,6 @@ using System.ComponentModel;
 public class bDropboxAPI : bhClowdDriveAPI{
 
 	private string _token;
-	private List<bItem> _listofFileNames;
 	private int _timeOut;
 	private JobStatus _status = JobStatus.NotStarted;
 	private bool _isGetToken = false;
@@ -162,13 +161,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			return false;
 	}
 		
-	public override bool DownloadFile (string filePath, string savePath, string saveName, fileDownload_Callback callback){
+	public override bool DownloadFile (string filename, string savePath, string saveName, fileDownload_Callback callback){
 		if (_status == JobStatus.Started)
 			return false;
 		else
 			_status = JobStatus.Started;
 
-		bool res = DownloadFile_internal (filePath, savePath, saveName, callback);
+		bool res = DownloadFile_internal (filename, savePath, saveName, callback);
 		if (res)
 			return true;
 		else
@@ -205,12 +204,12 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	}
 		
-	private bool DownloadFile_internal(string filePath, string savePath, string saveName, fileDownload_Callback callback){
+	private bool DownloadFile_internal(string filename, string savePath, string saveName, fileDownload_Callback callback){
 		if (_downloadFile_bw.IsBusy != true) {
 			_isDownloadFileDone = false;
 			_downloadFile_callback = callback;
 
-			_downloadFile_bw.RunWorkerAsync (new downloadFile_argData(_token,filePath,savePath, saveName ));
+			_downloadFile_bw.RunWorkerAsync (new downloadFile_argData(_token,filename,savePath, saveName ));
 			return true;
 		} else {
 			return false;
@@ -273,8 +272,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	}
 		
 	private void Initalize(){
-		_listofFileNames = new List<bItem>();
-
+		
 		//Get Filelist background worker initalize
 		_updateList_bw = new BackgroundWorker {
 			WorkerReportsProgress = true,

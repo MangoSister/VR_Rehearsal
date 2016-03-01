@@ -13,17 +13,12 @@ public abstract class bhClowdDriveAPI{
 	public delegate void fileList_Callback(string filelists);
 	public delegate void fileDownload_Callback();
 
-	public struct bItem{
-		string _name { get; set; }
-		string _type { get; set; }
-	}
-	
 	public abstract void StartAuthentication ();
 	public abstract bool GetFileListFromPath (string path, fileList_Callback callback);
 	public abstract bool GetCurrParentFileList( fileList_Callback callback);
 	public abstract bool GetSelectedFolderFileList (string _selectedFolderName, fileList_Callback callback);
 
-	public abstract bool DownloadFile (string filePath, string savePath,string saveName, fileDownload_Callback callback);
+	public abstract bool DownloadFile (string filename, string savePath,string saveName, fileDownload_Callback callback);
 	public abstract bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback);
 
 	public abstract void JobDone ();
