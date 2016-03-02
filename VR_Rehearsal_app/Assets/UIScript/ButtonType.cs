@@ -4,37 +4,31 @@ using UnityEngine.UI;
 
 public class ButtonType : MonoBehaviour {
 
-    public string buttonName;
+   // public string buttonName;
    
-    public GameObject dfd;
+   public RectTransform rootRect;
+   public bool isSelection = false;
+
+   public string buttonName;
+   public string buttonType;
+   public bool isSelected = false;
+
 	// Use this for initialization
 	void Start () {
-	
-	}
+       
+    }
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
-    public void getType()
+    public void GetButtonStatus()
     {
-        buttonName = GetComponent<RectTransform>().FindChild("pptName").GetComponent<Text>().text;
-        string type = GetComponent<RectTransform>().FindChild("Date").GetComponent<Text>().text;
-
-        if (type == "folder")
+       
+        if(isSelected == false)
         {
-            GameObject.Find("CanvasManager").GetComponent<UIManager>().UpdateButtons(buttonName);
+            isSelected = true;
         }
-        else if (type == "file") {
-            GameObject.Find("CanvasManager").GetComponent<UIManager>().Download();
-        }
-
     }
-
-    public string returnType()
-    {
-        return buttonName;
-    }
-
     
 }
