@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour {
 
-	/*  <UI Manager>
+    /*  <UI Manager>
 	 *  
 	 *  In this scene, there are 4 Panels.
 	 *  First,  LogoPanel shows only Logo.
@@ -26,8 +26,8 @@ public class UIManager : MonoBehaviour {
 	 *  7. In the ListPanel, use rcan show latest ppt.
 	 *  8. When use click ppt icon, goes to gameplay scene.
 	 */
-    
-	public GameObject mainCanvas;
+    #region variables
+    public GameObject mainCanvas;
     public GameObject commentBox;
     public GameObject prepHouse;
 
@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour {
     bool isButtonSelected = false;
     public Text token;
     private bool isReseting = false;
-
+    #endregion
     void Start () {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
         bDriveAPI = new bDropboxAPI();
@@ -92,12 +92,22 @@ public class UIManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ShowListPanel();
+            // ShowListPanel();
+            bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
+                isReseting = true;
+                // DeletePanels__(true, "dd");
+                if (storedButton.Count != 0)
+                {
+                    DeletePanels__(true, "dd");
+                }
+                bDriveAPI.JobDone();
+                CreatePanels__(resJson);
+                isReseting = false;
+            });
         }
 
         if (isReseting == false)
         {
-            //CheckButtonStatus();
             ButtonListener();
         }
     }
@@ -120,18 +130,17 @@ public class UIManager : MonoBehaviour {
     {
         foreach (GameObject _button in storedButton)
         {
-            if(_button.GetComponent<ButtonType>().isSelected == true && isButtonSelected == false)
+            if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
             {
-                isButtonSelected = true;
-                // _button.GetComponent<Button>().onClick.AddListener(() => SelectedButton(_button.GetComponent<ButtonType>().buttonName));
+            //    isButtonSelected = true;
                 Debug.Log("Name : " + _button.GetComponent<ButtonType>().buttonName + " / " + "type : " + _button.GetComponent<ButtonType>().buttonType);
+                CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+                
             }
         }
+        //isButtonSelected = false;
     }
-    void SelectedButton(string bName)
-    {
-        Debug.Log(bName);
-    }
+
     #region _Panel
 
     public void ShowLogoPanel(){
@@ -192,10 +201,9 @@ public class UIManager : MonoBehaviour {
     public void OnSignInButtonClick(){
         //GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
         //InputField inputField = inputObject.GetComponent<InputField>();
-
-        
         ShowListPanel();
         bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+         
         /*
                 if(inputField.text != empty){
                     ShowListPanel();
@@ -204,16 +212,21 @@ public class UIManager : MonoBehaviour {
     }
     public void CreateButtons(string _folder)
     {
+        Debug.Log("stored : " + storedButton.Count);
+   
+        bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
+            {
+                isReseting = true;
+                // DeletePanels__(true, "dd");
+                if (storedButton.Count != 0)
+                {
+                    DeletePanels__(true, "dd");
+                }
+                bDriveAPI.JobDone();
+                CreatePanels__(resJson);
+                isReseting = false;
+            });
       
-        
-        bDriveAPI.GetSelectedFolderFileList(_folder, delegate(string resJson) {
-            isReseting = true;
-            DeletePanels__(true, "dd");
-            bDriveAPI.JobDone();
-            CreatePanels__(resJson);
-            isReseting = false;
-        });
-        
     }
 
     public void Refresh()
@@ -221,6 +234,7 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.GetFileListFromPath("/", CreatePanels__);
 
         token.text = bDriveAPI.GetAPItoken();
+        
     }
 
     public void UpdateButtons(string _folderName) {
@@ -250,6 +264,7 @@ public class UIManager : MonoBehaviour {
                 }
             }
         }
+        storedButton.Clear();
     }
    
 
@@ -262,16 +277,16 @@ public class UIManager : MonoBehaviour {
 
     public void CreatePanels__(string fileList)
     {
-        isButtonSelected = false;
+        
         var parseResult = JSON.Parse(fileList);
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;
         float span = gLayout.spacing.y;
         float totalSizeofRect = (cellSize- span) * parseResult["entries"].Count;
-
+        Debug.Log (parseResult["entries"].Count);
         RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
-        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
-
+        // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
+        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
         for (int index = 0; index < parseResult["entries"].Count; index++)
         {
             GameObject createInstance = Instantiate(CreateInstance) as GameObject;
@@ -303,12 +318,11 @@ public class UIManager : MonoBehaviour {
 
             CreatedButton.Add(createInstance);
             StoreAllButtonStatus(createInstance);
-            // RectTransform nextRect = setTopButton;
-       //     CreatedButton[index].GetComponent<RectTransform>().localScale = setTopButton.localScale;
-            setTopButton = CreatedButton[index].GetComponent<RectTransform>();
         }
    
         bDriveAPI.JobDone();
+        isButtonSelected = false;
+       // isReseting = false;
     }
     
     public void OnOkButtonClick(){
