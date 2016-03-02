@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour {
 
     public ButtonType bType;
     private ButtonType _bType;
-
+    public GameObject canvasScroll;
     public Text token;
 
     void Start () {
@@ -231,10 +231,18 @@ public class UIManager : MonoBehaviour {
 
     private void CreatePanels__(string fileList)
     {
+        
         Vector3 InstancePosition = EndAnim;
         Debug.Log(fileList);
         var parseResult = JSON.Parse(fileList);
-     
+        GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
+        float cellSize = gLayout.cellSize.y;
+        float span = gLayout.spacing.y;
+        float totalSizeofRect = cellSize * parseResult["entries"].Count;
+
+        RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
+        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
+        //RootRect.offsetMin = new Vector2(RootRect.offsetMax.x,0);
         for (int index = 0; index < parseResult["entries"].Count; index++)
         {
             GameObject createInstance = Instantiate(CreateInstance) as GameObject;
@@ -251,12 +259,12 @@ public class UIManager : MonoBehaviour {
 
 
             createInstance.GetComponentInChildren<Text>().text = parseResult["entries"][index]["name"];
-            
+
             //parseResult["entries"][index][".tag"]
-            /*
-            if("file")
-            else if("folder")    
-            */
+
+            // if("file")
+            //else if("folder")    
+            
             // + "/" + parseResult["entries"][index][".tag"];
 
             createInstance.transform.SetParent(RootRect, false);
@@ -264,14 +272,15 @@ public class UIManager : MonoBehaviour {
             CreatedButton.Add(createInstance);
 
             RectTransform nextRect = setTopButton;
-            offset = 3.5f * (nextRect.rect.height);
+            //offset = 3.5f * (nextRect.rect.height);
             CreatedButton[index].GetComponent<RectTransform>().localScale = setTopButton.localScale;
-            CreatedButton[index].GetComponent<RectTransform>().position = new Vector2(nextRect.position.x, nextRect.position.y - offset);
+            //CreatedButton[index].GetComponent<RectTransform>().position = new Vector2(nextRect.position.x, nextRect.position.y - offset);
             setTopButton = CreatedButton[index].GetComponent<RectTransform>();
 
           //  InstancePosition.y += offset;
             //totalWidth += offset;
         }
+   
         bDriveAPI.JobDone();
     }
 
