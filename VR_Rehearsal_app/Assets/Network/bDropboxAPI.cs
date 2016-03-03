@@ -116,12 +116,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		//recentFolder = "aaa/bbb/ccc"
 		//cut it = "aaa/bbb/"
 		for (int i = 0; i < (result.Length -1 ); ++i) {
-            if (i == 0){
-                _recentPath = result[0];
-            } else {
-                _recentPath += "/" + result[i];
-            }
-			
+			if (i == 0) {
+				_recentPath = result [0];
+			} else {
+				_recentPath += "/" + result [i];
+			}
+		
+
 		}
 
 		bool res = GetFileListFromPath_internal (_recentPath, callback);
