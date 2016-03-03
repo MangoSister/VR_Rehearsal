@@ -12,6 +12,7 @@ public abstract class bhClowdDriveAPI{
 
 	public delegate void fileList_Callback(string filelists);
 	public delegate void fileDownload_Callback();
+	public delegate void fileDownload_Process_Callback (int total, int proceedNumber);
 
 	public abstract void StartAuthentication ();
 	public abstract bool GetFileListFromPath (string path, fileList_Callback callback);
@@ -19,7 +20,7 @@ public abstract class bhClowdDriveAPI{
 	public abstract bool GetSelectedFolderFileList (string _selectedFolderName, fileList_Callback callback);
 
 	public abstract bool DownloadFile (string filename, string savePath,string saveName, fileDownload_Callback callback);
-	public abstract bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback);
+	public abstract bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback, fileDownload_Process_Callback proceed_callback);
 
 	public abstract void JobDone ();
 

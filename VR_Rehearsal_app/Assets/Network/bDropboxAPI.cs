@@ -177,13 +177,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			return false;
 	}
 		
-	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback){
+	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback, fileDownload_Process_Callback proceed_callback){
 		if (_status == JobStatus.Started)
 			return false;
 		else
 			_status = JobStatus.Started;
 
-		bool res = DonwloadAllFilesInFolder_internal (loadFolderPath, saveFolderPath, callback);
+		bool res = DonwloadAllFilesInFolder_internal (loadFolderPath, saveFolderPath, callback, proceed_callback);
 		if (res)
 			return true;
 		else
@@ -219,7 +219,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	} 
 		
-	private bool DonwloadAllFilesInFolder_internal(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback){
+	private bool DonwloadAllFilesInFolder_internal(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback,fileDownload_Process_Callback proceed_callback){
 
 		if (_downloadFile_bw.IsBusy == true || _updateList_bw.IsBusy == true) {
 			return false;
@@ -233,7 +233,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		if (_recentPath != loadFolderPath) {
 			GetFileListFromPath_internal (loadFolderPath, delegate(string resJson) {
 				_updateList_result = resJson;
-				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 			});
 			return true;
 		}
@@ -245,16 +245,20 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		JSONNode parseResult = JSON.Parse(_updateList_result);
 
+		if(proceed_callback != null)
+		proceed_callback (parseResult ["entries"].Count, processIdx);
+
+
 		if (processIdx < parseResult ["entries"].Count) {
 			//Ignore the folder
 			if (parseResult ["entries"] [processIdx] [".tag"].Value == "file") {
 				DownloadFile_internal (parseResult ["entries"] [processIdx] ["id"].Value, saveFolderPath, parseResult ["entries"] [processIdx] ["name"].Value, delegate() {
 					processIdx++;
-					DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
+					DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 				});
 			} else {
 				processIdx++;
-				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 			}
 
 		} else {
@@ -266,6 +270,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		return true;
 	}
 
+	/*
 	private void DonwloadAllFilesInFolder_refreshCallback(string json){
 		_updateList_result = json;
 		DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
@@ -273,6 +278,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	private void DonwloadAllFilesInFolder_SignleFileDownloadDoneCallback(){
 		DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback);
 	}
+	*/
 		
 	private void Initalize(){
 		
