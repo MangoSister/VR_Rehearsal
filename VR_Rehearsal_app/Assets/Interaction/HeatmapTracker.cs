@@ -1,9 +1,11 @@
 ﻿/* HeatmapTracker.cs
- * Yang Zhou, last modified on Feb 20, 2016
- * HeatmapTracker stores the presenter's gaze data, generate heatmap based on the data,
- * and performs gaze trajectory replay.
+ * Yang Zhou, last modified on Mar 3, 2016
+ * HeatmapTracker stores the presenter's gaze data
  * Dependencies: need RoomCenter in VR scene, Cardboard post render object for editor ONLY screen overlay
  * May implement interpolation in the future
+
+ * Now be able to capture a screenshot (with edge enhancement) with a separate camera
+ * The actual heatmap generation relies on HeatmapGenerator.cs
  */
 
 using UnityEngine;

@@ -1,4 +1,11 @@
-﻿using UnityEngine;
+﻿/* HeatmapGenerator.cs
+ * Yang Zhou, last modified on Mar 3, 2016
+ * HeatmapGenerator generates heatmap based on the data from HeatmapTracker.
+ * Dependencies: data and params from HeatmapTracker
+ * May implement interpolation in the future
+ */
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
