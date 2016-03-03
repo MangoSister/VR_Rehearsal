@@ -119,6 +119,7 @@ public class CardboardPostRender : MonoBehaviour
             meshMaterial.SetPass(0);
             Graphics.DrawMeshNow(distortionMesh, transform.position, transform.rotation);
         }
+
         stereoScreen.DiscardContents();
         if (!Cardboard.SDK.NativeUILayerSupported && Cardboard.SDK.UILayerEnabled)
         {

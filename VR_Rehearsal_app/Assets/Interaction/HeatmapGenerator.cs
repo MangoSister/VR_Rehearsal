@@ -13,15 +13,13 @@ public class HeatmapGenerator : MonoBehaviour
     //instead of simple linear lerp, a curve provides more flexibility and more reasonable mapping
     public AnimationCurve heatmapColorCurve;
 
-    //heatmaptracker works similar to a camera, i.e., projects the presenter's view direction on a XY plane at z = 1
-    //vertical "field of view" (in degrees) of heatmap, horizontal FOV can be computed with it and (screen) aspect
-    //view direction outside FOV would contribute to "out of bound" component
+    //Should get params from HeatmapTracker
     public float verticalFOVDeg = 60f;
 
     //The width of generated heatmap. The height of the map depends on aspect
     public int widthResolution = 64;
 
-    //Screen aspect ratio
+    //Shoulld get params from HeatmapTracker
     public float aspect = (float)Screen.width / (float)Screen.height;
 
     private void Start()

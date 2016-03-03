@@ -1,5 +1,5 @@
 ﻿/* SimpleGazeCollision.cs
- * Yang Zhou, last modified on Feb 08, 2016
+ * Yang Zhou, last modified on Match 2nd, 2016
  * SimpleGazeCollision provides a simple but fast way to detect presenter's gazing behavior
  * and evaluate its influence on audience.
  * 1. Project virtual audiences' head position on a collision plane
@@ -9,9 +9,12 @@
  * now collision plane is manually placed, may consider auto fit later (least squared error?)
  * may also considered more sophisticated collision surface shape (quadratic, hyperpola?)
  * Dependencies: need PresenterHead transform in unity scene
+
+ * Now separate two axes to get better estimation
  */
 
 using UnityEngine;
+using System.Collections.Generic;
 
 public class SimpleGazeCollision : MonoBehaviour
 {
@@ -28,11 +31,12 @@ public class SimpleGazeCollision : MonoBehaviour
 
     //define gaussian distribution for gazing power
     public float peak = 1.0f; //amplitude of distribution
-    public float range = 1.0f; //variance of distribution
-
+    public float rangeForward = 1.0f; //variance of distribution, forward component
+    public float rangeRight = 5.0f; //variance of distribution, right component
     //contact point is stored here
     public Vector3? _lastContactPoint { get; private set; }
-
+    public Vector3? _lastAxisForward { get; private set; }
+    public Vector3? _lastAxisRight { get; private set; }
 #if UNITY_EDITOR
     //for debug, visualization range of collision plane
     public float debugPlaneRange = 1.0f;
@@ -44,8 +48,17 @@ public class SimpleGazeCollision : MonoBehaviour
         Ray ray = new Ray(presenterHead.position, presenterHead.forward);
         float enter;
         if (collisionPlane.Raycast(ray, out enter))
+        {
             _lastContactPoint = ray.GetPoint(enter);
-        else _lastContactPoint = null;
+            _lastAxisForward = Vector3.ProjectOnPlane(ray.direction, collisionPlaneNormal).normalized;
+            _lastAxisRight = Vector3.Cross(_lastAxisForward.Value, collisionPlaneNormal);
+        }
+        else
+        {
+            _lastContactPoint = null;
+            _lastAxisForward = null;
+            _lastAxisRight = null;
+        }
     }
 
     //Use this to evaluate gaze influence for each audience
@@ -55,9 +68,11 @@ public class SimpleGazeCollision : MonoBehaviour
         if (presenterHead == null || !_lastContactPoint.HasValue)
             return 0f;
         var plane = collisionPlane;
-        float power = peak * Mathf.Exp
-                    (-(0.5f / range *
-                    ((audiencePos - _lastContactPoint) - plane.GetDistanceToPoint(audiencePos) * plane.normal).Value.sqrMagnitude));
+
+        Vector3 projDisp = (audiencePos - _lastContactPoint.Value) - plane.GetDistanceToPoint(audiencePos) * plane.normal;
+        float df = Vector3.Dot(projDisp, _lastAxisForward.Value);
+        float dr = Vector3.Dot(projDisp, _lastAxisRight.Value);
+        float power = peak * Mathf.Exp(-0.5f * (df * df / rangeForward + dr * dr / rangeRight));
         return power;
 
     }
@@ -97,23 +112,43 @@ public class SimpleGazeCollision : MonoBehaviour
         Gizmos.DrawRay(pos, normal);
 
         Color oldColor = UnityEditor.Handles.color;
+        Vector3 center, axisF, axisR;
+        if (_lastContactPoint.HasValue)
+        {
+            center = _lastContactPoint.Value;
+            axisF = _lastAxisForward.Value;
+            axisR = _lastAxisRight.Value;
+        }
+        else
+        {
+            center = collisionPlaneCenter;
+            axisF = Vector3.ProjectOnPlane( Vector3.forward, collisionPlaneNormal).normalized;
+            axisR = Vector3.Cross(axisF, collisionPlaneNormal);
+        }
+
         for (float val = 0.1f; val <= 0.9f; val += 0.2f)
         {
-            float r = Mathf.Sqrt
-                (-2f * range * range * Mathf.Log(1f / peak * val));
-
+            float radius = Mathf.Sqrt
+                (-2f * Mathf.Log(1f / peak * val));
+            
             if (_lastContactPoint.HasValue)
-            {
                 UnityEditor.Handles.color = Color.red * new Color(val, val, val, 1f);
-                UnityEditor.Handles.DrawWireDisc(_lastContactPoint.Value, collisionPlaneNormal, r);
-            }
             else
-            {
                 UnityEditor.Handles.color = Color.yellow * new Color(val, val, val, 1f);
-                UnityEditor.Handles.DrawWireDisc(collisionPlaneCenter, collisionPlaneNormal, r);
+
+            //draw ellipse
+            List<Vector3> samples = new List<Vector3>();
+            
+            for (float theta = 0f; theta < 360f; theta += 10f)
+            {
+                samples.Add
+                (Mathf.Cos((Mathf.Deg2Rad * theta)) * axisF * Mathf.Sqrt(rangeForward) * radius +
+                Mathf.Sin(Mathf.Deg2Rad * theta) * axisR * Mathf.Sqrt(rangeRight) * radius + center);
             }
+            UnityEditor.Handles.DrawAAPolyLine(samples.ToArray());
         }
         UnityEditor.Handles.color = oldColor;
+
     }
 #endif
 

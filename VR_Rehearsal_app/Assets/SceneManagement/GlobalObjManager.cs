@@ -57,12 +57,14 @@ public static class GlobalManager
         (
             float HGVertFOVDeg,
             float HGAspect,
-            List<GazeSnapshot> HGGazeData
+            List<GazeSnapshot> HGGazeData,
+            Texture2D screenshot
         )
     {
         PresentationData.out_HGVertFOVDeg = HGVertFOVDeg;
         PresentationData.out_HGAspect = HGAspect;
         PresentationData.out_HGGazeData = HGGazeData;
+        PresentationData.out_Screenshot = screenshot;
 
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
             SceneManager.LoadScene(_EVAL_SCENE_NAME);
@@ -109,7 +111,7 @@ public static class PresentationData
 
     public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
     {
-        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_2", "lightprobes") }
+        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_1", "lightprobes") }
     };
 
     //Input
@@ -119,4 +121,5 @@ public static class PresentationData
     public static float out_HGVertFOVDeg;
     public static float out_HGAspect;
     public static List<GazeSnapshot> out_HGGazeData;
+    public static Texture2D out_Screenshot;
 }
