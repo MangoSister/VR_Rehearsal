@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-
+using SimpleJSON;
+using System.Collections.Generic;
 public class UIManager : MonoBehaviour {
 
-	/*  <UI Manager>
+    /*  <UI Manager>
 	 *  
 	 *  In this scene, there are 4 Panels.
 	 *  First,  LogoPanel shows only Logo.
@@ -24,31 +25,21 @@ public class UIManager : MonoBehaviour {
 	 *  7. In the ListPanel, use rcan show latest ppt.
 	 *  8. When use click ppt icon, goes to gameplay scene.
 	 */
-
-	public GameObject mainCanvas;
+    #region variables
+    public GameObject mainCanvas;
     public GameObject commentBox;
     public GameObject prepHouse;
 
     public GameObject logoCanvas;
     public GameObject loginCanvas;
-    public GameObject listCanvas;
+    public GameObject showcaseCanvas;
+    public GameObject connectCanvas;
     public GameObject urlCanvas;
     public GameObject rotationCanvas;
 	public GameObject okButton;
-    /*
-    private GameObject _logoCanvas;
-    private GameObject _loginCanvas;
-    private GameObject _listCanvas;
-    private GameObject _urlCanvas;
-    private GameObject _rotationCanvas;
-    */
-    /*
-	private GameObject _logoPanel;
-	private GameObject _loginPanel;
-	private GameObject _listPanel;
-	private GameObject _urlPanel;
-    private GameObject _rotationPanel;
-    */
+    public GameObject navigationCanvas;
+    
+
    	private string _email;
 	private string _url;
 	private string _dbNumber;
@@ -58,134 +49,289 @@ public class UIManager : MonoBehaviour {
     private InputField _dbInputField;
     private InputField _commentField;
 
+    private bhClowdDriveAPI bDriveAPI;
+    private bShowcaseManager bShowcaseMgr;
+    public  float offset;
+
+    public GameObject CreateInstance;
+
+    public RectTransform RootRect;
+    public RectTransform RootCanvas;
+
+    public RectTransform fixedButton;
+    private List<GameObject> CreatedButton = new List<GameObject>();
+    public List<GameObject> storedButton = new List<GameObject>();
+
+    private Vector2 InitialCanvasScrollSize;
+    private float totalWidth = 0f;
 
     public bool isRotate = false;
-    
-    
-	void Start () {
-      
-        /*
-		_logoPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LogoPanel").gameObject;
-		_loginPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("LoginPanel").gameObject;
-		_listPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("ListPanel").gameObject;
-		_urlPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("UrlPanel").gameObject;
-        _rotationPanel = (GameObject)mainCanvas.GetComponentInChildren<RectTransform>().FindChild("RotationPanel").gameObject;
-        */
+
+    public ButtonType bType;
+    private ButtonType _bType;
+    public GameObject canvasScroll;
+    bool isButtonSelected = false;
+    public Text token;
+    private bool isReseting = false;
+    private GameObject selectedButton;
+    private bool isCopy = false;
+    #endregion
+
+    void Start () {
+        InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
+       
+        bShowcaseMgr = new bShowcaseManager();
+        bShowcaseMgr.Start();
+        //bDriveAPI.StartAuthentication();
         ShowLogoPanel();
-	}
-	
-	void Update () {
+        _bType = bType;
+ 	}
+
+    
+    void Update () {
+        if (bDriveAPI != null)
+        {
+            bDriveAPI.Update();
+        }
+
         if (isRotate == true)
         {
             IsRotate();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ShowListPanel();
+            // ShowListPanel();
+            bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
+                isReseting = true;
+                // DeletePanels__(true, "dd");
+                if (storedButton.Count != 0)
+                {
+                    DeletePanels__(true, "dd");
+                }
+                bDriveAPI.JobDone();
+                CreatePanels__(resJson);
+                isReseting = false;
+            });
+        }
+
+        if (isReseting == false)
+        {
+            ButtonListener();
         }
     }
 
-	public void ShowLogoPanel(){
-        /*
-        _logoPanel.GetComponent<RectTransform>().SetAsLastSibling();
-        _logoPanel.SetActive(true);
-		_loginPanel.SetActive(false);
-		_listPanel.SetActive(false);
-		_urlPanel.SetActive(true);
-        _rotationPanel.SetActive(false);
-        */
+    public void SelectedDownload()
+    {
+        if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
+        {
+            string str = bDriveAPI.GetRecentPath();
+            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
+            {
+                Debug.Log("fileDownLoad Complete");
+
+            }, delegate(int totalFileNum, int completedFileNum) {
+
+            });
+
+            Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+        }
+    }
+
+    void ButtonListener()
+    {
+        foreach (GameObject _button in storedButton)
+        {
+            if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
+            {
+                
+                if (isCopy == false)
+                {
+                    if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
+                    {
+                        Destroy(GameObject.Find("PPT_Practice(Clone)(Clone)"));
+                    }
+                    selectedButton = Instantiate(_button) as GameObject;
+                    isCopy = true;
+                }
+                if (_button.GetComponent<ButtonType>().buttonType == "folder")
+                {
+                    CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+                }
+                
+            }
+        }
+        //isButtonSelected = false;
+    }
+
+    #region _Panel
+
+    public void ShowLogoPanel(){
         logoCanvas.GetComponent<RectTransform>().SetAsLastSibling();
         logoCanvas.SetActive(true);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
         StartCoroutine("ChangePanel");
 	}
 
-    public void ShowLoginPanel(){/*
-        _loginPanel.GetComponent<RectTransform>().SetAsLastSibling();
-        _logoPanel.SetActive(false);
-		_loginPanel.SetActive(true);
-    	_listPanel.SetActive(false);
-		_urlPanel.SetActive(false);
-        _rotationPanel.SetActive(false);
-        */
+    public void ShowLoginPanel(){
         loginCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(true);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
-
+        navigationCanvas.SetActive(false);
     }
 
-    public void ShowListPanel(){
-        /*
-        _listPanel.GetComponent<RectTransform>().SetAsLastSibling();
-        _logoPanel.SetActive(false);
-		_loginPanel.SetActive(false);
-		_listPanel.SetActive(true);
-		_urlPanel.SetActive(false);
-        _rotationPanel.SetActive(false);
-        */
-		listCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+    public void ShowCasePanel(){
+        showcaseCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(true);
+        showcaseCanvas.SetActive(true);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
     }
 
     public void ShowUrlPanel(){
-        /*
-        _urlPanel.GetComponent<RectTransform>().SetAsLastSibling();
-        _logoPanel.SetActive(false);
-		_loginPanel.SetActive(false);
-		_listPanel.SetActive(false);
-		_urlPanel.SetActive(true);
-        _rotationPanel.SetActive(false);
-        */
 		urlCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
-
-
+        navigationCanvas.SetActive(false);
     }
+
     public void ShowRotation()
     {
-        /*
-        _rotationPanel.GetComponent<RectTransform>().SetAsLastSibling();
-        _logoPanel.SetActive(false);
-        _loginPanel.SetActive(false);
-        _listPanel.SetActive(false);
-        _urlPanel.SetActive(false);
-        _rotationPanel.SetActive(true);
-        */
 		rotationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(true);
+        navigationCanvas.SetActive(false);
         isRotate = true;
-
     }
-	public void OnSignInButtonClick(){
-		//GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
-		//InputField inputField = inputObject.GetComponent<InputField>();
-        ShowListPanel();
+
+    public void ShowConnectPanel()
+    {
+        connectCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(true);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
+    }
+
+    public void ShowNavigationPanel()
+    {
+        navigationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(false);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(true);
+    }
+
+    #endregion 
+    public void OnSignInButtonClick(){
+        //GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
+        //InputField inputField = inputObject.GetComponent<InputField>();
+        ShowCasePanel();
+        //bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+         
         /*
                 if(inputField.text != empty){
                     ShowListPanel();
                 }
                 */
     }
+    public void CreateButtons(string _folder)
+    {
+        bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
+            {
+                isReseting = true;
+                // DeletePanels__(true, "dd");
+                if (storedButton.Count != 0)
+                {
+                    DeletePanels__(true, "dd");
+                }
+                bDriveAPI.JobDone();
+                CreatePanels__(resJson);
+                isReseting = false;
+            });
+      
+    }
 
-	public void OnOkButtonClick(){
+
+    public void UpdateButtons(string _folderName) {
+        bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels__);
+    }
+
+    public void DeletePanels__(bool isSelected, string whichButton)
+    {
+        //GameObject[] allPrefabs = GameObject.FindObjectOfType("PPT_Practice(Clone)");
+        if (isSelected == true)
+        {
+            foreach (RectTransform child in RootRect)
+            {
+                if (child.name == "PPT_Practice(Clone)")
+                {
+                    GameObject.Destroy(child.gameObject);
+                }
+            }
+        }
+        storedButton.Clear();
+        isCopy = false;
+    }
+   
+
+    void StoreAllButtonStatus(GameObject button)
+    {
+        storedButton.Add(button);
+       // Debug.Log("totalButton : "+storedButton.Count);
+    }
+    
+
+    public void CreatePanels__(string fileList)
+    {
+        
+        var parseResult = JSON.Parse(fileList);
+        GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
+        float cellSize = gLayout.cellSize.y;
+        float span = gLayout.spacing.y;
+        float totalSizeofRect = (cellSize- span) * parseResult["entries"].Count;
+        Debug.Log (parseResult["entries"].Count);
+        RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
+        // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
+        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
+        for (int index = 0; index < parseResult["entries"].Count; index++)
+        {
+            GameObject createInstance = Instantiate(CreateInstance) as GameObject;
+
+            createInstance.GetComponent<ButtonType>().buttonName = parseResult["entries"][index]["name"];
+            createInstance.GetComponent<ButtonType>().buttonType = parseResult["entries"][index][".tag"];
+            createInstance.GetComponentInChildren<Text>().text = parseResult["entries"][index]["name"];
+
+            createInstance.transform.SetParent(RootRect, false);
+
+            CreatedButton.Add(createInstance);
+            StoreAllButtonStatus(createInstance);
+        }
+   
+        bDriveAPI.JobDone();
+        isButtonSelected = false;
+       // isReseting = false;
+    }
+    
+    public void OnOkButtonClick(){
 
         _urlInputField = GameObject.FindGameObjectWithTag("INPUT_URL").GetComponent<InputField>();
         _dbInputField = GameObject.FindGameObjectWithTag("INPUT_DB").GetComponent<InputField>();
@@ -193,7 +339,7 @@ public class UIManager : MonoBehaviour {
 
         //if(urlInputField.text != empty || dbInputField.text != empty || commentField.text != empty){
         SetPowerPointData(_commentField.text);
-			ShowListPanel();
+        ShowCasePanel();
 		//}
 	}
     public void OnPPTClick()
@@ -202,20 +348,19 @@ public class UIManager : MonoBehaviour {
     }
     public void SetPowerPointData(string newStr)
     {
-        GameObject pptPractice =listCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
-        // GameObject pptPractice = (GameObject)_listPanel.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
+        GameObject pptPractice =showcaseCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
         GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
 
         commentBox.GetComponent<Text>().text = string.Format("[{0}]", newStr); 
-       
+      
         Text dateText = date.GetComponent<Text>();
         dateText.text = string.Format("{0:yyyy.MM.dd HH:mm:ss}",System.DateTime.Now);
      
     }
 
 	public void OnAddButtonClick(){
-
-		ShowUrlPanel();
+        //ShowUrlPanel();
+        ShowConnectPanel();
 
 	}
 
@@ -237,8 +382,18 @@ public class UIManager : MonoBehaviour {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
-            // SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_present_0"));
-            // Application.LoadLevel("sc_present_0");
         }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
+        }
+  }
+    public void DropboxClicked()
+    {
+        bDriveAPI = new bDropboxAPI();
+        bDriveAPI.StartAuthentication();
+        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+        ShowNavigationPanel();
     }
+
 }
