@@ -87,6 +87,13 @@ public static class GlobalManager
         PresentationData.out_Screenshot = screenshot;
         PresentationData.out_ExitTime = Time.time;
 
+        //ONLY for debugging
+#if UNITY_EDITOR
+        if (PresentationData.out_HGGazeData != null)
+        {
+            PresentationData.SaveGazeDataToBinary();
+        }
+#endif
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
             SceneManager.LoadScene(_EVAL_SCENE_NAME);
     }
@@ -152,9 +159,10 @@ public static class PresentationData
     public static List<GazeSnapshot> out_HGGazeData;
     public static Texture2D out_Screenshot;
 
-	#if UNITY_EDITOR
+    //ONLY for debugging
+#if UNITY_EDITOR
 
-	public static void saveToBinary(){
+    public static void SaveGazeDataToBinary(){
 		 string savePath = Application.dataPath + "/heatMapDATA.bytes";
 		const string _fileHeadValidChecker = "@^*#$@";
 		//1. List of Data Save
@@ -181,7 +189,7 @@ public static class PresentationData
 
 	}
 
-	public static void loadFromBinary(){
+	public static void LoadGazeDataFromBinary(){
 		 string loadPath = Application.dataPath + "/heatMapDATA.bytes";
 		const string _fileHeadValidChecker = "@^*#$@";
 		if (File.Exists (loadPath)) {
@@ -231,6 +239,7 @@ public static class PresentationData
 		}
 
 	}
-	#endif
+
+#endif
 
 }
