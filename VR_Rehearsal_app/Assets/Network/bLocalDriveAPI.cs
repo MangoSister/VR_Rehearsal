@@ -80,7 +80,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 		return true;
 	}
 
-	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback){
+	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback,  fileDownload_Process_Callback proceed_callback){
 
 		GetFileListFromPath (loadFolderPath, delegate(string resJson) {
 
@@ -92,7 +92,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 			for (int index = 0; index < parseResult ["entries"].Count; index++) {
 				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
 					DownloadFile (parseResult ["entries"] [index] ["name"].Value, saveFolderPath, parseResult ["entries"] [index] ["name"].Value, delegate() {
-						
+						proceed_callback(parseResult ["entries"].Count, index);
 					});
 				}
 			}
