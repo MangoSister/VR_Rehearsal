@@ -32,10 +32,13 @@ public class UIManager : MonoBehaviour {
 
     public GameObject logoCanvas;
     public GameObject loginCanvas;
-    public GameObject listCanvas;
+    public GameObject showcaseCanvas;
+    public GameObject connectCanvas;
     public GameObject urlCanvas;
     public GameObject rotationCanvas;
 	public GameObject okButton;
+    public GameObject navigationCanvas;
+    
 
    	private string _email;
 	private string _url;
@@ -47,6 +50,7 @@ public class UIManager : MonoBehaviour {
     private InputField _commentField;
 
     private bhClowdDriveAPI bDriveAPI;
+    private bShowcaseManager bShowcaseMgr;
     public  float offset;
 
     public GameObject CreateInstance;
@@ -70,18 +74,25 @@ public class UIManager : MonoBehaviour {
     public Text token;
     private bool isReseting = false;
     private GameObject selectedButton;
+    private bool isCopy = false;
     #endregion
+
     void Start () {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
-        bDriveAPI = new bDropboxAPI();
-        bDriveAPI.StartAuthentication();
+       
+        bShowcaseMgr = new bShowcaseManager();
+        bShowcaseMgr.Start();
+        //bDriveAPI.StartAuthentication();
         ShowLogoPanel();
         _bType = bType;
  	}
 
     
     void Update () {
-        bDriveAPI.Update();
+        if (bDriveAPI != null)
+        {
+            bDriveAPI.Update();
+        }
 
         if (isRotate == true)
         {
@@ -117,13 +128,15 @@ public class UIManager : MonoBehaviour {
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
+
+            }, delegate(int totalFileNum, int completedFileNum) {
+
             });
 
             Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
         }
     }
 
-    private bool isCopy = false;
     void ButtonListener()
     {
         foreach (GameObject _button in storedButton)
@@ -153,13 +166,13 @@ public class UIManager : MonoBehaviour {
     #region _Panel
 
     public void ShowLogoPanel(){
-
         logoCanvas.GetComponent<RectTransform>().SetAsLastSibling();
         logoCanvas.SetActive(true);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
         StartCoroutine("ChangePanel");
 	}
 
@@ -167,51 +180,72 @@ public class UIManager : MonoBehaviour {
         loginCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(true);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
-
+        navigationCanvas.SetActive(false);
     }
 
-    public void ShowListPanel(){
-        
-		listCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+    public void ShowCasePanel(){
+        showcaseCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(true);
+        showcaseCanvas.SetActive(true);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
     }
 
     public void ShowUrlPanel(){
-       
 		urlCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
-
-
+        navigationCanvas.SetActive(false);
     }
+
     public void ShowRotation()
     {
-       
 		rotationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
-        listCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(true);
+        navigationCanvas.SetActive(false);
         isRotate = true;
-
     }
+
+    public void ShowConnectPanel()
+    {
+        connectCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(true);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
+    }
+
+    public void ShowNavigationPanel()
+    {
+        navigationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(false);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(true);
+    }
+
     #endregion 
     public void OnSignInButtonClick(){
         //GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
         //InputField inputField = inputObject.GetComponent<InputField>();
-        ShowListPanel();
-        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+        ShowCasePanel();
+        //bDriveAPI.GetFileListFromPath("/", CreatePanels__);
          
         /*
                 if(inputField.text != empty){
@@ -281,29 +315,10 @@ public class UIManager : MonoBehaviour {
         for (int index = 0; index < parseResult["entries"].Count; index++)
         {
             GameObject createInstance = Instantiate(CreateInstance) as GameObject;
-           // createInstance.name = string.Format("{index}_button");
-           // Text[] tempObject = createInstance.GetComponentsInChildren<Text>();
+
             createInstance.GetComponent<ButtonType>().buttonName = parseResult["entries"][index]["name"];
             createInstance.GetComponent<ButtonType>().buttonType = parseResult["entries"][index][".tag"];
-            /*
-            foreach (Text go in tempObject) {
-                if (go.name == "pptName") {
-                    go.text = parseResult["entries"][index]["name"];
-                } else if (go.name == "type") {
-                    go.text = parseResult["entries"][index][".tag"];
-                }
-
-            }
-            */
-            
             createInstance.GetComponentInChildren<Text>().text = parseResult["entries"][index]["name"];
-
-            //parseResult["entries"][index][".tag"]
-
-            // if("file")
-            //else if("folder")    
-            
-            // + "/" + parseResult["entries"][index][".tag"];
 
             createInstance.transform.SetParent(RootRect, false);
 
@@ -324,7 +339,7 @@ public class UIManager : MonoBehaviour {
 
         //if(urlInputField.text != empty || dbInputField.text != empty || commentField.text != empty){
         SetPowerPointData(_commentField.text);
-			ShowListPanel();
+        ShowCasePanel();
 		//}
 	}
     public void OnPPTClick()
@@ -333,7 +348,7 @@ public class UIManager : MonoBehaviour {
     }
     public void SetPowerPointData(string newStr)
     {
-        GameObject pptPractice =listCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
+        GameObject pptPractice =showcaseCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
         GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
 
         commentBox.GetComponent<Text>().text = string.Format("[{0}]", newStr); 
@@ -344,7 +359,9 @@ public class UIManager : MonoBehaviour {
     }
 
 	public void OnAddButtonClick(){
-		ShowUrlPanel();
+        //ShowUrlPanel();
+        ShowConnectPanel();
+
 	}
 
 	public IEnumerator ChangePanel(){
@@ -370,6 +387,13 @@ public class UIManager : MonoBehaviour {
         {
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
+  }
+    public void DropboxClicked()
+    {
+        bDriveAPI = new bDropboxAPI();
+        bDriveAPI.StartAuthentication();
+        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+        ShowNavigationPanel();
     }
 
 }

@@ -121,21 +121,17 @@ public class RoomCenter : MonoBehaviour
                 using (var input = new BinaryReader(stream))
                 {
                     int count = input.ReadInt32();
-                    if (count != LightmapSettings.lightProbes.count)
-                        LoadLightProbeFromScene();
-                    else
+                    SphericalHarmonicsL2[] bakedProbes = new SphericalHarmonicsL2[count];
+                    for (int i = 0; i < count; ++i)
                     {
-                        SphericalHarmonicsL2[] bakedProbes = LightmapSettings.lightProbes.bakedProbes;
-                        for (int i = 0; i < count; ++i)
-                        {
-                            bakedProbes[i].Clear();
-                            for (int ch = 0; ch < 3; ++ch)
-                                for (int coef = 0; coef < 9; ++coef)
-                                    bakedProbes[i][ch, coef] = input.ReadSingle();
-                        }
-
-                        LightmapSettings.lightProbes.bakedProbes = bakedProbes;
+                        bakedProbes[i].Clear();
+                        for (int ch = 0; ch < 3; ++ch)
+                            for (int coef = 0; coef < 9; ++coef)
+                                bakedProbes[i][ch, coef] = input.ReadSingle();
                     }
+
+                    LightmapSettings.lightProbes.bakedProbes = bakedProbes;
+
                     input.Close();
                 }
                 stream.Close();

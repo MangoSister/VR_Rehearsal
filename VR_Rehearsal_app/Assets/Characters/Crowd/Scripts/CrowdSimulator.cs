@@ -26,6 +26,7 @@ public class CrowdSimulator : MonoBehaviour
     public string crowdConfigFileName;
     public bool dummy = true;
     public float stepInterval;
+    public float stepExternalInterval;
 
     public float globalAttentionMean { get; set; }
     public float globalAttentionStDev { get; set; }
@@ -184,6 +185,7 @@ public class CrowdSimulator : MonoBehaviour
         if (dummy && _dummyAudienceBt != null)
         {
             StartCoroutine(Simulate_CR());
+            StartCoroutine(ExternalFactor_CR());
         }
     }
 
@@ -192,7 +194,6 @@ public class CrowdSimulator : MonoBehaviour
         float stepPerAudience = stepInterval / audienceNum;
         while (true)
         {
-            gazeCollision.UpdateGazeContact();
             foreach (SocialGroup group in socialGroups)
                 group.isComputed = false;
 
@@ -202,6 +203,15 @@ public class CrowdSimulator : MonoBehaviour
                 _dummyAudienceBt.NextTick(audiences[i]);
                 yield return new WaitForSeconds(stepPerAudience);
             }
+        }
+    }
+
+    private IEnumerator ExternalFactor_CR()
+    {
+        while (true)
+        {
+            gazeCollision.UpdateGazeContact();
+            yield return new WaitForSeconds(stepExternalInterval);
         }
     }
 

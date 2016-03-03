@@ -1,9 +1,11 @@
 ﻿/* HeatmapTracker.cs
- * Yang Zhou, last modified on Feb 20, 2016
- * HeatmapTracker stores the presenter's gaze data, generate heatmap based on the data,
- * and performs gaze trajectory replay.
+ * Yang Zhou, last modified on Mar 3, 2016
+ * HeatmapTracker stores the presenter's gaze data
  * Dependencies: need RoomCenter in VR scene, Cardboard post render object for editor ONLY screen overlay
  * May implement interpolation in the future
+
+ * Now be able to capture a screenshot (with edge enhancement) with a separate camera
+ * The actual heatmap generation relies on HeatmapGenerator.cs
  */
 
 using UnityEngine;
@@ -24,6 +26,23 @@ public class HeatmapTracker : MonoBehaviour
     //updating interval. Accumulate once per updateInterval
     public float updateInteval = 1f;
 
+    //heatmaptracker works similar to a camera, i.e., projects the presenter's view direction on a XY plane at z = 1
+    //vertical "field of view" (in degrees) of heatmap, horizontal FOV can be computed with it and (screen) aspect
+    //view direction outside FOV would contribute to "out of bound" component
+    public float verticalFOVDeg = 60f;
+
+    public float horizontalFOVDeg = 120f;
+
+    //Screen aspect ratio
+    private float _aspect
+    {
+        get
+        {
+            return Mathf.Tan(Mathf.Deg2Rad * 0.5f * horizontalFOVDeg) /
+              Mathf.Tan(Mathf.Deg2Rad * 0.5f * verticalFOVDeg);
+        }
+    }
+
     //Gaze data: a series of GazeSnapshot (temporal)
     private List<GazeSnapshot> _gazeData = new List<GazeSnapshot>();
 
@@ -36,9 +55,13 @@ public class HeatmapTracker : MonoBehaviour
     private bool _replayOverlay = false;
 #endif
 
+    public Texture2D scn;
+    public Camera scnCam;
+    public int scnWidthRes = 1024;
     private void Start()
     {
         _gazeData.Clear();
+        //StartCoroutine(Capture_CR());
     }
 
     //In VR scene, call me to start track
@@ -111,36 +134,68 @@ public class HeatmapTracker : MonoBehaviour
         }
     }
 
-//#if UNITY_EDITOR
-//    //screen overlay routine in editor ONLY
-//    //need to be plugged to Cardboard post render object
-//    public void RenderOverlay()
-//    {
-//        if (!_replayOverlay)
-//            return;
-   
-//        GL.PushMatrix();
-//        GL.LoadOrtho();
+    public Texture2D CaptureScreenshot()
+    {
+        scnCam.gameObject.SetActive(true);
+        scnCam.fieldOfView = verticalFOVDeg;
+        scnCam.aspect = _aspect;
 
-//        _overLayMat.SetPass(0);
+        RenderTexture rt = new RenderTexture
+            (scnWidthRes, (int)((float)scnWidthRes / _aspect), 24, RenderTextureFormat.Default);
+        scnCam.targetTexture = rt;
+        scnCam.Render();
+        RenderTexture oldActive = RenderTexture.active;
+        RenderTexture.active = rt;
 
-//        GL.Begin(GL.QUADS);
+        scn = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false);
+        scn.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        scn.Apply();
 
-//        GL.TexCoord(new Vector3(0, 0, 0));
-//        GL.Vertex3(0, 0, 0);
+        RenderTexture.active = oldActive;
 
-//        GL.TexCoord(new Vector3(1, 0, 0));
-//        GL.Vertex3(1, 0, 0);
+        scnCam.gameObject.SetActive(false);
 
-//        GL.TexCoord(new Vector3(1, 1, 0));
-//        GL.Vertex3(1, 1, 0);
+        return scn;
 
-//        GL.TexCoord(new Vector3(0, 1, 0));
-//        GL.Vertex3(0, 1, 0);
+    }
 
-//        GL.End();
+    private IEnumerator Capture_CR()
+    {
+        scnCam.gameObject.SetActive(false);
+        yield return new WaitForSeconds(3f);
+        CaptureScreenshot();
+    }
 
-//        GL.PopMatrix();
-//    }
-//#endif
+    //#if UNITY_EDITOR
+    //    //screen overlay routine in editor ONLY
+    //    //need to be plugged to Cardboard post render object
+    //    public void RenderOverlay()
+    //    {
+    //        if (!_replayOverlay)
+    //            return;
+
+    //        GL.PushMatrix();
+    //        GL.LoadOrtho();
+
+    //        _overLayMat.SetPass(0);
+
+    //        GL.Begin(GL.QUADS);
+
+    //        GL.TexCoord(new Vector3(0, 0, 0));
+    //        GL.Vertex3(0, 0, 0);
+
+    //        GL.TexCoord(new Vector3(1, 0, 0));
+    //        GL.Vertex3(1, 0, 0);
+
+    //        GL.TexCoord(new Vector3(1, 1, 0));
+    //        GL.Vertex3(1, 1, 0);
+
+    //        GL.TexCoord(new Vector3(0, 1, 0));
+    //        GL.Vertex3(0, 1, 0);
+
+    //        GL.End();
+
+    //        GL.PopMatrix();
+    //    }
+    //#endif
 }
