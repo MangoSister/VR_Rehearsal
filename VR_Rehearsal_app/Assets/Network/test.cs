@@ -3,7 +3,8 @@ using System.Collections;
 using SimpleJSON;
 
 public class test : MonoBehaviour {
-	
+
+	bShowcaseManager showcaseMgr;
 	bhClowdDriveAPI clowdAPI;
 	public GameObject pf;
 	string str;
@@ -11,32 +12,13 @@ public class test : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		clowdAPI = new bLocalDriveAPI ();
-		clowdAPI.StartAuthentication ();
-
-		clowdAPI.GetFileListFromPath (Application.persistentDataPath, delegate(string json) {
-			Debug.Log (json);
-			var parseResult = JSON.Parse(json);
-
-			for (int index = 0; index < parseResult["entries"].Count; index++ )
-			{
-				Debug.Log(parseResult["entries"][index]["name"].Value);
-			}
-
 		
-		});
-
-		clowdAPI.DonwloadAllFilesInFolder (Application.persistentDataPath, Application.persistentDataPath + "/babo", delegate() {
-			Debug.Log("Done");
-		});
-
-		/*
-		bool res1 = clowdAPI.DonwloadAllFilesInFolder ("/Photos", Application.persistentDataPath , delegate() {
-			Debug.Log ("Update Complete");
-			clowdAPI.JobDone ();
-		});
-		*/
-
+		showcaseMgr = new bShowcaseManager ();
+		showcaseMgr.Start ();
+		showcaseMgr.AddShowcase ("jake1", 1, "coll/coll", 30);
+		showcaseMgr.AddShowcase ("jake2", 1, "coll/coll", 30);
+		showcaseMgr.AddShowcase ("jake3", 1, "coll/coll", 30);
+		showcaseMgr.End ();
 	}
 	
 	// Update is called once per frame
