@@ -78,7 +78,6 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			#endif
 		}
 
-
 		/* Message System */
 		if (_isUpdateListDone) {
 			_updateList_callback (_updateList_result);
@@ -123,6 +122,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 				_recentPath += "/" + result [i];
 			}
 		
+
 		}
 
 		bool res = GetFileListFromPath_internal (_recentPath, callback);
