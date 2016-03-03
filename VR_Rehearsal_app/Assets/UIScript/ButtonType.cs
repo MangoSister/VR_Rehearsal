@@ -45,7 +45,6 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
             isSelected = true;
             Debug.Log("Clicked");
         }
-
     }
     public void GetButtonRealse()
     {
@@ -56,20 +55,19 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
             Debug.Log("Releasd!");
         }
         isReleased = false;
-
     }
-   
+
     public void OnPointerClick(PointerEventData eventData)
     {
         
     }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         timePressStarted = Time.time;
         if (Time.time - timePressStarted < durationThreshold/2f) { 
             if (isSelected == false && isReleased == false)
             {
-              //timePressStarted = Time.time;
                isPointerDown = true;
                longPressTriggered = false;
                isSelected = true;
@@ -80,28 +78,18 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
 
     public void OnPointerUp(PointerEventData eventData)
     {
-
         if(isSelected == true && isReleased ==false)
         {
             isPointerDown = false;
             isSelected = false;
             isReleased = true;
             Debug.Log("PointUp");
-
         }
         isReleased = false;
-       
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         isPointerDown = false;
     }
-
-    public void LongPressAndNavigate()
-    {
-
-        Debug.Log("lonolong");
-    }
-
 }

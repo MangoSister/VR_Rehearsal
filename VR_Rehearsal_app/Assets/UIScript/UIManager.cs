@@ -37,8 +37,6 @@ public class UIManager : MonoBehaviour {
     public GameObject rotationCanvas;
 	public GameObject okButton;
 
-    public RectTransform setTopButton;
-
    	private string _email;
 	private string _url;
 	private string _dbNumber;
@@ -71,6 +69,7 @@ public class UIManager : MonoBehaviour {
     bool isButtonSelected = false;
     public Text token;
     private bool isReseting = false;
+    private GameObject selectedButton;
     #endregion
     void Start () {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
@@ -78,8 +77,7 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.StartAuthentication();
         ShowLogoPanel();
         _bType = bType;
-        Debug.Log("InitialCanvasScrollSize" + InitialCanvasScrollSize);
-	}
+ 	}
 
     
     void Update () {
@@ -110,30 +108,42 @@ public class UIManager : MonoBehaviour {
             ButtonListener();
         }
     }
-    /*
-    void CheckButtonStatus()
+
+    public void SelectedDownload()
     {
-        foreach (GameObject _button in storedButton)
+        if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
         {
-            if(_button.GetComponent<ButtonType>().isSelected == true && isButtonSelected == false)
+            string str = bDriveAPI.GetRecentPath();
+            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
             {
-                isButtonSelected = true;
-                CreateButtons(_button.GetComponent<ButtonType>().buttonName);
-              //  Debug.Log("Name : " + _button.GetComponent<ButtonType>().buttonName + " / " + "type : " + _button.GetComponent<ButtonType>().buttonType);
-            }
-            
+                Debug.Log("fileDownLoad Complete");
+            });
+
+            Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
         }
     }
-    */
+
+    private bool isCopy = false;
     void ButtonListener()
     {
         foreach (GameObject _button in storedButton)
         {
             if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
             {
-            //    isButtonSelected = true;
-                //Debug.Log("Name : " + _button.GetComponent<ButtonType>().buttonName + " / " + "type : " + _button.GetComponent<ButtonType>().buttonType);
-                CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+                
+                if (isCopy == false)
+                {
+                    if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
+                    {
+                        Destroy(GameObject.Find("PPT_Practice(Clone)(Clone)"));
+                    }
+                    selectedButton = Instantiate(_button) as GameObject;
+                    isCopy = true;
+                }
+                if (_button.GetComponent<ButtonType>().buttonType == "folder")
+                {
+                    CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+                }
                 
             }
         }
@@ -226,26 +236,9 @@ public class UIManager : MonoBehaviour {
       
     }
 
-    public void Refresh()
-    {
-        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
-
-        token.text = bDriveAPI.GetAPItoken();
-        
-    }
 
     public void UpdateButtons(string _folderName) {
         bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels__);
-    }
-
-    public void Download() {
-        //string str = bDriveAPI.GetRecentPath();
-        //bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
-        //{
-        //    Debug.Log("fileDownLoad Complete");
-        //});
-
-        Debug.Log(Application.persistentDataPath);
     }
 
     public void DeletePanels__(bool isSelected, string whichButton)
@@ -262,6 +255,7 @@ public class UIManager : MonoBehaviour {
             }
         }
         storedButton.Clear();
+        isCopy = false;
     }
    
 
@@ -377,8 +371,5 @@ public class UIManager : MonoBehaviour {
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
     }
-
-    
-      
 
 }
