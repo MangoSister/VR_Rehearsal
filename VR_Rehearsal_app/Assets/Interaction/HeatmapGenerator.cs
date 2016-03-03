@@ -27,7 +27,7 @@ public class HeatmapGenerator : MonoBehaviour
     public int widthResolution = 64;
 
     //Shoulld get params from HeatmapTracker
-    public float aspect = (float)Screen.width / (float)Screen.height;
+    public float aspect;
 
     private void Start()
     {

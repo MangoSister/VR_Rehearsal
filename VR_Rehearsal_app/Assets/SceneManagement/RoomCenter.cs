@@ -98,18 +98,21 @@ public class RoomCenter : MonoBehaviour
         OperateAmbient(false);
     }
 
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.L))
-    //    {
-    //        GlobalManager.EndPresentation
-    //            (
-    //                60,
-    //                (float)Screen.width / (float)Screen.height,
-    //                heatmapTracker.output
-    //            );
-    //    }
-    //}
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            GlobalManager.EndPresentation
+                (
+                    heatmapTracker.verticalFOVDeg,
+                    heatmapTracker.aspect,
+                    heatmapTracker.output,
+                    heatmapTracker.scn
+                );
+        }
+    }
+#endif
 
     private void LoadLightProbes(string path)
     {
@@ -130,8 +133,13 @@ public class RoomCenter : MonoBehaviour
                                 bakedProbes[i][ch, coef] = input.ReadSingle();
                     }
 
+                    if (LightmapSettings.lightProbes == null)
+                    {
+                        LightmapSettings.lightProbes = new LightProbes();
+                        LightmapSettings.lightProbes.name = "Imported probes";
+                    }
                     LightmapSettings.lightProbes.bakedProbes = bakedProbes;
-
+                    
                     input.Close();
                 }
                 stream.Close();

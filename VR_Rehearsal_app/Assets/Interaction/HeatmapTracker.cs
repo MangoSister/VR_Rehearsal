@@ -34,7 +34,7 @@ public class HeatmapTracker : MonoBehaviour
     public float horizontalFOVDeg = 120f;
 
     //Screen aspect ratio
-    private float _aspect
+    public float aspect
     {
         get
         {
@@ -61,7 +61,7 @@ public class HeatmapTracker : MonoBehaviour
     private void Start()
     {
         _gazeData.Clear();
-        //StartCoroutine(Capture_CR());
+        StartCoroutine(Capture_CR());
     }
 
     //In VR scene, call me to start track
@@ -138,10 +138,10 @@ public class HeatmapTracker : MonoBehaviour
     {
         scnCam.gameObject.SetActive(true);
         scnCam.fieldOfView = verticalFOVDeg;
-        scnCam.aspect = _aspect;
+        scnCam.aspect = aspect;
 
         RenderTexture rt = new RenderTexture
-            (scnWidthRes, (int)((float)scnWidthRes / _aspect), 24, RenderTextureFormat.Default);
+            (scnWidthRes, (int)((float)scnWidthRes / aspect), 24, RenderTextureFormat.Default);
         scnCam.targetTexture = rt;
         scnCam.Render();
         RenderTexture oldActive = RenderTexture.active;
@@ -162,7 +162,7 @@ public class HeatmapTracker : MonoBehaviour
     private IEnumerator Capture_CR()
     {
         scnCam.gameObject.SetActive(false);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.2f);
         CaptureScreenshot();
     }
 
