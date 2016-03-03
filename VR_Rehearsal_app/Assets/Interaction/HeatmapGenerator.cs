@@ -31,8 +31,8 @@ public class HeatmapGenerator : MonoBehaviour
 
     private void Start()
     {
-        verticalFOVDeg = PresentationData.out_HGVertFOVDeg;
-        aspect = PresentationData.out_HGAspect;
+        verticalFOVDeg = Mathf.Clamp(PresentationData.out_HGVertFOVDeg, 0f, 179f);
+        aspect = Mathf.Clamp(PresentationData.out_HGAspect, 0.01f, 100f);
     }
 
     //Call me to query a time period and generate the heatmap (as well as the max staring time of all directions)
@@ -42,13 +42,15 @@ public class HeatmapGenerator : MonoBehaviour
     //maxTime: the max staring time of all directions
     public void GenerateMap(List<GazeSnapshot> gazeData, float from, float to, out Texture2D heatmap, out float maxTime)
     {
-        if (gazeData.Count == 0)
+        if (gazeData == null || gazeData.Count == 0)
         {
             heatmap = null;
             maxTime = 0f;
             return;
         }
 
+        from = Mathf.Clamp(from, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
+        to = Mathf.Clamp(to, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
         float halfProjHeight = Mathf.Tan(verticalFOVDeg * 0.5f * Mathf.Deg2Rad);
         float halfProjWidth = halfProjHeight * aspect;
         float length = to - from;

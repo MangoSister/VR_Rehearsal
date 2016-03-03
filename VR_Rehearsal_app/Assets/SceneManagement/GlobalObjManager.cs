@@ -63,6 +63,7 @@ public static class GlobalManager
         )
     {
         PresentationData.in_EnvType = envType;
+        PresentationData.in_EnterTime = Time.time;
 
         if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
             SceneManager.LoadScene(_PRESENT_SCENE_NAME);
@@ -83,6 +84,7 @@ public static class GlobalManager
         PresentationData.out_HGAspect = HGAspect;
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
+        PresentationData.out_ExitTime = Time.time;
 
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
             SceneManager.LoadScene(_EVAL_SCENE_NAME);
@@ -140,8 +142,10 @@ public static class PresentationData
 
     //Input
     public static EnvType in_EnvType;
+    public static float in_EnterTime;
 
     //Output
+    public static float out_ExitTime;
     public static float out_HGVertFOVDeg;
     public static float out_HGAspect;
     public static List<GazeSnapshot> out_HGGazeData;
