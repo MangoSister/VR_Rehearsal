@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using System;
 
-public class ButtonType : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
 
    // public string buttonName;
@@ -12,16 +14,30 @@ public class ButtonType : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     public bool isSelected = false;
     public bool isReleased = false;
 
-	// Use this for initialization
-	void Start () {
-       
+    public float durationThreshold = 0.5f;
+
+    public UnityEvent onLongPress = new UnityEvent();
+
+    private bool isPointerDown = false;
+    private bool longPressTriggered = false;
+    private float timePressStarted;
+
+    private void Update()
+    {
+        if (isPointerDown && !longPressTriggered)
+        {
+            if (Time.time - timePressStarted > durationThreshold)
+            {
+                longPressTriggered = true;
+                onLongPress.Invoke();
+            }
+            else if (Time.time - timePressStarted < durationThreshold)
+            {
+
+            }
+         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-    
+
     public void GetButtonStatus()
     {
         if (isSelected == false && isReleased == false)
@@ -42,29 +58,50 @@ public class ButtonType : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
         isReleased = false;
 
     }
+   
     public void OnPointerClick(PointerEventData eventData)
     {
         
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-
-        if (isSelected == false && isReleased == false)
-        {
-            isSelected = true;
-        }
-       
+        timePressStarted = Time.time;
+        if (Time.time - timePressStarted < durationThreshold/2f) { 
+            if (isSelected == false && isReleased == false)
+            {
+              //timePressStarted = Time.time;
+               isPointerDown = true;
+               longPressTriggered = false;
+               isSelected = true;
+                Debug.Log("PointDown");
+            }
+         }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+
         if(isSelected == true && isReleased ==false)
         {
+            isPointerDown = false;
             isSelected = false;
             isReleased = true;
+            Debug.Log("PointUp");
+
         }
         isReleased = false;
        
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isPointerDown = false;
+    }
+
+    public void LongPressAndNavigate()
+    {
+
+        Debug.Log("lonolong");
     }
 
 }

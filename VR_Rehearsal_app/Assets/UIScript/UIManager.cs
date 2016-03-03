@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 using SimpleJSON;
 using System.Collections.Generic;
-
 public class UIManager : MonoBehaviour {
 
     /*  <UI Manager>
@@ -133,7 +132,7 @@ public class UIManager : MonoBehaviour {
             if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
             {
             //    isButtonSelected = true;
-                Debug.Log("Name : " + _button.GetComponent<ButtonType>().buttonName + " / " + "type : " + _button.GetComponent<ButtonType>().buttonType);
+                //Debug.Log("Name : " + _button.GetComponent<ButtonType>().buttonName + " / " + "type : " + _button.GetComponent<ButtonType>().buttonType);
                 CreateButtons(_button.GetComponent<ButtonType>().buttonName);
                 
             }
@@ -212,8 +211,6 @@ public class UIManager : MonoBehaviour {
     }
     public void CreateButtons(string _folder)
     {
-        Debug.Log("stored : " + storedButton.Count);
-   
         bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
             {
                 isReseting = true;
