@@ -409,10 +409,13 @@ public class UIManager : MonoBehaviour {
     public void DropboxClicked()
     {
         bDriveAPI = new bDropboxAPI();
-        bDriveAPI.StartAuthentication();
-        StartCoroutine("FinishList");
+        bDriveAPI.StartAuthentication(delegate() {
+			bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+       });
+       
         ShowNavigationPanel();
     }
+
 
     IEnumerator FinishList(){
         while (true) {
@@ -425,6 +428,10 @@ public class UIManager : MonoBehaviour {
     }
 
     public void CheckToggle(int index)
+
+    
+   public void CheckToggle(int index)
+
     {
         switch(index)
         {
