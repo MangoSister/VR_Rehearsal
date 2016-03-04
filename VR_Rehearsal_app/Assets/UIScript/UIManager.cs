@@ -427,9 +427,6 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public void CheckToggle(int index)
-
-    
    public void CheckToggle(int index)
 
     {
