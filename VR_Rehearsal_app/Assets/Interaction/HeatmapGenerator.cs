@@ -24,7 +24,7 @@ public class HeatmapGenerator : MonoBehaviour
     public float verticalFOVDeg = 60f;
 
     //The width of generated heatmap. The height of the map depends on aspect
-    public int widthResolution = 64;
+    public int widthResolution = 1024;
 
     //Shoulld get params from HeatmapTracker
     public float aspect;
@@ -32,7 +32,9 @@ public class HeatmapGenerator : MonoBehaviour
     private void Start()
     {
         verticalFOVDeg = Mathf.Clamp(PresentationData.out_HGVertFOVDeg, 0f, 179f);
+		//verticalFOVDeg =60f;
         aspect = Mathf.Clamp(PresentationData.out_HGAspect, 0.01f, 100f);
+		//aspect = 3f;
     }
 
     //Call me to query a time period and generate the heatmap (as well as the max staring time of all directions)
@@ -50,13 +52,13 @@ public class HeatmapGenerator : MonoBehaviour
         }
 
         from = Mathf.Clamp(from, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
-        to = Mathf.Clamp(to, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
+         to = Mathf.Clamp(to, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
         float halfProjHeight = Mathf.Tan(verticalFOVDeg * 0.5f * Mathf.Deg2Rad);
         float halfProjWidth = halfProjHeight * aspect;
         float length = to - from;
 
-
-        heatmap = new Texture2D(widthResolution, Mathf.RoundToInt((float)widthResolution / aspect),
+		int bdd = Mathf.RoundToInt ((float)widthResolution / aspect);
+		heatmap = new Texture2D(widthResolution, bdd ,
                                  TextureFormat.ARGB32, false);
         float[] outputTime = new float[heatmap.width * heatmap.height];
         float outOfBoundTime = 0f;
@@ -96,12 +98,14 @@ public class HeatmapGenerator : MonoBehaviour
         for (int i = 0; i < heatmap.width * heatmap.height; ++i)
         {
             outputCol[i] = heatmapGradient.Evaluate
-                (Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
-            outputCol[i].a = 0.5f;
+
+				(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
+            outputCol[i].a = 1.0f;
         }
         outofBoundCol = heatmapGradient.Evaluate
-            (Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxElementTime)));
-        outofBoundCol.a = 0.5f;
+			(Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxElementTime)));
+		outofBoundCol.a = 1.0f;
+
         heatmap.SetPixels(outputCol);
         heatmap.Apply();
     }
