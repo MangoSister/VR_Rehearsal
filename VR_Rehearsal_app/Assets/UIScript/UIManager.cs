@@ -38,6 +38,7 @@ public class UIManager : MonoBehaviour {
     public GameObject rotationCanvas;
 	public GameObject okButton;
     public GameObject navigationCanvas;
+    public GameObject loadingCanvas;
     
 
    	private string _email;
@@ -75,6 +76,10 @@ public class UIManager : MonoBehaviour {
     private bool isReseting = false;
     private GameObject selectedButton;
     private bool isCopy = false;
+
+    public GameObject ProgressCircle;
+
+    
     #endregion
 
     void Start () {
@@ -89,6 +94,7 @@ public class UIManager : MonoBehaviour {
 
     
     void Update () {
+
         if (bDriveAPI != null)
         {
             bDriveAPI.Update();
@@ -100,7 +106,6 @@ public class UIManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // ShowListPanel();
             bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
                 isReseting = true;
                 // DeletePanels__(true, "dd");
@@ -124,13 +129,15 @@ public class UIManager : MonoBehaviour {
     {
         if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
         {
+            ShowLoadingPanel();
             string str = bDriveAPI.GetRecentPath();
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
 
             }, delegate(int totalFileNum, int completedFileNum) {
-
+                ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+                Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
             });
 
             Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
@@ -173,6 +180,7 @@ public class UIManager : MonoBehaviour {
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
         StartCoroutine("ChangePanel");
 	}
 
@@ -184,6 +192,7 @@ public class UIManager : MonoBehaviour {
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
     }
 
     public void ShowCasePanel(){
@@ -194,6 +203,7 @@ public class UIManager : MonoBehaviour {
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
     }
 
     public void ShowUrlPanel(){
@@ -204,6 +214,7 @@ public class UIManager : MonoBehaviour {
         urlCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
     }
 
     public void ShowRotation()
@@ -215,6 +226,7 @@ public class UIManager : MonoBehaviour {
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(true);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
         isRotate = true;
     }
 
@@ -227,6 +239,7 @@ public class UIManager : MonoBehaviour {
         connectCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        loadingCanvas.SetActive(false);
     }
 
     public void ShowNavigationPanel()
@@ -238,21 +251,26 @@ public class UIManager : MonoBehaviour {
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(true);
+        loadingCanvas.SetActive(false);
+    }
+
+    public void ShowLoadingPanel()
+    {
+        loadingCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        loadingCanvas.SetActive(true);
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(false);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
     }
 
     #endregion 
     public void OnSignInButtonClick(){
-        //GameObject inputObject = GameObject.FindGameObjectWithTag("INPUT_EMAIL");
-        //InputField inputField = inputObject.GetComponent<InputField>();
         ShowCasePanel();
-        //bDriveAPI.GetFileListFromPath("/", CreatePanels__);
-         
-        /*
-                if(inputField.text != empty){
-                    ShowListPanel();
-                }
-                */
     }
+
     public void CreateButtons(string _folder)
     {
         bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
@@ -267,10 +285,8 @@ public class UIManager : MonoBehaviour {
                 CreatePanels__(resJson);
                 isReseting = false;
             });
-      
     }
-
-
+    
     public void UpdateButtons(string _folderName) {
         bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels__);
     }
@@ -298,7 +314,6 @@ public class UIManager : MonoBehaviour {
         storedButton.Add(button);
        // Debug.Log("totalButton : "+storedButton.Count);
     }
-    
 
     public void CreatePanels__(string fileList)
     {
@@ -395,5 +410,4 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.GetFileListFromPath("/", CreatePanels__);
         ShowNavigationPanel();
     }
-
 }
