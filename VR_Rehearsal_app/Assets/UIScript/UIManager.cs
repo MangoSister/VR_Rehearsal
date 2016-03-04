@@ -31,7 +31,6 @@ public class UIManager : MonoBehaviour {
     public GameObject prepHouse;
 
     public GameObject logoCanvas;
-    public GameObject loginCanvas;
     public GameObject showcaseCanvas;
     public GameObject connectCanvas;
     public GameObject urlCanvas;
@@ -41,10 +40,6 @@ public class UIManager : MonoBehaviour {
     public GameObject loadingCanvas;
     public GameObject customizeCanvas;
     
-   	private string _email;
-	private string _url;
-	private string _dbNumber;
-	private string _comment;
 	private string empty = "";
     private InputField _urlInputField;
     private InputField _dbInputField;
@@ -91,10 +86,9 @@ public class UIManager : MonoBehaviour {
         ShowLogoPanel();
         _bType = bType;
  	}
-
     
     void Update () {
-
+  
         if (bDriveAPI != null)
         {
             bDriveAPI.Update();
@@ -110,17 +104,32 @@ public class UIManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
-                isReseting = true;
-                // DeletePanels__(true, "dd");
-                if (storedButton.Count != 0)
+            if (navigationCanvas.activeSelf && bDriveAPI.GetRecentPath() == "/")
+            {
+                ShowConnectPanel();
+            }
+            else if (navigationCanvas.activeSelf && bDriveAPI.GetRecentPath() == empty)
+            {
+                ShowConnectPanel();
+            }
+            else if (connectCanvas.activeSelf)
+            {
+                ShowCasePanel();
+            }
+            else {
+                bDriveAPI.GetCurrParentFileList(delegate (string resJson)
                 {
-                    DeletePanels__(true, "dd");
-                }
-                bDriveAPI.JobDone();
-                CreatePanels__(resJson);
-                isReseting = false;
-            });
+                    isReseting = true;
+                    // DeletePanels__(true, "dd");
+                    if (storedButton.Count != 0)
+                    {
+                        DeletePanels__(true, "dd");
+                    }
+                    bDriveAPI.JobDone();
+                    CreatePanels__(resJson);
+                    isReseting = false;
+                });
+            }
         }
 
         if (customizeCanvas.activeSelf)
@@ -144,7 +153,7 @@ public class UIManager : MonoBehaviour {
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
-                bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
+                bShowcaseMgr.AddShowcase(showCaseName, 1, str, 30);
                 CustomizePanel();
                 //bShowcaseMgr
 
@@ -152,8 +161,11 @@ public class UIManager : MonoBehaviour {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
               //  Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
             });
-
             Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+        }
+        else
+        {
+            Debug.Log("you can;t download");
         }
     }
 
@@ -163,7 +175,6 @@ public class UIManager : MonoBehaviour {
         {
             if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
             {
-                
                 if (isCopy == false)
                 {
                     if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
@@ -177,7 +188,6 @@ public class UIManager : MonoBehaviour {
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
                 }
-                
             }
         }
         //isButtonSelected = false;
@@ -188,7 +198,6 @@ public class UIManager : MonoBehaviour {
     public void ShowLogoPanel(){
         logoCanvas.GetComponent<RectTransform>().SetAsLastSibling();
         logoCanvas.SetActive(true);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -198,22 +207,9 @@ public class UIManager : MonoBehaviour {
         StartCoroutine("ChangePanel");
 	}
 
-    public void ShowLoginPanel(){
-        loginCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
-        logoCanvas.SetActive(false);
-        loginCanvas.SetActive(true);
-        showcaseCanvas.SetActive(false);
-        urlCanvas.SetActive(false);
-        rotationCanvas.SetActive(false);
-        navigationCanvas.SetActive(false);
-        loadingCanvas.SetActive(false);
-        customizeCanvas.SetActive(false);
-    }
-
     public void ShowCasePanel(){
         showcaseCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(true);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -225,7 +221,6 @@ public class UIManager : MonoBehaviour {
     public void ShowUrlPanel(){
 		urlCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
@@ -238,7 +233,6 @@ public class UIManager : MonoBehaviour {
     {
 		rotationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(true);
@@ -252,7 +246,6 @@ public class UIManager : MonoBehaviour {
     {
         connectCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
@@ -265,7 +258,6 @@ public class UIManager : MonoBehaviour {
     {
         navigationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -279,7 +271,6 @@ public class UIManager : MonoBehaviour {
         loadingCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         loadingCanvas.SetActive(true);
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -293,7 +284,6 @@ public class UIManager : MonoBehaviour {
         customizeCanvas.SetActive(true);
         loadingCanvas.SetActive(false);
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -307,6 +297,7 @@ public class UIManager : MonoBehaviour {
 
     public void CreateButtons(string _folder)
     {
+        Debug.Log(bDriveAPI.GetRecentPath());
         bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
             {
                 isReseting = true;
@@ -327,7 +318,6 @@ public class UIManager : MonoBehaviour {
 
     public void DeletePanels__(bool isSelected, string whichButton)
     {
-        //GameObject[] allPrefabs = GameObject.FindObjectOfType("PPT_Practice(Clone)");
         if (isSelected == true)
         {
             foreach (RectTransform child in RootRect)
@@ -346,7 +336,6 @@ public class UIManager : MonoBehaviour {
     void StoreAllButtonStatus(GameObject button)
     {
         storedButton.Add(button);
-       // Debug.Log("totalButton : "+storedButton.Count);
     }
 
     public void CreatePanels__(string fileList)
@@ -357,7 +346,6 @@ public class UIManager : MonoBehaviour {
         float cellSize = gLayout.cellSize.y;
         float span = gLayout.spacing.y;
         float totalSizeofRect = (cellSize- span) * parseResult["entries"].Count;
-        Debug.Log (parseResult["entries"].Count);
         RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
         // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
         RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
@@ -379,18 +367,7 @@ public class UIManager : MonoBehaviour {
         isButtonSelected = false;
        // isReseting = false;
     }
-    
-    public void OnOkButtonClick(){
 
-        _urlInputField = GameObject.FindGameObjectWithTag("INPUT_URL").GetComponent<InputField>();
-        _dbInputField = GameObject.FindGameObjectWithTag("INPUT_DB").GetComponent<InputField>();
-        _commentField = GameObject.FindGameObjectWithTag("INPUT_COMMENT").GetComponent<InputField>();
-
-        //if(urlInputField.text != empty || dbInputField.text != empty || commentField.text != empty){
-        SetPowerPointData(_commentField.text);
-        ShowCasePanel();
-		//}
-	}
     public void OnPPTClick()
 	{
         ShowRotation();
@@ -415,15 +392,7 @@ public class UIManager : MonoBehaviour {
 
 	public IEnumerator ChangePanel(){
 		yield return new WaitForSeconds(2.0f);
-		ShowLoginPanel();
-	}
-
-	public void SetEmailAccount(string str){
-		_email = str;
-	}
-
-	public string GetEmailAccount(){
-		return _email;
+		ShowCasePanel();
 	}
 
     void IsRotate()
@@ -447,17 +416,15 @@ public class UIManager : MonoBehaviour {
 
     IEnumerator FinishList(){
         while (true) {
-
             if (bDriveAPI.GetAPItoken().Length > 5) {
                 bDriveAPI.GetFileListFromPath("/", CreatePanels__);
                 break;
             }
             yield return null;
         }
-
-      
     }
-   public void CheckToggle(int index)
+
+    public void CheckToggle(int index)
     {
         switch(index)
         {
@@ -477,7 +444,6 @@ public class UIManager : MonoBehaviour {
     public void CheckSliderValue()
     {
         sliderVal = sliderVla.value;
-        //Debug.Log("value" + sliderVal);
     }
 
     public InputField timer;
@@ -486,5 +452,13 @@ public class UIManager : MonoBehaviour {
     {
         time = timer.text;
         Debug.Log("TIMER : " + time);
+    }
+
+    public InputField showCase;
+    public string showCaseName;
+    public void SetShowCaseName()
+    {
+        showCaseName = showCase.text;
+        Debug.Log("ShowCase name : " + showCaseName);
     }
 }
