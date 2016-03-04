@@ -38,7 +38,8 @@ public class bShowcaseManager  {
 	}
 		
 	public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
-		string tempId = System.DateTime.Now.ToString () + Random.Range(0, 5000);
+
+		string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
 		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage);
 		_showcaseTable.Add (tempId, tempShowcase);
 		return tempId;

@@ -138,17 +138,17 @@ public class UIManager : MonoBehaviour {
             }
         }
     }
-
+    string pptID;
     public void SelectedDownload()
     {
         if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
         {
             ShowLoadingPanel();
             string str = bDriveAPI.GetRecentPath();
-            string folder = "/so";
+          //  string folder = "/so";
 
-            string id = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
-            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
+            pptID = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
+            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath +"/"+ pptID, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
                // bShowcaseMgr.EditShowcase(id, showCaseName , 0,Application.persistentDataPath + "/" + id, (int)sliderVal);
@@ -412,22 +412,31 @@ public class UIManager : MonoBehaviour {
        
         ShowNavigationPanel();
     }
-
+    public int roomNumber;
     public void CheckToggle(int index)
 
     {
+
         switch(index)
         {
             case 1:
                 Debug.Log("Fucking Large");
+                roomNumber = 1;
                 break;
             case 2:
                 Debug.Log("Fucking Medi");
+                roomNumber = 2;
                 break;
             case 3:
                 Debug.Log("Fucking small");
-                break;    
+                roomNumber = 3;
+                break;
+            default:
+                roomNumber = 0;
+                break;
+                  
         }
+
     }
     public Slider sliderVla;
     public float sliderVal;
@@ -456,10 +465,13 @@ public class UIManager : MonoBehaviour {
         ShowRotation();
     }
 
-/*
     public void OkCustomize()
     {
-        if()
+        if(showCaseName != empty && roomNumber != 0 && time != empty)
+        {
+            Debug.Log("PHAN!!");
+            bShowcaseMgr.EditShowcase(pptID, showCaseName, 0, Application.persistentDataPath + "/" + pptID, (int)sliderVal);
+        }
     }
-    */
+    
 }
