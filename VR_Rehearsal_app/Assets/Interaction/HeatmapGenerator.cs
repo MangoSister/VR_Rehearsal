@@ -41,13 +41,13 @@ public class HeatmapGenerator : MonoBehaviour
     //from: query start time (0 is the time when VR scene starts)
     //to: query end time
     //heatmap: generated heatmap
-    //maxTime: the max staring time of all directions
-    public void GenerateMap(List<GazeSnapshot> gazeData, float from, float to, out Texture2D heatmap, out float maxTime)
+    //maxTime: the max staring time (of one direction) among all directions
+    public void GenerateMap(List<GazeSnapshot> gazeData, float from, float to, out Texture2D heatmap, out float maxElementTime)
     {
         if (gazeData == null || gazeData.Count == 0)
         {
             heatmap = null;
-            maxTime = 0f;
+            maxElementTime = 0f;
             return;
         }
 
@@ -93,17 +93,19 @@ public class HeatmapGenerator : MonoBehaviour
             lastTime = snapshot.timeStamp;
         }
 
-        maxTime = outputTime.Max();
-        maxTime = Mathf.Max(maxTime, outOfBoundTime);
+        maxElementTime = outputTime.Max();
+        maxElementTime = Mathf.Max(maxElementTime, outOfBoundTime);
         for (int i = 0; i < heatmap.width * heatmap.height; ++i)
         {
             outputCol[i] = heatmapGradient.Evaluate
-                (Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxTime)));
+
+				(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
             outputCol[i].a = 1.0f;
         }
         outofBoundCol = heatmapGradient.Evaluate
-            (Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxTime)));
+			(Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxElementTime)));
 		outofBoundCol.a = 1.0f;
+
         heatmap.SetPixels(outputCol);
         heatmap.Apply();
     }
