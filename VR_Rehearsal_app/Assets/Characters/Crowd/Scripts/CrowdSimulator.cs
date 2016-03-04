@@ -1,11 +1,24 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using MangoBehaviorTree;
 using CrowdConfigInfo = spaceInfoParser.parsedData_spaceInfo;
+using URandom = UnityEngine.Random;
 
 public class CrowdSimulator : MonoBehaviour
 {
+    [Flags]
+    public enum SimModule
+    {
+        Gaze = 1,
+        VoiceVolume = 2,
+        FillerWords = 4,
+        SeatDistribution = 8,
+        SocialGroup = 16,
+        Global = 32,
+    };
+
     private static CrowdSimulator _currSim = null;
     public static CrowdSimulator currSim
     {
@@ -24,9 +37,15 @@ public class CrowdSimulator : MonoBehaviour
 
     public Transform crowdParent;
     public string crowdConfigFileName;
-    public bool dummy = true;
     public float stepInterval;
     public float stepExternalInterval;
+
+    public SimModule simModule = 
+        SimModule.Gaze | SimModule.VoiceVolume | 
+        SimModule.FillerWords | SimModule.SeatDistribution | 
+        SimModule.SocialGroup | SimModule.Global;
+
+    public bool deterministic;
 
     public float globalAttentionMean { get; set; }
     public float globalAttentionStDev { get; set; }
@@ -69,11 +88,11 @@ public class CrowdSimulator : MonoBehaviour
     private List<SocialGroup> socialGroups;
 
     //private BehaviorTree<Audience> _audienceBt = null;
-    private BehaviorTree<Audience> _dummyAudienceBt;
+    private BehaviorTree<Audience> _behaviorTree;
 
     private void CreateDummyTree()
     {
-        _dummyAudienceBt = new BehaviorTree<Audience>(
+        _behaviorTree = new BehaviorTree<Audience>(
             new SequenceNode<Audience>(
                 new AudienceSimStepNode(),
                 new AudienceStateSelectorNode(1,
@@ -97,7 +116,7 @@ public class CrowdSimulator : MonoBehaviour
 
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
-            int rand = Random.Range(0, (prefabsL1.Length - 1));
+            int rand = URandom.Range(0, (prefabsL1.Length - 1));
             Audience ad;
             if (i % tx.seat_ColNum < 2)
             {
@@ -123,7 +142,7 @@ public class CrowdSimulator : MonoBehaviour
         socialGroups = new List<SocialGroup>();
         for (int i = 0; i < audiences.Count; i++)
         {
-            if (Random.value > 0.3f)
+            if (URandom.value > 0.3f)
                 continue;
 
             int z = i % tx.seat_ColNum;
@@ -135,22 +154,22 @@ public class CrowdSimulator : MonoBehaviour
 
             List<Audience> neighbors = new List<Audience>();
             //randomly create social groups for now, 8 connectivity neighbors
-            if (idx + 1 >= 0 && idx + 1 < audiences.Count && audiences[idx + 1].socialGroup == null && Random.value > 0.25f)
+            if (idx + 1 >= 0 && idx + 1 < audiences.Count && audiences[idx + 1].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx + 1]);
-            if (idx - 1 >= 0 && idx - 1 < audiences.Count && audiences[idx - 1].socialGroup == null && Random.value > 0.25f)
+            if (idx - 1 >= 0 && idx - 1 < audiences.Count && audiences[idx - 1].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx - 1]);
-            if (idx + tx.seat_ColNum >= 0 && idx + tx.seat_ColNum < audiences.Count && audiences[idx + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx + tx.seat_ColNum >= 0 && idx + tx.seat_ColNum < audiences.Count && audiences[idx + tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx + tx.seat_ColNum]);
-            if (idx - tx.seat_ColNum >= 0 && idx - tx.seat_ColNum < audiences.Count && audiences[idx - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx - tx.seat_ColNum >= 0 && idx - tx.seat_ColNum < audiences.Count && audiences[idx - tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx - tx.seat_ColNum]);
 
-            if (idx + 1 + tx.seat_ColNum >= 0 && idx + 1 + tx.seat_ColNum < audiences.Count && audiences[idx + 1 + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx + 1 + tx.seat_ColNum >= 0 && idx + 1 + tx.seat_ColNum < audiences.Count && audiences[idx + 1 + tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx + 1 + tx.seat_ColNum]);
-            if (idx - 1 + tx.seat_ColNum >= 0 && idx - 1 + tx.seat_ColNum < audiences.Count && audiences[idx - 1 + tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx - 1 + tx.seat_ColNum >= 0 && idx - 1 + tx.seat_ColNum < audiences.Count && audiences[idx - 1 + tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx - 1 + tx.seat_ColNum]);
-            if (idx + 1 - tx.seat_ColNum >= 0 && idx + 1 - tx.seat_ColNum < audiences.Count && audiences[idx + 1 - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx + 1 - tx.seat_ColNum >= 0 && idx + 1 - tx.seat_ColNum < audiences.Count && audiences[idx + 1 - tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx + 1 - tx.seat_ColNum]);
-            if (idx - 1 - tx.seat_ColNum >= 0 && idx - 1 - tx.seat_ColNum < audiences.Count && audiences[idx - 1 - tx.seat_ColNum].socialGroup == null && Random.value > 0.25f)
+            if (idx - 1 - tx.seat_ColNum >= 0 && idx - 1 - tx.seat_ColNum < audiences.Count && audiences[idx - 1 - tx.seat_ColNum].socialGroup == null && URandom.value > 0.25f)
                 neighbors.Add(audiences[idx - 1 - tx.seat_ColNum]);
 
             if (neighbors.Count > 0)
@@ -173,7 +192,7 @@ public class CrowdSimulator : MonoBehaviour
         globalAttentionMean = 0.6f;
         globalAttentionStDev = 0.05f;
 
-        if (_dummyAudienceBt == null)
+        if (_behaviorTree == null)
             CreateDummyTree();
 
         CreateCrowd();
@@ -182,7 +201,7 @@ public class CrowdSimulator : MonoBehaviour
 
     private void Start()
     {
-        if (dummy && _dummyAudienceBt != null)
+        if (_behaviorTree != null)
         {
             StartCoroutine(Simulate_CR());
             StartCoroutine(ExternalFactor_CR());
@@ -200,7 +219,7 @@ public class CrowdSimulator : MonoBehaviour
             Shuffle(audiences);
             for (int i = 0; i < audiences.Count; ++i)
             {
-                _dummyAudienceBt.NextTick(audiences[i]);
+                _behaviorTree.NextTick(audiences[i]);
                 yield return new WaitForSeconds(stepPerAudience);
             }
         }
@@ -221,7 +240,7 @@ public class CrowdSimulator : MonoBehaviour
         while (n > 1)
         {
             n--;
-            int k = Random.Range(0, n + 1);
+            int k = URandom.Range(0, n + 1);
             T value = list[k];
             list[k] = list[n];
             list[n] = value;

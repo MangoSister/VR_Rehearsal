@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
+
 using MangoBehaviorTree;
 using State = Audience.States;
+using SimModule = CrowdSimulator.SimModule;
 
 public class AudienceSimStepNode : BaseNode<Audience>
 {
@@ -20,11 +21,43 @@ public class AudienceSimStepNode : BaseNode<Audience>
     {
         CrowdSimulator sim = CrowdSimulator.currSim;
         Audience target = tick.target;
-        
-        float global = GaussianRandom(sim.globalAttentionMean, sim.globalAttentionStDev);
-        global = Mathf.Clamp01(global);
-        float pos = sim.seatPosAttentionFactor.Evaluate(target.normalizedPos);
-        pos = Mathf.Clamp01(pos);
+
+        for (int i = 0; i < target.stateMassFunction.Length; ++i)
+            target.stateMassFunction[i] = 1f / (float)target.stateMassFunction.Length;
+
+        ProcessGlobal(target);
+        ProcessSeatDistribution(target);
+        ProcessSocialGroup(target); //override
+
+        ProcessFillerWord(target);
+        ProcessVoiceVolume(target);
+        ProcessGaze(target); //override
+
+        float sum = 0f;
+        foreach (var mass in target.stateMassFunction)
+            sum += mass;
+        for (int i = 0; i < target.stateMassFunction.Length; ++i)
+            target.stateMassFunction[i] /= sum;
+
+        if (sim.deterministic)
+        {
+            float max = target.stateMassFunction.Max();
+            for (int i = 0; i < target.stateMassFunction.Length; ++i)
+            {
+                if (target.stateMassFunction[i] == max)
+                    target.stateMassFunction[i] = 1f;
+                else target.stateMassFunction[i] = 0f;
+            }
+        }
+
+        return NodeStatus.SUCCESS;
+    }
+
+    private void ProcessGaze(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.Gaze) == 0x00)
+            return;
 
         target.gazeFactor = Mathf.Max(target.gazeFactor - sim.gazeCumulativeIntensity, 0f);
         target.gazeFactor += sim.gazeCollision.EvaluateGazePower(target.headTransform.position);
@@ -36,11 +69,49 @@ public class AudienceSimStepNode : BaseNode<Audience>
             target.stateMassFunction[(int)State.Bored] = 0f;
             target.stateMassFunction[(int)State.Chatting] = 0f;
         }
-        else
+    }
+
+    private void ProcessVoiceVolume(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.VoiceVolume) == 0x00)
+            return;
+    }
+
+    private void ProcessFillerWord(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.FillerWords) == 0x00)
+            return;
+    }
+
+    private void ProcessSeatDistribution(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.SeatDistribution) == 0x00)
+            return;
+
+        float pos = sim.seatPosAttentionFactor.Evaluate(target.normalizedPos);
+        pos = Mathf.Clamp(pos, -1f, 1f);
+        target.stateMassFunction[(int)State.Focused] += pos;
+        target.stateMassFunction[(int)State.Bored] -= pos;
+        target.stateMassFunction[(int)State.Chatting] -= pos;
+
+        if (target.stateMassFunction[(int)State.Focused] < 0f)
+            target.stateMassFunction[(int)State.Focused] = 0f;
+        if (target.stateMassFunction[(int)State.Bored] < 0f)
+            target.stateMassFunction[(int)State.Bored] = 0f;
+        if (target.stateMassFunction[(int)State.Chatting] < 0f)
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+    }
+
+    private void ProcessSocialGroup(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.SocialGroup) == 0x00)
         {
-            target.stateMassFunction[(int)State.Focused] = global * pos;
-            target.stateMassFunction[(int)State.Bored] = (1f - global) * (1f - pos);
-            target.stateMassFunction[(int)State.Chatting] = (1f - global) * (1f - pos);
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+            return;
         }
 
         if (target.socialGroup == null)
@@ -70,14 +141,27 @@ public class AudienceSimStepNode : BaseNode<Audience>
         }
         else target.stateMassFunction[(int)State.Chatting] = 0f;
 
+    }
 
-        float sum = 0f;
-        foreach (var mass in target.stateMassFunction)
-            sum += mass;
-        for (int i = 0; i < target.stateMassFunction.Length; ++i)
-            target.stateMassFunction[i] /= sum;
+    private void ProcessGlobal(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.Global) == 0x00)
+            return;
 
-        return NodeStatus.SUCCESS;
+        float global = GaussianRandom(sim.globalAttentionMean, sim.globalAttentionStDev);
+        global = Mathf.Clamp(global, -1f, 1f);
+        target.stateMassFunction[(int)State.Focused] += global;
+        target.stateMassFunction[(int)State.Bored] -= global;
+        target.stateMassFunction[(int)State.Chatting] -= global;
+
+        if (target.stateMassFunction[(int)State.Focused] < 0f)
+            target.stateMassFunction[(int)State.Focused] = 0f;
+        if (target.stateMassFunction[(int)State.Bored] < 0f)
+            target.stateMassFunction[(int)State.Bored] = 0f;
+        if (target.stateMassFunction[(int)State.Chatting] < 0f)
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+
     }
 
     protected override void Exit(Tick<Audience> tick)
