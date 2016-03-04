@@ -45,7 +45,7 @@ public class PrepHouseKeeper : MonoBehaviour
             transitionTxt.gameObject.SetActive(true);
             //StartCoroutine(Transition_CR());
             uiManager.GetComponent<UIManager>().SetPowerPointData(commentField.text);
-            uiManager.GetComponent<UIManager>().ShowListPanel();
+            uiManager.GetComponent<UIManager>().ShowCasePanel();
         }
         else
         {
