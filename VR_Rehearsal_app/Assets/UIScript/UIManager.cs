@@ -53,8 +53,6 @@ public class UIManager : MonoBehaviour {
 
     public RectTransform RootRect;
     public RectTransform RootCanvas;
-
-    public RectTransform fixedButton;
     private List<GameObject> CreatedButton = new List<GameObject>();
     public List<GameObject> storedButton = new List<GameObject>();
 
@@ -153,7 +151,7 @@ public class UIManager : MonoBehaviour {
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
-                bShowcaseMgr.AddShowcase(showCaseName, 1, str, 30);
+               // bShowcaseMgr.EditShowcase(id, showCaseName , 0,Application.persistentDataPath + "/" + id, (int)sliderVal);
                 CustomizePanel();
                 //bShowcaseMgr
 
@@ -347,8 +345,8 @@ public class UIManager : MonoBehaviour {
         float span = gLayout.spacing.y;
         float totalSizeofRect = (cellSize- span) * parseResult["entries"].Count;
         RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
-        // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
-        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
+    //    // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
+        //RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
         for (int index = 0; index < parseResult["entries"].Count; index++)
         {
             GameObject createInstance = Instantiate(CreateInstance) as GameObject;
@@ -365,7 +363,6 @@ public class UIManager : MonoBehaviour {
    
         bDriveAPI.JobDone();
         isButtonSelected = false;
-       // isReseting = false;
     }
 
     public void OnPPTClick()
@@ -416,21 +413,7 @@ public class UIManager : MonoBehaviour {
         ShowNavigationPanel();
     }
 
-
-    IEnumerator FinishList(){
-        while (true) {
-            if (bDriveAPI.GetAPItoken().Length > 5) {
-                bDriveAPI.GetFileListFromPath("/", CreatePanels__);
-                break;
-            }
-            yield return null;
-        }
-    }
-
     public void CheckToggle(int index)
-
-    
-   public void CheckToggle(int index)
 
     {
         switch(index)
@@ -468,4 +451,15 @@ public class UIManager : MonoBehaviour {
         showCaseName = showCase.text;
         Debug.Log("ShowCase name : " + showCaseName);
     }
+    public void TrueTest()
+    {
+        ShowRotation();
+    }
+
+/*
+    public void OkCustomize()
+    {
+        if()
+    }
+    */
 }
