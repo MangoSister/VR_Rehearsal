@@ -104,6 +104,10 @@ public class UIManager : MonoBehaviour {
         {
             IsRotate();
         }
+        if (isReseting == false)
+        {
+            ButtonListener();
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
@@ -119,17 +123,12 @@ public class UIManager : MonoBehaviour {
             });
         }
 
-        if (isReseting == false)
-        {
-            ButtonListener();
-        }
         if (customizeCanvas.activeSelf)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 ShowNavigationPanel();
             }
-            //Debug.Log("CUSTOMIZE PANEL ONE!!!!");
         }
     }
 
@@ -139,17 +138,22 @@ public class UIManager : MonoBehaviour {
         {
             ShowLoadingPanel();
             string str = bDriveAPI.GetRecentPath();
-            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
+            string folder = "/so";
+
+            //string id = bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
+            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
+                bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
                 CustomizePanel();
+               // bShowcaseMgr.edit
 
             }, delegate(int totalFileNum, int completedFileNum) {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
               //  Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
             });
 
-          //  Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+            Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
         }
     }
 
