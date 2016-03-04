@@ -39,8 +39,8 @@ public class UIManager : MonoBehaviour {
 	public GameObject okButton;
     public GameObject navigationCanvas;
     public GameObject loadingCanvas;
+    public GameObject customizeCanvas;
     
-
    	private string _email;
 	private string _url;
 	private string _dbNumber;
@@ -78,6 +78,8 @@ public class UIManager : MonoBehaviour {
     private bool isCopy = false;
 
     public GameObject ProgressCircle;
+
+
 
     
     #endregion
@@ -134,6 +136,7 @@ public class UIManager : MonoBehaviour {
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath , delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
+                CustomizePanel();
 
             }, delegate(int totalFileNum, int completedFileNum) {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
@@ -258,6 +261,19 @@ public class UIManager : MonoBehaviour {
     {
         loadingCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         loadingCanvas.SetActive(true);
+        logoCanvas.SetActive(false);
+        loginCanvas.SetActive(false);
+        showcaseCanvas.SetActive(false);
+        connectCanvas.SetActive(false);
+        rotationCanvas.SetActive(false);
+        navigationCanvas.SetActive(false);
+    }
+
+    public void CustomizePanel()
+    {
+        customizeCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
+        customizeCanvas.SetActive(true);
+        loadingCanvas.SetActive(false);
         logoCanvas.SetActive(false);
         loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
