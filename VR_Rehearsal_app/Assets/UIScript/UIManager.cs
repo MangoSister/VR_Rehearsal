@@ -79,16 +79,14 @@ public class UIManager : MonoBehaviour {
 
     public GameObject ProgressCircle;
 
-
-
-    
     #endregion
 
     void Start () {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
-       
+        //bDriveAPI = new bDropboxAPI();
         bShowcaseMgr = new bShowcaseManager();
         bShowcaseMgr.Start();
+
         //bDriveAPI.StartAuthentication();
         ShowLogoPanel();
         _bType = bType;
@@ -125,6 +123,14 @@ public class UIManager : MonoBehaviour {
         {
             ButtonListener();
         }
+        if (customizeCanvas.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ShowNavigationPanel();
+            }
+            //Debug.Log("CUSTOMIZE PANEL ONE!!!!");
+        }
     }
 
     public void SelectedDownload()
@@ -140,10 +146,10 @@ public class UIManager : MonoBehaviour {
 
             }, delegate(int totalFileNum, int completedFileNum) {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
-                Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
+              //  Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
             });
 
-            Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+          //  Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
         }
     }
 
@@ -184,6 +190,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
         StartCoroutine("ChangePanel");
 	}
 
@@ -196,6 +203,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void ShowCasePanel(){
@@ -207,6 +215,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void ShowUrlPanel(){
@@ -218,6 +227,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void ShowRotation()
@@ -230,6 +240,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(true);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
         isRotate = true;
     }
 
@@ -243,6 +254,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void ShowNavigationPanel()
@@ -255,6 +267,7 @@ public class UIManager : MonoBehaviour {
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(true);
         loadingCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void ShowLoadingPanel()
@@ -267,6 +280,7 @@ public class UIManager : MonoBehaviour {
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
+        customizeCanvas.SetActive(false);
     }
 
     public void CustomizePanel()
@@ -423,7 +437,38 @@ public class UIManager : MonoBehaviour {
     {
         bDriveAPI = new bDropboxAPI();
         bDriveAPI.StartAuthentication();
-        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
         ShowNavigationPanel();
+        bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+    
+    }
+   public void CheckToggle(int index)
+    {
+        switch(index)
+        {
+            case 1:
+                Debug.Log("Fucking Large");
+                break;
+            case 2:
+                Debug.Log("Fucking Medi");
+                break;
+            case 3:
+                Debug.Log("Fucking small");
+                break;    
+        }
+    }
+    public Slider sliderVla;
+    public float sliderVal;
+    public void CheckSliderValue()
+    {
+        sliderVal = sliderVla.value;
+        //Debug.Log("value" + sliderVal);
+    }
+
+    public InputField timer;
+    public string time;
+    public void SetTimer()
+    {
+        time = timer.text;
+        Debug.Log("TIMER : " + time);
     }
 }
