@@ -37,11 +37,11 @@ public class bShowcaseManager  {
 		return res;
 	}
 		
-	public bool AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
+	public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
 		string tempId = System.DateTime.Now.ToString () + Random.Range(0, 5000);
 		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage);
 		_showcaseTable.Add (tempId, tempShowcase);
-		return true;
+		return tempId;
 	}
 
 	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage ){
