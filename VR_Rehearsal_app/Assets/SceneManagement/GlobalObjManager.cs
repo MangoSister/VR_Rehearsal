@@ -60,6 +60,7 @@ public static class GlobalManager
     //Filling the input data area!!
     public static void EnterPresentation
         (
+            string slidePath,
             PresentationData.EnvType envType = PresentationData.EnvType.RPIS
         )
     {
@@ -143,6 +144,7 @@ public static class PresentationData
 
     //Input
     public static EnvType in_EnvType;
+    public static string in_SlidePath;
     public static float in_EnterTime;
 
     //Output
