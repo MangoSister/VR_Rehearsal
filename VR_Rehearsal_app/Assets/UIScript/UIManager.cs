@@ -140,13 +140,13 @@ public class UIManager : MonoBehaviour {
             string str = bDriveAPI.GetRecentPath();
             string folder = "/so";
 
-            //string id = bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
+            string id = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
                 bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
                 CustomizePanel();
-               // bShowcaseMgr.edit
+                //bShowcaseMgr
 
             }, delegate(int totalFileNum, int completedFileNum) {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
