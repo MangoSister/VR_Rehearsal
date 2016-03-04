@@ -20,6 +20,9 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	private JobStatus _status = JobStatus.NotStarted;
 	private bool _isGetToken = false;
 
+	/*Authentication callback*/
+	Authentication_Callback _authen_callback;
+
 	/* Get List update variable */
 	BackgroundWorker _updateList_bw; 
 	fileList_Callback _updateList_callback;
@@ -49,16 +52,16 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	fileDownload_Callback _downloadMultipleFile_callback;
 	int processIdx = 0;
 
-	public override void StartAuthentication (){
+	public override void StartAuthentication (Authentication_Callback callback){
 
 		#if UNITY_EDITOR
 			_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
 		#elif UNITY_ANDROID
 			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 			AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
-			currentActivity.Call ("start_Dropbox_Authentication");
+			currentActivity.Call("start_Dropbox_Authentication");
 		#endif
-
+		_authen_callback = callback;
 		Initalize ();
 	}
 
@@ -67,6 +70,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		if (!_isGetToken) {
 			#if UNITY_EDITOR
 				_isGetToken = true;
+				_authen_callback();
 			#elif UNITY_ANDROID
 				AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 				AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
@@ -74,6 +78,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 				if(_token.Length > 0){
 				_isGetToken = true;
+				_authen_callback();
 				}
 			#endif
 		}
