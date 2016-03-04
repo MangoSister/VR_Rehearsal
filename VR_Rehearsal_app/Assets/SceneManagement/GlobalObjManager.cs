@@ -86,14 +86,7 @@ public static class GlobalManager
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
         PresentationData.out_ExitTime = Time.time;
-
-        //ONLY for debugging
-#if UNITY_EDITOR
-        if (PresentationData.out_HGGazeData != null)
-        {
-            PresentationData.SaveGazeDataToBinary();
-        }
-#endif
+		
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
             SceneManager.LoadScene(_EVAL_SCENE_NAME);
     }
@@ -159,87 +152,5 @@ public static class PresentationData
     public static List<GazeSnapshot> out_HGGazeData;
     public static Texture2D out_Screenshot;
 
-    //ONLY for debugging
-#if UNITY_EDITOR
-
-    public static void SaveGazeDataToBinary(){
-		 string savePath = Application.dataPath + "/heatMapDATA.bytes";
-		const string _fileHeadValidChecker = "@^*#$@";
-		//1. List of Data Save
-		using(var w = new BinaryWriter(File.OpenWrite(savePath))){
-			//1. Header checking in order to check file corruption
-			w.Write(_fileHeadValidChecker);
-			//2. Number Of Showcase
-			w.Write(out_HGGazeData.Count);
-
-			//3.save each showcase 
-			for(int i =0; i < out_HGGazeData.Count; i++){
-				w.Write(out_HGGazeData [i].timeStamp);
-				w.Write (out_HGGazeData [i].headToBodyDir.x);
-				w.Write (out_HGGazeData [i].headToBodyDir.y);
-				w.Write (out_HGGazeData [i].headToBodyDir.z);
-			}
-				
-			//4. End
-			w.Write(_fileHeadValidChecker);
-			w.Close();
-		}
-		//2. Screen shot Save
-		System.IO.File.WriteAllBytes (Application.dataPath + "/screenshotTx.png", out_Screenshot.EncodeToPNG());
-
-	}
-
-	public static void LoadGazeDataFromBinary(){
-		 string loadPath = Application.dataPath + "/heatMapDATA.bytes";
-		const string _fileHeadValidChecker = "@^*#$@";
-		if (File.Exists (loadPath)) {
-			try{
-				if(out_HGGazeData != null)
-				out_HGGazeData.Clear();
-
-				out_HGGazeData = new List<GazeSnapshot>();
-				//3.Retrive each gazeshot 
-				using (BinaryReader r = new BinaryReader (File.Open (loadPath, FileMode.Open))) {
-					//1. Header checking in order to check file corruption
-					string tempHeader = r.ReadString ();
-					if (tempHeader != _fileHeadValidChecker)
-						return ;
-					//2. list of gaze load 
-					int resCount = r.ReadInt32 ();
-				
-					for (int i = 0; i < resCount; ++i) {
-
-						GazeSnapshot temp = new GazeSnapshot ();
-						temp.timeStamp = r.ReadSingle ();
-						temp.headToBodyDir.x = r.ReadSingle ();
-						temp.headToBodyDir.y = r.ReadSingle ();
-						temp.headToBodyDir.z = r.ReadSingle ();
-
-						out_HGGazeData.Add (temp);
-					}
-
-					//4. End
-					string tempfooter = r.ReadString ();
-					if (tempHeader != _fileHeadValidChecker) {
-						Debug.LogError("File is Not Valid");
-					} 
-
-					//Texture Load
-					byte[] bytes = File.ReadAllBytes(Application.dataPath + "/screenshotTx.png");
-					out_Screenshot = new Texture2D(1,1);
-					out_Screenshot.LoadImage(bytes);
-				}
-
-			}catch{
-				Debug.LogError("There is problem when Loading binary file");
-			}
-
-		} else {
-			Debug.LogError("File is Not Valid");
-		}
-
-	}
-
-#endif
 
 }

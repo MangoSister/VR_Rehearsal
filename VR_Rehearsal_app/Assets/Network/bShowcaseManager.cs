@@ -20,7 +20,6 @@ public class bShowcaseManager  {
 		public showcase_Data(string id, string name, ushort mapIdx, string pptPath, ushort percentage){
 			 _showcaseID = id; _showcaseName = name; _mapIdx = mapIdx; _pptFolderPath = pptPath;  _percentageOfAudience = percentage;
 		}
-
 	}
 
 	public bool Start(){
