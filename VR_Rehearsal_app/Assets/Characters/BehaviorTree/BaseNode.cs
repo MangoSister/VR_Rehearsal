@@ -25,11 +25,10 @@ namespace MangoBehaviorTree
 
         public NodeStatus Execute(Tick<T> tick)
         {
-            if (!tick.openNodes.Contains(this))
-            {
-                tick.openNodes.Add(this);
+            if (!tick.tree._openNodes[tick.target.agentId].Contains(this))
                 Open(tick);
-            }
+
+            tick.traverseNodes.Add(this);
 
             Enter(tick);
             
@@ -40,8 +39,9 @@ namespace MangoBehaviorTree
             if (status != NodeStatus.RUNNING)
             { 
                 Close(tick);
-                tick.openNodes.Remove(this);
+                tick.traverseNodes.Remove(this);
             }
+
 
             return status;
         }
