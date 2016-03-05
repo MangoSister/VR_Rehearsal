@@ -231,6 +231,8 @@ public class CrowdSimulatorInspector : Editor
         groupSwitch[SimModule.Global] = EditorGUILayout.BeginToggleGroup(SimModule.Global.ToString(), groupSwitch[SimModule.Global]);
         sim.globalAttentionMean = EditorGUILayout.FloatField("Mean (Gaussian)", sim.globalAttentionMean);
         sim.globalAttentionStDev = EditorGUILayout.FloatField("Std Deviation (Gaussian)", sim.globalAttentionStDev);
+        sim.globalAttentionAmp = EditorGUILayout.FloatField("Amplitude (Gaussian)", sim.globalAttentionAmp);
+        sim.globalAttentionConstOffset = EditorGUILayout.FloatField("Constant offset", sim.globalAttentionConstOffset);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 

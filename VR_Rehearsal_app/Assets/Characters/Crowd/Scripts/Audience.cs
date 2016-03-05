@@ -35,6 +35,7 @@ public class Audience : MonoBehaviour, IAgent
     [Range(0f, 1f)]
     public float gazeFactor = 0.0f;
 
+    public float[] stateMassFunctionInternal;
     public float[] stateMassFunction;
 
     public DetailLevel detailLevel;
@@ -46,8 +47,11 @@ public class Audience : MonoBehaviour, IAgent
         get { return _currState; }
         set
         {
-            _currState = value;
-            _animHandler.UpdateStateAnim();
+            if (_currState != value)
+            {
+                _currState = value;
+                _animHandler.UpdateStateAnim();
+            }
         }
     }
 
@@ -66,8 +70,6 @@ public class Audience : MonoBehaviour, IAgent
         }
     }
 
-    //public int agentId { get; set;}
-    //public int id;
     public Transform followingTransform;
     public Transform headTransform;
 
@@ -78,9 +80,8 @@ public class Audience : MonoBehaviour, IAgent
         _animHandler = GetComponent<AudienceAnimHandler>();
 
         int num = Enum.GetNames(typeof(States)).Length;
+        stateMassFunctionInternal = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
         stateMassFunction = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
-        //agentId = NextGlobalId;
-        //id = agentId;
     }
 
 
