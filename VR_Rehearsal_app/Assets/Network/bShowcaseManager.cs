@@ -10,7 +10,7 @@ public class bShowcaseManager  {
 	private int _numOfShowcase = 0;
 	private Dictionary<string, showcase_Data> _showcaseTable;
 
-	private struct showcase_Data{
+	public struct showcase_Data{
 		public string _showcaseID;
 		public string _showcaseName;
 		public ushort _mapIdx;
@@ -31,13 +31,23 @@ public class bShowcaseManager  {
 		return res;
 	}
 
-	public bool End(){
+    public bool End(){
 		bool res = SaveShowcasesBinaryInLocal ();
 		_showcaseTable.Clear ();
 		return res;
 	}
-		
-	public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
+
+    public showcase_Data[] GetAllShowcases(){
+        showcase_Data[] arr = new showcase_Data[_showcaseTable.Count];
+        int index = 0;
+        foreach (KeyValuePair<string, showcase_Data> pair in _showcaseTable){
+            arr[index] = (showcase_Data)pair.Value;
+            index++;
+        }
+        return arr;
+    }
+
+    public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
 
 		string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
 		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage);

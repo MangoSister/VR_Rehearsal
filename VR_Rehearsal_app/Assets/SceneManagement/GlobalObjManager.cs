@@ -59,12 +59,13 @@ public static class GlobalManager
     //Use me to enter presentation scene!!!
     //Filling the input data area!!
     public static void EnterPresentation
-        (
+        (/*
             string slidePath,
             PresentationData.EnvType envType = PresentationData.EnvType.RPIS
+        Shiba */
         )
     {
-        PresentationData.in_EnvType = envType;
+        //PresentationData.in_EnvType = envType; Shiba
         PresentationData.in_EnterTime = Time.time;
 
         if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
