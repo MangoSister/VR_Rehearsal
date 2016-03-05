@@ -10,52 +10,6 @@ using System.Collections;
 [RequireComponent(typeof(SpriteRenderer))]
 public class TutorialManager : MonoBehaviour {
 
-	//Structure for saving each slide session info
-	//------------------------------------------------------------------------------------------------
-	public class TutSlide{
-		//Slide Textures
-		public Sprite[] _sprites;
-		//when we set a playtime without event, it means entirle play time.
-		//but if we set this with event, it means animation interval time.
-		public float _playTime;
-		//Flag for having animation or not
-		public bool _isAnimation;
-		//Flag for checking Event signal
-		public bool _eventFlag;
-		//nullable type for enumurator 
-		public VRInputManager.TutorialInputType? _inputType = null;
-		
-		//Initialize function, if want to make non event type, just set _type as null
-		public void Initialize(string[] slideName, VRInputManager.TutorialInputType? _type, bool isAnimation, float playTime ){
-			LoadSlides (slideName);
-			if (_type != null) {
-				_inputType = _type;
-			}
-            _isAnimation = isAnimation; _playTime = playTime; _eventFlag = false;
-		}
-		
-		//Load slides from Asset/Resources folder.
-		void LoadSlides(string[] slideName){
-            _sprites = new Sprite[slideName.Length];
-			for (int i = 0; i < slideName.Length; ++i) {
-				Sprite tempSprite = Resources.Load<Sprite>( slideName[i]);
-				
-				if(tempSprite != null){
-                    _sprites[i] = tempSprite;
-				}else{
-#if UNITY_EDITOR
-                    Debug.LogError("[Error] There is no such a texture file");
-#endif
-                }
-			}
-		}
-		
-		public void SetOnEventFlag(){
-            _eventFlag = true;
-		}
-	}
-    //---------------------------------------------------------------------------------------------------
-
     public SlidesPlayerTest slidePlayer;
     public clockTimer timerPlayer;
 
@@ -66,18 +20,14 @@ public class TutorialManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
 		// I am gonaa change later this structure ~~~~ QUE~~~~~~~
-		// 
 		spriteRend = this.gameObject.GetComponent<SpriteRenderer> ();
 		tutorialName = "pptKaraoke";
 
         //Configuration
         slidePlayer.enabled = false;
         timerPlayer.enabled = false;
-
-
-
+		
         _slides = new TutSlide[8];
 
 		_slides[0] = new TutSlide();
@@ -129,13 +79,11 @@ public class TutorialManager : MonoBehaviour {
             //Configuration
             slidePlayer.enabled = true;
             timerPlayer.enabled = true;
-
         }
 	}
 	
 	//Change Slide and Draw 
 	public void Draw(TutSlide slide){
-		
 		if (slide._inputType.HasValue == false) { /* Non Event Type */
 			if (!slide._isAnimation) {
 				// Default Draw slide
@@ -156,8 +104,7 @@ public class TutorialManager : MonoBehaviour {
 			}
 		}
 	}
-	
-	
+
 	// Type of play each slide 
 	// 1. default draw -> change slide from sprite and then wait for a second and, go next page
 	IEnumerator DrawDefalut_CR(TutSlide slide){
@@ -187,7 +134,6 @@ public class TutorialManager : MonoBehaviour {
 
 		GoNextSlide ();
 	}
-
 	// 3. Wait unitl get a Event from VRInputManager. 
 	IEnumerator DrawDefalutUnitlEvent_CR(TutSlide slide){
 		if (slide._inputType.HasValue == false)
@@ -206,7 +152,6 @@ public class TutorialManager : MonoBehaviour {
 		VRInputManager.currTutInputManager.UnRegisterEvent (slide._inputType.Value, slide.SetOnEventFlag);
 		GoNextSlide ();
 	}
-	
 	// 4. Wait unitl get a Event from VRInputManager while looping animation.
 	IEnumerator DrawAnimationUnilEvent_CR(TutSlide slide){
 		if (slide._inputType.HasValue == false)
@@ -237,5 +182,49 @@ public class TutorialManager : MonoBehaviour {
 	}
 
 
-
+	//Structure for saving each slide session info
+	//------------------------------------------------------------------------------------------------
+	public class TutSlide{
+		//Slide Textures
+		public Sprite[] _sprites;
+		//when we set a playtime without event, it means entirle play time.
+		//but if we set this with event, it means animation interval time.
+		public float _playTime;
+		//Flag for having animation or not
+		public bool _isAnimation;
+		//Flag for checking Event signal
+		public bool _eventFlag;
+		//nullable type for enumurator 
+		public VRInputManager.TutorialInputType? _inputType = null;
+		
+		//Initialize function, if want to make non event type, just set _type as null
+		public void Initialize(string[] slideName, VRInputManager.TutorialInputType? _type, bool isAnimation, float playTime ){
+			LoadSlides (slideName);
+			if (_type != null) {
+				_inputType = _type;
+			}
+			_isAnimation = isAnimation; _playTime = playTime; _eventFlag = false;
+		}
+		
+		//Load slides from Asset/Resources folder.
+		void LoadSlides(string[] slideName){
+			_sprites = new Sprite[slideName.Length];
+			for (int i = 0; i < slideName.Length; ++i) {
+				Sprite tempSprite = Resources.Load<Sprite>( slideName[i]);
+				
+				if(tempSprite != null){
+					_sprites[i] = tempSprite;
+				}else{
+					#if UNITY_EDITOR
+					Debug.LogError("[Error] There is no such a texture file");
+					#endif
+				}
+			}
+		}
+		
+		public void SetOnEventFlag(){
+			_eventFlag = true;
+		}
+	}
+	//---------------------------------------------------------------------------------------------------
 }

@@ -16,9 +16,11 @@ public class bShowcaseManager  {
 		public ushort _mapIdx;
 		public string _pptFolderPath;
 		public ushort _percentageOfAudience;
+		public ushort _expetedTime_min;
 
-		public showcase_Data(string id, string name, ushort mapIdx, string pptPath, ushort percentage){
+		public showcase_Data(string id, string name, ushort mapIdx, string pptPath, ushort percentage,ushort expectedTime){
 			 _showcaseID = id; _showcaseName = name; _mapIdx = mapIdx; _pptFolderPath = pptPath;  _percentageOfAudience = percentage;
+			_expetedTime_min = expectedTime;
 		}
 	}
 
@@ -47,15 +49,15 @@ public class bShowcaseManager  {
         return arr;
     }
 
-    public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage ){
+    public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
 
 		string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
-		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage);
+		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage, (ushort)expTime);
 		_showcaseTable.Add (tempId, tempShowcase);
 		return tempId;
 	}
 
-	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage ){
+	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
 
 		if (!_showcaseTable.ContainsKey(caseID))
 			return false;
@@ -65,6 +67,7 @@ public class bShowcaseManager  {
 		tempShowcase._mapIdx = (ushort)mapIdx;
 		tempShowcase._pptFolderPath = pptFolderPath;
 		tempShowcase._percentageOfAudience = (ushort)percentage;
+		tempShowcase._expetedTime_min = (ushort)expTime;
 
 		_showcaseTable [caseID] = tempShowcase;
 		return true;
@@ -104,6 +107,7 @@ public class bShowcaseManager  {
 						tempCase._mapIdx = (ushort)r.ReadInt16 ();
 						tempCase._pptFolderPath = r.ReadString ();
 						tempCase._percentageOfAudience = (ushort)r.ReadInt16 ();
+						tempCase._expetedTime_min = (ushort)r.ReadInt16 ();
 
 						_showcaseTable.Add (tempCase._showcaseID, tempCase);
 					}
@@ -148,6 +152,7 @@ public class bShowcaseManager  {
 					w.Write(((showcase_Data)pair.Value)._mapIdx);
 					w.Write(((showcase_Data)pair.Value)._pptFolderPath);
 					w.Write(((showcase_Data)pair.Value)._percentageOfAudience);
+					w.Write(((showcase_Data)pair.Value)._expetedTime_min);
 				}
 					
 				//4. End

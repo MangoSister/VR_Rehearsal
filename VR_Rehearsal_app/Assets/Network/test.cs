@@ -15,9 +15,9 @@ public class test : MonoBehaviour {
 		
 		showcaseMgr = new bShowcaseManager ();
 		showcaseMgr.Start ();
-		showcaseMgr.AddShowcase ("jake1", 1, "coll/coll", 30);
-		showcaseMgr.AddShowcase ("jake2", 1, "coll/coll", 30);
-		showcaseMgr.AddShowcase ("jake3", 1, "coll/coll", 30);
+		//showcaseMgr.AddShowcase ("jake1", 1, "coll/coll", 30);
+		//showcaseMgr.AddShowcase ("jake2", 1, "coll/coll", 30);
+		//showcaseMgr.AddShowcase ("jake3", 1, "coll/coll", 30);
 		showcaseMgr.End ();
 	}
 	
