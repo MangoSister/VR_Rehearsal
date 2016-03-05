@@ -7,63 +7,81 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(SpriteRenderer))]
-public class TutorialManager : MonoBehaviour {
 
-    public SlidesPlayerTest slidePlayer;
-    public clockTimer timerPlayer;
+public class turtorial_vrscene : Tutorial_Base{
 
-    private SpriteRenderer spriteRend;
-	public string tutorialName;
-	private TutSlide[] _slides;
-	private int _currIdx;
-
-	// Use this for initialization
-	void Start () {
-		// I am gonaa change later this structure ~~~~ QUE~~~~~~~
-		spriteRend = this.gameObject.GetComponent<SpriteRenderer> ();
+	protected override void Initialize(){
 		tutorialName = "pptKaraoke";
 
-        //Configuration
-        slidePlayer.enabled = false;
-        timerPlayer.enabled = false;
+		//Configuration
+		slidePlayer.enabled = false;
+		timerPlayer.enabled = false;
 		
-        _slides = new TutSlide[8];
-
+		_slides = new TutSlide[8];
+		
 		_slides[0] = new TutSlide();
 		string[] arr1 = new string[] { "pptKaraoke/t1" };
 		_slides[0].Initialize( arr1, null, false, 3.0f);
-
+		
 		_slides[1] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t2"};
 		_slides[1].Initialize( arr1, null, false, 3.0f);
-
+		
 		_slides[2] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t3"};
 		_slides[2].Initialize( arr1, VRInputManager.TutorialInputType.LookAtScreen, false, 0);
-
+		
 		_slides[3] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t5", "pptKaraoke/t5_1"};
 		_slides[3].Initialize( arr1, null, true, 3.0f);
-
+		
 		_slides[4] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t7"};
 		_slides[4].Initialize( arr1, null, false, 3.0f);
-
+		
 		_slides[5] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t8"};
 		_slides[5].Initialize( arr1, null, false, 3.0f);
-
+		
 		_slides[6] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t9"};
 		_slides[6].Initialize( arr1, null, false, 3.0f);
-
+		
 		_slides[7] = new TutSlide();
 		arr1 = new string[] { "pptKaraoke/t10"};
 		_slides[7].Initialize( arr1, null, false, 3.0f);
 
-		Draw (_slides [_currIdx]);
 	}
+}
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class Tutorial_Base : MonoBehaviour {
+
+    public SlidesPlayerTest slidePlayer;
+    public clockTimer timerPlayer;
+
+	protected SpriteRenderer spriteRend;
+	public string tutorialName;
+	protected TutSlide[] _slides;
+	protected int _currIdx;
+
+	// Use this for initialization
+	protected virtual void Start () {
+		// I am gonaa change later this structure ~~~~ QUE~~~~~~~
+		spriteRend = this.gameObject.GetComponent<SpriteRenderer> ();
+		Initialize ();
+
+		if (_slides.Length > 0)
+			Draw (_slides [_currIdx]);
+		else {
+			#if UNITY_EDITOR
+			Debug.Log("[Error] Tutorial_ " +tutorialName);
+			#endif
+		}
+	}
+
+	protected virtual void Initialize (){}
+
 
 	public void ChangeSlide(Sprite slide){
 		spriteRend.sprite = slide;
