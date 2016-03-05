@@ -31,7 +31,6 @@ public class UIManager : MonoBehaviour {
     public GameObject prepHouse;
 
     public GameObject logoCanvas;
-    public GameObject loginCanvas;
     public GameObject showcaseCanvas;
     public GameObject connectCanvas;
     public GameObject urlCanvas;
@@ -41,10 +40,6 @@ public class UIManager : MonoBehaviour {
     public GameObject loadingCanvas;
     public GameObject customizeCanvas;
     
-   	private string _email;
-	private string _url;
-	private string _dbNumber;
-	private string _comment;
 	private string empty = "";
     private InputField _urlInputField;
     private InputField _dbInputField;
@@ -55,14 +50,15 @@ public class UIManager : MonoBehaviour {
     public  float offset;
 
     public GameObject CreateInstance;
+    public GameObject prefab_ShowCase;
 
     public RectTransform RootRect;
+    public RectTransform RootRect_ShowCase;
     public RectTransform RootCanvas;
-
-    public RectTransform fixedButton;
     private List<GameObject> CreatedButton = new List<GameObject>();
+    private List<GameObject> showCaseButtonList = new List<GameObject>();
     public List<GameObject> storedButton = new List<GameObject>();
-
+    public List<GameObject> storedShocase = new List<GameObject>();
     private Vector2 InitialCanvasScrollSize;
     private float totalWidth = 0f;
 
@@ -71,6 +67,7 @@ public class UIManager : MonoBehaviour {
     public ButtonType bType;
     private ButtonType _bType;
     public GameObject canvasScroll;
+    public GameObject showCaseScroll;
     bool isButtonSelected = false;
     public Text token;
     private bool isReseting = false;
@@ -91,10 +88,9 @@ public class UIManager : MonoBehaviour {
         ShowLogoPanel();
         _bType = bType;
  	}
-
     
     void Update () {
-
+  
         if (bDriveAPI != null)
         {
             bDriveAPI.Update();
@@ -110,50 +106,60 @@ public class UIManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            bDriveAPI.GetCurrParentFileList(delegate(string resJson) {
-                isReseting = true;
-                // DeletePanels__(true, "dd");
-                if (storedButton.Count != 0)
-                {
-                    DeletePanels__(true, "dd");
-                }
-                bDriveAPI.JobDone();
-                CreatePanels__(resJson);
-                isReseting = false;
-            });
-        }
-
-        if (customizeCanvas.activeSelf)
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (navigationCanvas.activeSelf && bDriveAPI.GetRecentPath() == "/")
             {
-                ShowNavigationPanel();
+                ShowConnectPanel();
+            }
+            else if (navigationCanvas.activeSelf && bDriveAPI.GetRecentPath() == empty)
+            {
+                ShowConnectPanel();
+            }
+            else if (connectCanvas.activeSelf)
+            {
+                ShowCasePanel();
+            }
+            else {
+                bDriveAPI.GetCurrParentFileList(delegate (string resJson)
+                {
+                    isReseting = true;
+                    // DeletePanels__(true, "dd");
+                    if (storedButton.Count != 0)
+                    {
+                        DeletePanels__(true, "dd");
+                    }
+                    bDriveAPI.JobDone();
+                    CreatePanels__(resJson);
+                    isReseting = false;
+                });
             }
         }
-    }
 
+    }
+    string pptID;
     public void SelectedDownload()
     {
         if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
         {
             ShowLoadingPanel();
             string str = bDriveAPI.GetRecentPath();
-            string folder = "/so";
 
-            string id = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
-            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath+folder, delegate ()
+            pptID = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
+            bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath +"/"+ pptID, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
-                bShowcaseMgr.AddShowcase("tomorrow", 1, str, 30);
-                CustomizePanel();
+                // bShowcaseMgr.EditShowcase(id, showCaseName , 0,Application.persistentDataPath + "/" + id, (int)sliderVal);
+               CustomizePanel();
                 //bShowcaseMgr
 
             }, delegate(int totalFileNum, int completedFileNum) {
                 ProgressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
               //  Debug.Log("How many download = " + totalFileNum +"and also"+ completedFileNum);
             });
-
             Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+        }
+        else
+        {
+            Debug.Log("you can;t download");
         }
     }
 
@@ -163,7 +169,6 @@ public class UIManager : MonoBehaviour {
         {
             if(_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
             {
-                
                 if (isCopy == false)
                 {
                     if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
@@ -177,7 +182,6 @@ public class UIManager : MonoBehaviour {
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
                 }
-                
             }
         }
         //isButtonSelected = false;
@@ -188,7 +192,6 @@ public class UIManager : MonoBehaviour {
     public void ShowLogoPanel(){
         logoCanvas.GetComponent<RectTransform>().SetAsLastSibling();
         logoCanvas.SetActive(true);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -198,34 +201,22 @@ public class UIManager : MonoBehaviour {
         StartCoroutine("ChangePanel");
 	}
 
-    public void ShowLoginPanel(){
-        loginCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
-        logoCanvas.SetActive(false);
-        loginCanvas.SetActive(true);
-        showcaseCanvas.SetActive(false);
-        urlCanvas.SetActive(false);
-        rotationCanvas.SetActive(false);
-        navigationCanvas.SetActive(false);
-        loadingCanvas.SetActive(false);
-        customizeCanvas.SetActive(false);
-    }
-
     public void ShowCasePanel(){
         showcaseCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(true);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
         navigationCanvas.SetActive(false);
         loadingCanvas.SetActive(false);
         customizeCanvas.SetActive(false);
+        CheckLocalPPT();
+
     }
 
     public void ShowUrlPanel(){
 		urlCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
@@ -238,7 +229,6 @@ public class UIManager : MonoBehaviour {
     {
 		rotationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         urlCanvas.SetActive(false);
         rotationCanvas.SetActive(true);
@@ -252,7 +242,6 @@ public class UIManager : MonoBehaviour {
     {
         connectCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(true);
         rotationCanvas.SetActive(false);
@@ -265,7 +254,6 @@ public class UIManager : MonoBehaviour {
     {
         navigationCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -279,7 +267,6 @@ public class UIManager : MonoBehaviour {
         loadingCanvas.GetComponent<RectTransform>().SetAsFirstSibling();
         loadingCanvas.SetActive(true);
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -293,7 +280,6 @@ public class UIManager : MonoBehaviour {
         customizeCanvas.SetActive(true);
         loadingCanvas.SetActive(false);
         logoCanvas.SetActive(false);
-        loginCanvas.SetActive(false);
         showcaseCanvas.SetActive(false);
         connectCanvas.SetActive(false);
         rotationCanvas.SetActive(false);
@@ -301,12 +287,10 @@ public class UIManager : MonoBehaviour {
     }
 
     #endregion 
-    public void OnSignInButtonClick(){
-        ShowCasePanel();
-    }
 
     public void CreateButtons(string _folder)
     {
+        Debug.Log(bDriveAPI.GetRecentPath());
         bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
             {
                 isReseting = true;
@@ -327,7 +311,6 @@ public class UIManager : MonoBehaviour {
 
     public void DeletePanels__(bool isSelected, string whichButton)
     {
-        //GameObject[] allPrefabs = GameObject.FindObjectOfType("PPT_Practice(Clone)");
         if (isSelected == true)
         {
             foreach (RectTransform child in RootRect)
@@ -346,7 +329,6 @@ public class UIManager : MonoBehaviour {
     void StoreAllButtonStatus(GameObject button)
     {
         storedButton.Add(button);
-       // Debug.Log("totalButton : "+storedButton.Count);
     }
 
     public void CreatePanels__(string fileList)
@@ -357,10 +339,9 @@ public class UIManager : MonoBehaviour {
         float cellSize = gLayout.cellSize.y;
         float span = gLayout.spacing.y;
         float totalSizeofRect = (cellSize- span) * parseResult["entries"].Count;
-        Debug.Log (parseResult["entries"].Count);
         RootRect.offsetMin = new Vector2(RootRect.offsetMin.x, -1 * (totalSizeofRect/2));
-        // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
-        RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
+    //    // RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, -10);
+        //RootRect.offsetMax = new Vector2(RootRect.offsetMin.x, 0);
         for (int index = 0; index < parseResult["entries"].Count; index++)
         {
             GameObject createInstance = Instantiate(CreateInstance) as GameObject;
@@ -377,20 +358,8 @@ public class UIManager : MonoBehaviour {
    
         bDriveAPI.JobDone();
         isButtonSelected = false;
-       // isReseting = false;
     }
-    
-    public void OnOkButtonClick(){
 
-        _urlInputField = GameObject.FindGameObjectWithTag("INPUT_URL").GetComponent<InputField>();
-        _dbInputField = GameObject.FindGameObjectWithTag("INPUT_DB").GetComponent<InputField>();
-        _commentField = GameObject.FindGameObjectWithTag("INPUT_COMMENT").GetComponent<InputField>();
-
-        //if(urlInputField.text != empty || dbInputField.text != empty || commentField.text != empty){
-        SetPowerPointData(_commentField.text);
-        ShowCasePanel();
-		//}
-	}
     public void OnPPTClick()
 	{
         ShowRotation();
@@ -399,9 +368,7 @@ public class UIManager : MonoBehaviour {
     {
         GameObject pptPractice =showcaseCanvas.GetComponent<RectTransform>().FindChild("PPT_Practice").gameObject;
         GameObject date = (GameObject)pptPractice.GetComponent<RectTransform>().FindChild("Date").gameObject;
-
         commentBox.GetComponent<Text>().text = string.Format("[{0}]", newStr); 
-      
         Text dateText = date.GetComponent<Text>();
         dateText.text = string.Format("{0:yyyy.MM.dd HH:mm:ss}",System.DateTime.Now);
      
@@ -410,30 +377,25 @@ public class UIManager : MonoBehaviour {
 	public void OnAddButtonClick(){
         //ShowUrlPanel();
         ShowConnectPanel();
-
-	}
+        //DeleteShowCase();
+        
+    }
 
 	public IEnumerator ChangePanel(){
 		yield return new WaitForSeconds(2.0f);
-		ShowLoginPanel();
-	}
-
-	public void SetEmailAccount(string str){
-		_email = str;
-	}
-
-	public string GetEmailAccount(){
-		return _email;
+		ShowCasePanel();
 	}
 
     void IsRotate()
     {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
+            bShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
+            bShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
   }
@@ -443,32 +405,38 @@ public class UIManager : MonoBehaviour {
         bDriveAPI.StartAuthentication(delegate() {
 			bDriveAPI.GetFileListFromPath("/", CreatePanels__);
        });
-       
+   
         ShowNavigationPanel();
     }
 
-    
-   public void CheckToggle(int index)
+    public int roomNumber;
+    public void CheckToggle(int index)
     {
         switch(index)
         {
-            case 1:
+            case 0:
                 Debug.Log("Fucking Large");
+                roomNumber = 0;
+                break;
+            case 1:
+                Debug.Log("Fucking Medi");
+                roomNumber = 1;
                 break;
             case 2:
-                Debug.Log("Fucking Medi");
-                break;
-            case 3:
                 Debug.Log("Fucking small");
-                break;    
-        }
+                roomNumber = 2;
+                break;
+            default:
+                roomNumber = -1;
+                break;
+          }
     }
+
     public Slider sliderVla;
     public float sliderVal;
     public void CheckSliderValue()
     {
         sliderVal = sliderVla.value;
-        //Debug.Log("value" + sliderVal);
     }
 
     public InputField timer;
@@ -478,4 +446,74 @@ public class UIManager : MonoBehaviour {
         time = timer.text;
         Debug.Log("TIMER : " + time);
     }
+
+    public InputField showCase;
+    public string showCaseName;
+    public void SetShowCaseName()
+    {
+        showCaseName = showCase.text;
+        Debug.Log("ShowCase name : " + showCaseName);
+    }
+    public void TrueTest()
+    {
+        ShowRotation();
+    }
+
+    public void OkCustomize()
+    {
+        if(showCaseName != empty && roomNumber != -1 && time != empty)
+        {
+            Debug.Log("PHAN!!");
+            bShowcaseMgr.EditShowcase(pptID, showCaseName, 0, Application.persistentDataPath + "/" + pptID, (int)sliderVal);
+            ShowCasePanel();
+        }
+        if (storedButton.Count > 0)
+        {
+            foreach (RectTransform child in RootRect)
+            {
+                if (child.name == "PPT_Practice(Clone)")
+                {
+                    GameObject.Destroy(child.gameObject);
+                }
+            }
+            storedButton.Clear();
+        }
+        
+    }
+
+    void CheckLocalPPT()
+    {
+        DeleteShowCase();
+        bShowcaseManager.showcase_Data[] caseDatas =  bShowcaseMgr.GetAllShowcases();
+        GridLayoutGroup gLayout_showCase = showCaseScroll.GetComponent<GridLayoutGroup>();
+        float cellSize = gLayout_showCase.cellSize.y;
+        float span = gLayout_showCase.spacing.y;
+        float totalSizeofRect = (cellSize - span) * caseDatas.Length;
+        for (int i = 0; i < caseDatas.Length; ++i) {
+            Debug.Log(i + ": " + caseDatas[i]._showcaseID + "," + caseDatas[i]._showcaseName);
+            GameObject createShowCase = Instantiate(prefab_ShowCase) as GameObject;
+            createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID);
+            createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
+            RootRect_ShowCase.offsetMin = new Vector2(RootRect_ShowCase.offsetMin.x, -1 * (totalSizeofRect / 2));
+            createShowCase.transform.SetParent(RootRect_ShowCase, false);            
+            showCaseButtonList.Add(createShowCase);
+            StoreShowCaseButtons(createShowCase);
+        }
+    }
+    void StoreShowCaseButtons(GameObject obj)
+    {
+        storedShocase.Add(obj);
+    }
+    void DeleteShowCase()
+    {
+        foreach (RectTransform child in RootRect_ShowCase)
+        {
+            if (child.name == "Prefab_ShowCase(Clone)")
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+        }
+        storedShocase.Clear();
+    }
+    
 }
