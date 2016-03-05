@@ -56,6 +56,16 @@ public static class GlobalManager
         }
     }
 
+    /*SHIBA*/
+    public static void EnterPresentation()
+    {
+        PresentationData.in_EnterTime = Time.time;
+
+        if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
+            SceneManager.LoadScene(_PRESENT_SCENE_NAME);
+        //Application.LoadLevel(param.sceneName);
+    }
+
     //Use me to enter presentation scene!!!
     //Filling the input data area!!
     public static void EnterPresentation
