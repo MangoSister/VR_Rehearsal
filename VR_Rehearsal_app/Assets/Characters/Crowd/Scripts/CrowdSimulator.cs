@@ -47,8 +47,11 @@ public class CrowdSimulator : MonoBehaviour
 
     public bool deterministic;
 
-    public float globalAttentionMean { get; set; }
-    public float globalAttentionStDev { get; set; }
+    public float globalAttentionMean;
+    public float globalAttentionStDev;
+    public float globalAttentionAmp;
+    public float globalAttentionConstOffset;
+
     public AnimationCurve seatPosAttentionFactor;
     public float seatPosAttentionUpper
     {
@@ -92,20 +95,19 @@ public class CrowdSimulator : MonoBehaviour
 
     private void CreateDummyTree()
     {
-        _behaviorTree = new BehaviorTree<Audience>(
-            new SequenceNode<Audience>(
-                new AudienceSimStepNode(),
-                new AudienceStateSelectorNode(1,
-                    new List<BaseNode<Audience>>
-                    {
-                        //new AudienceStateNode(Audience.States.Focused),
-                        //new AudienceStateNode(Audience.States.Bored),
-                        //new AudienceStateNode(Audience.States.Chatting)
-                        new AudienceFocusStateNode(),
-                        new AudienceBoredStateNode(),
-                        new AudienceChatStateNode()
-                    })
-                ));
+        _behaviorTree = new BehaviorTree<Audience>
+            (new SequenceNode<Audience>
+                (new SelectorNode<Audience>
+                    (new SequenceNode<Audience>
+                        (new InstantSuccessModifier<Audience>(new WaitNode<Audience>(stepInterval, true)),
+                        new AudienceInternalSimNode()),
+                    new AudienceBypassInternalNode()),
+                new AudienceExternalSimNode(),
+                new AudienceStateSelectorNode
+                    (1, 
+                    new AudienceFocusStateNode(), 
+                    new AudienceBoredStateNode(), 
+                    new AudienceChatStateNode())));
     }
 
     private void CreateCrowd()
@@ -189,9 +191,6 @@ public class CrowdSimulator : MonoBehaviour
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
 
-        globalAttentionMean = 0.6f;
-        globalAttentionStDev = 0.05f;
-
         if (_behaviorTree == null)
             CreateDummyTree();
 
@@ -202,35 +201,32 @@ public class CrowdSimulator : MonoBehaviour
     private void Start()
     {
         if (_behaviorTree != null)
-        {
             StartCoroutine(Simulate_CR());
-            StartCoroutine(ExternalFactor_CR());
-        }
     }
 
     private IEnumerator Simulate_CR()
     {
-        float stepPerAudience = stepInterval / audienceNum;
+        //init round
+        foreach (SocialGroup group in socialGroups)
+            group.isComputed = false;
+        for (int i = 0; i < audienceNum; ++i)
+            _behaviorTree.NextTick(audiences[i]);
+
+        //update rounds
+        float stepPerAudience = stepExternalInterval / (float)audienceNum;
         while (true)
         {
+            gazeCollision.UpdateGazeContact();
+
             foreach (SocialGroup group in socialGroups)
                 group.isComputed = false;
 
-            Shuffle(audiences);
-            for (int i = 0; i < audiences.Count; ++i)
+            //(audiences);
+            for (int i = 0; i < audienceNum; ++i)
             {
                 _behaviorTree.NextTick(audiences[i]);
                 yield return new WaitForSeconds(stepPerAudience);
             }
-        }
-    }
-
-    private IEnumerator ExternalFactor_CR()
-    {
-        while (true)
-        {
-            gazeCollision.UpdateGazeContact();
-            yield return new WaitForSeconds(stepExternalInterval);
         }
     }
 
