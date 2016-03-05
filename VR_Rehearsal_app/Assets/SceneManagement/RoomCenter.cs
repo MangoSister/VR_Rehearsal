@@ -22,10 +22,10 @@ public class RoomCenter : MonoBehaviour
 
     public GameObject presenter;
     public Transform presenterHead;
-    public micManager mic;
-    public Stage stage;
-    public HeatmapTracker heatmapTracker;
 
+    public HeatmapTracker heatmapTracker;
+    public RecordingWrapper recordWrapper;
+    public ExitTrigger exitTrigger;
 
     private AudioUnit _ambientUnit = null;
 
@@ -39,11 +39,10 @@ public class RoomCenter : MonoBehaviour
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 
-        var a = LightmapSettings.lightmaps;
+        recordWrapper.StartRecording();
 
         OperateAmbient(true);
         StartCoroutine(SilenceAfterOpenning_CR());
-        //currRoom.presenter.OnPostMove += OperateAmbient;
     }
 
     private void LoadLights()
@@ -93,24 +92,28 @@ public class RoomCenter : MonoBehaviour
 
     private IEnumerator SilenceAfterOpenning_CR()
     {
-        while (!currRoom.mic.isSpeaking)
-            yield return null;
+        yield return new WaitForSeconds(5f);
         OperateAmbient(false);
+    }
+
+    public void EndPresentation()
+    {
+        recordWrapper.EndRecording();
+
+        GlobalManager.EndPresentation
+            (
+                heatmapTracker.verticalFOVDeg,
+                heatmapTracker.aspect,
+                heatmapTracker.output,
+                heatmapTracker.scn
+            );
     }
 
 #if UNITY_EDITOR
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.L))
-        {
-            GlobalManager.EndPresentation
-                (
-                    heatmapTracker.verticalFOVDeg,
-                    heatmapTracker.aspect,
-                    heatmapTracker.output,
-                    heatmapTracker.scn
-                );
-        }
+            EndPresentation();
     }
 #endif
 
