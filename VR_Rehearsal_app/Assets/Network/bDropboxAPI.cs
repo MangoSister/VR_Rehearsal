@@ -65,22 +65,48 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		Initalize ();
 	}
 
+	bool SaveTokenOnLocal (string token){
+		string savePath = Application.persistentDataPath + "/bDropboxToken.bytes";
+		try{
+			using(var w = new BinaryWriter(File.OpenWrite(savePath))){
+				w.Write(token); 
+				w.Close();
+				return true;
+			}
+		}catch{
+			return false;
+		}
+	}
+
+	string LoadTokenFromLocal(){
+		string loadPath = Application.persistentDataPath + "/bDropboxToken.bytes";
+		string token = "";
+		using(var r = new BinaryReader(File.Open (loadPath, FileMode.Open))){
+			token = r.ReadString(); 
+		}
+		return token;
+	}
+
+
 	public override void Update (){
 
 		if (!_isGetToken) {
+
 			#if UNITY_EDITOR
-				_isGetToken = true;
-				_authen_callback();
+				
 			#elif UNITY_ANDROID
 				AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 				AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 				_token = currentActivity.Call<string> ("getTokenFromNative");
 
-				if(_token.Length > 0){
-				_isGetToken = true;
-				_authen_callback();
-				}
 			#endif
+
+			if(_token.Length > 0){
+				_isGetToken = true;
+				SaveTokenOnLocal(_token);
+				_authen_callback();
+			}
+
 		}
 
 		/* Message System */
@@ -303,6 +329,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		};
 		_downloadFile_bw.DoWork += bw_DownloadFilesFromPath_do;
 		_downloadFile_bw.RunWorkerCompleted += bw_DownlaodFilesFromPath_done;
+
+		//Authentication
+		if (File.Exists (Application.persistentDataPath + "/bDropboxToken.bytes")) {
+			_token = LoadTokenFromLocal();
+			_isGetToken = true;
+			_authen_callback();
+		}
 	}
 		
 	private void bw_DownloadFilesFromPath_do(object sender,  DoWorkEventArgs e){

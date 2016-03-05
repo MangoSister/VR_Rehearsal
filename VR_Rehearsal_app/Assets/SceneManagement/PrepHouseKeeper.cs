@@ -45,6 +45,7 @@ public class PrepHouseKeeper : MonoBehaviour
             transitionTxt.gameObject.SetActive(true);
             //StartCoroutine(Transition_CR());
             uiManager.GetComponent<UIManager>().SetPowerPointData(commentField.text);
+
             uiManager.GetComponent<UIManager>().ShowCasePanel();
 
         }
@@ -95,7 +96,7 @@ public class PrepHouseKeeper : MonoBehaviour
     // At this time, change to present_0 scene
     public void NextScene()
     {
-         GlobalManager.EnterPresentation();
+        GlobalManager.EnterPresentation();
         //SceneManager.LaunchPresentationScene(new PresentationInitParam("sc_rotation"));
     }
  }

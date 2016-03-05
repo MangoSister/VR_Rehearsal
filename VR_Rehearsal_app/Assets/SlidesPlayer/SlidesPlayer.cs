@@ -34,8 +34,12 @@ public class SlidesPlayer : MonoBehaviour
     private void Start()
     {
         Stop();
+        
         if (!pptKaraoke)
         {
+
+            LoadSlidesFromDisk(PresentationData.in_SlidePath);
+            /*Shiba
             if (GlobalManager.downloadManager != null)
             {
                 List<string> slidesNames = GlobalManager.downloadManager.ExportExistedName();
@@ -45,6 +49,8 @@ public class SlidesPlayer : MonoBehaviour
             }
             else
                 LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
+
+            */
         }
         else
         {
@@ -85,7 +91,19 @@ public class SlidesPlayer : MonoBehaviour
         else
         {
             UnLoadSlides();
-            string[] imgNames = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
+            //this multiple filter is not working. 
+            //string[] imgNames = Directory.GetFiles(path, "*.png|*.jpg|*.bmp", SearchOption.TopDirectoryOnly);
+            string[] imgNames_png = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
+            string[] imgNames_jpg = Directory.GetFiles(path, "*.jpg", SearchOption.TopDirectoryOnly);
+            string[] imgNames_bmp = Directory.GetFiles(path, "*.bmp", SearchOption.TopDirectoryOnly);
+
+            
+            string[] imgNames = new string[imgNames_png.Length + imgNames_jpg.Length + imgNames_bmp.Length];
+            
+            System.Array.Copy(imgNames_png, imgNames, imgNames_png.Length);
+            System.Array.Copy(imgNames_jpg, 0, imgNames, imgNames_png.Length, imgNames_jpg.Length);
+            System.Array.Copy(imgNames_bmp, 0, imgNames, imgNames_jpg.Length, imgNames_bmp.Length);
+            
             _slides = new List<Texture2D>();
             foreach (string name in imgNames)
             {
