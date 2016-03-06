@@ -143,7 +143,7 @@ public class UIManager : MonoBehaviour {
             ShowLoadingPanel();
             string str = bDriveAPI.GetRecentPath();
 
-            pptID = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30);
+            pptID = bShowcaseMgr.AddShowcase("empty", 0, "/empty", 30,5);
             bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath +"/"+ pptID, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
@@ -464,7 +464,7 @@ public class UIManager : MonoBehaviour {
         if(showCaseName != empty && roomNumber != -1 && time != empty)
         {
             Debug.Log("PHAN!!");
-            bShowcaseMgr.EditShowcase(pptID, showCaseName, 0, Application.persistentDataPath + "/" + pptID, (int)sliderVal);
+            bShowcaseMgr.EditShowcase(pptID, showCaseName, 0, Application.persistentDataPath + "/" + pptID, (int)sliderVal, 5);
             ShowCasePanel();
         }
         if (storedButton.Count > 0)
@@ -492,7 +492,7 @@ public class UIManager : MonoBehaviour {
         for (int i = 0; i < caseDatas.Length; ++i) {
             Debug.Log(i + ": " + caseDatas[i]._showcaseID + "," + caseDatas[i]._showcaseName);
             GameObject createShowCase = Instantiate(prefab_ShowCase) as GameObject;
-            createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID);
+			createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, 5);
             createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
             RootRect_ShowCase.offsetMin = new Vector2(RootRect_ShowCase.offsetMin.x, -1 * (totalSizeofRect / 2));
             createShowCase.transform.SetParent(RootRect_ShowCase, false);            

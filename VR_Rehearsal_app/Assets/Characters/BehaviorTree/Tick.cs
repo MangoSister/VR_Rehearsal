@@ -8,13 +8,14 @@ namespace MangoBehaviorTree
     {
         public BehaviorTree<T> tree;
         public T target;
-        public HashSet<BaseNode<T>> openNodes;
-
+        public HashSet<BaseNode<T>> traverseNodes;
+       
         public Tick(BehaviorTree<T> tree, T target)
         {
             this.tree = tree;
             this.target = target;
-            openNodes = new HashSet<BaseNode<T>>();
+            traverseNodes = new HashSet<BaseNode<T>>();
+            
         }
     }
 }
