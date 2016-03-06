@@ -101,7 +101,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 			#endif
 
-			if(_token.Length > 0){
+			if(_token != "null"){
 				_isGetToken = true;
 				//SaveTokenOnLocal(_token);
 				_authen_callback();
