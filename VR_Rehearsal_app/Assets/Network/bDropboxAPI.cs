@@ -64,7 +64,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		_authen_callback = callback;
 		Initalize ();
 	}
-
+	/*
 	bool SaveTokenOnLocal (string token){
 		string savePath = Application.persistentDataPath + "/bDropboxToken.bytes";
 		try{
@@ -86,7 +86,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 		return token;
 	}
-
+	*/
 
 	public override void Update (){
 
@@ -103,7 +103,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 			if(_token.Length > 0){
 				_isGetToken = true;
-				SaveTokenOnLocal(_token);
+				//SaveTokenOnLocal(_token);
 				_authen_callback();
 			}
 
@@ -331,11 +331,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		_downloadFile_bw.RunWorkerCompleted += bw_DownlaodFilesFromPath_done;
 
 		//Authentication
+		/*
 		if (File.Exists (Application.persistentDataPath + "/bDropboxToken.bytes")) {
 			_token = LoadTokenFromLocal();
 			_isGetToken = true;
 			_authen_callback();
 		}
+		*/
 	}
 		
 	private void bw_DownloadFilesFromPath_do(object sender,  DoWorkEventArgs e){
@@ -366,8 +368,8 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		while (true);
 
 		result = memoryStream.ToArray();
-	
-		FileStream fs = new FileStream (arg._savePath + "\\" + arg._saveName, FileMode.Create);
+			
+		FileStream fs = new FileStream (arg._savePath + "/" + arg._saveName, FileMode.Create);
 		fs.Write(result, 0, result.Length);
 	}
 

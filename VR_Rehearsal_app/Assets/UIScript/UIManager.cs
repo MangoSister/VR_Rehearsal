@@ -333,8 +333,7 @@ public class UIManager : MonoBehaviour {
 
     public void CreatePanels__(string fileList)
     {
-        
-        var parseResult = JSON.Parse(fileList);
+		var parseResult = JSON.Parse(fileList);
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;
         float span = gLayout.spacing.y;
