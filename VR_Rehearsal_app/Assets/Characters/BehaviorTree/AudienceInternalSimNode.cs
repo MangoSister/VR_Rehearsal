@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using MangoBehaviorTree;
 using State = Audience.States;
 using SimModule = CrowdSimulator.SimModule;
@@ -17,10 +18,12 @@ public class AudienceInternalSimNode : BaseNode<Audience>
 
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
-//#if UNITY_EDITOR
-//        Debug.Log("internal sim");
-//#endif
+#if UNITY_EDITOR
+        Debug.Log("internal sim");
+#endif
         Audience target = tick.target;
+        for (int i = 0; i < target.stateMassFunction.Length; ++i)
+            target.stateMassFunctionInternal[i] = 1f / target.stateMassFunction.Length;
 
         ProcessGlobal(target);
         ProcessSeatDistribution(target);
@@ -28,6 +31,8 @@ public class AudienceInternalSimNode : BaseNode<Audience>
 
         for (int i = 0; i < target.stateMassFunction.Length; ++i)
             target.stateMassFunction[i] = target.stateMassFunctionInternal[i];
+
+        target.inertiaLock = true;
 
         return NodeStatus.SUCCESS;
     }
