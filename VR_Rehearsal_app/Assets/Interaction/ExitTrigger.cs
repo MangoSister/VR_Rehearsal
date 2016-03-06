@@ -18,7 +18,13 @@ public class ExitTrigger : MonoBehaviour
     private void Start()
     {
         _receiver.eyeStared += ReceiverEyeStared;
+        _receiver.eyeExited += ReceiverEyeExited;
         _initColor = _mat.color;
+    }
+
+    private void ReceiverEyeExited(RaycastReceiver receiver)
+    {
+        _mat.color = _initColor;
     }
 
     private void ReceiverEyeStared(RaycastReceiver receiver, float progress)
