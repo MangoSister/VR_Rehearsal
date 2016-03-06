@@ -368,8 +368,8 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		while (true);
 
 		result = memoryStream.ToArray();
-	
-		FileStream fs = new FileStream (arg._savePath + "\\" + arg._saveName, FileMode.Create);
+			
+		FileStream fs = new FileStream (arg._savePath + "/" + arg._saveName, FileMode.Create);
 		fs.Write(result, 0, result.Length);
 	}
 
