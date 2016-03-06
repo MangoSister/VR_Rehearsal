@@ -99,7 +99,9 @@ public class RoomCenter : MonoBehaviour
     public void EndPresentation()
     {
         recordWrapper.EndRecording();
-
+#if UNITY_ANDROID
+        Screen.orientation = ScreenOrientation.AutoRotation;
+#endif
         GlobalManager.EndPresentation
             (
                 heatmapTracker.verticalFOVDeg,
