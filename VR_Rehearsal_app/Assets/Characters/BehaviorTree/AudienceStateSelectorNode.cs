@@ -24,4 +24,14 @@ public class AudienceStateSelectorNode : RandomSelectorNode<Audience>
         _agentExecInfo[tick.target.agentId] = info;
 
     }
+
+    protected override NodeStatus Tick(Tick<Audience> tick)
+    {
+        if (tick.target.inertiaLock)
+        {
+            tick.target.inertiaLock = false;
+            return base.Tick(tick);
+        }
+        else return children[(int)tick.target.currState].Execute(tick);
+    }
 }

@@ -45,8 +45,6 @@ namespace MangoBehaviorTree
             {
                 NodeInfo info = _agentExecInfo[tick.target.agentId];
                 info.timer= Time.time;
-                if (_initSucc)
-                    info.timer -= waitTime;
                 _agentExecInfo[tick.target.agentId] = info;
             }
             return;
@@ -63,6 +61,7 @@ namespace MangoBehaviorTree
         {
             NodeInfo info = _agentExecInfo[tick.target.agentId];
             info.timer = 0f;
+            
             _agentExecInfo[tick.target.agentId] = info;
         }
 

@@ -79,6 +79,7 @@ public class AudienceExternalSimNode : BaseNode<Audience>
             target.stateMassFunction[(int)State.Focused] = 1f;
             target.stateMassFunction[(int)State.Bored] = 0f;
             target.stateMassFunction[(int)State.Chatting] = 0f;
+            target.inertiaLock = true;
         }
     }
 
