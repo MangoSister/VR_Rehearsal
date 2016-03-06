@@ -138,8 +138,9 @@ public class RoomCenter : MonoBehaviour
 
                     if (LightmapSettings.lightProbes == null)
                     {
-                        LightmapSettings.lightProbes = new LightProbes();
-                        LightmapSettings.lightProbes.name = "Imported probes";
+                        LightProbes probes = new LightProbes();
+                        probes.name = "Imported probes";
+                        LightmapSettings.lightProbes = probes;
                     }
                     LightmapSettings.lightProbes.bakedProbes = bakedProbes;
                     
