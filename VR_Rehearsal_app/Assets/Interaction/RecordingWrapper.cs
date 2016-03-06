@@ -3,7 +3,7 @@
 public class RecordingWrapper : MonoBehaviour
 {
     [Range(0f, 1f)]
-    public float reverbStrength = 0.2f;
+    public float reverbStrength = 0.3f;
 
     private AndroidJavaClass unity;
     private AndroidJavaObject currentActivity;
@@ -13,7 +13,7 @@ public class RecordingWrapper : MonoBehaviour
     {
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-        currentActivity.Call("initialize_recordNplayback", Application.persistentDataPath);
+		currentActivity.Call("initialize_recordNplayback", (Application.persistentDataPath + "/record.pcm"));
         currentActivity.Call("setReverbStrength", reverbStrength);
     }
 
