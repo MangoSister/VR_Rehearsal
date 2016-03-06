@@ -36,3 +36,11 @@ Thumbs.db
 *.swp
 
 Output/
+
+# ===================================== #
+# Unity Binary File #
+# ===================================== #
+*.asset
+*.asset.meta
+*.exr
+*.exr.meta
