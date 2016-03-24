@@ -460,12 +460,12 @@ public class UIManager : MonoBehaviour {
 
     public void OkCustomize()
     {
-        if(showCaseName != empty && roomNumber != -1 && time != empty)
-        {
+      //  if(showCaseName != empty && roomNumber != -1 && time != empty)
+       // {
             Debug.Log("PHAN!!");
             bShowcaseMgr.EditShowcase(pptID, showCaseName, 0, Application.persistentDataPath + "/" + pptID, (int)sliderVal, 5);
             ShowCasePanel();
-        }
+		//}
         if (storedButton.Count > 0)
         {
             foreach (RectTransform child in RootRect)
