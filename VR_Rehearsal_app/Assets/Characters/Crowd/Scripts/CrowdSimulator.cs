@@ -37,8 +37,9 @@ public class CrowdSimulator : MonoBehaviour
 
     public Transform crowdParent;
     public string crowdConfigFileName;
-    public float stepInterval;
-    public float stepExternalInterval;
+    public float stepIntervalInt;
+    public float stepIntervalExt;
+    public float stepIntervalInput;
 
     public SimModule simModule = 
         SimModule.Gaze | SimModule.VoiceVolume | 
@@ -93,13 +94,13 @@ public class CrowdSimulator : MonoBehaviour
     //private BehaviorTree<Audience> _audienceBt = null;
     private BehaviorTree<Audience> _behaviorTree;
 
-    private void CreateDummyTree()
+    private void CreateBehaviorTree()
     {
         _behaviorTree = new BehaviorTree<Audience>
             (new SequenceNode<Audience>
                 (new SelectorNode<Audience>
                     (new SequenceNode<Audience>
-                        (new InstantSuccessModifier<Audience>(new WaitNode<Audience>(stepInterval, true)),
+                        (new InstantSuccessModifier<Audience>(new WaitNode<Audience>(stepIntervalInt)),
                         new AudienceInternalSimNode()),
                     new AudienceBypassInternalNode()),
                 new AudienceExternalSimNode(),
@@ -130,8 +131,9 @@ public class CrowdSimulator : MonoBehaviour
                 ad = Instantiate(prefabsL2[rand], Vector3.zero, Quaternion.identity) as Audience;
                 ad.detailLevel = Audience.DetailLevel.HalfSize_VL_FullAnim;
             }
+            ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
-            ad.GetComponent<AudienceAnimHandler>().repeatPeriodBound = new Vector2(10f, 20f);
+            ad.GetComponent<AudienceAnimHandler>().repeatPeriodBound = new Vector2(10000f, 400000f);
 
             //to Phan: fix the layout here
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;
@@ -192,7 +194,7 @@ public class CrowdSimulator : MonoBehaviour
         transform.rotation = Quaternion.identity;
 
         if (_behaviorTree == null)
-            CreateDummyTree();
+            CreateBehaviorTree();
 
         CreateCrowd();
 
@@ -201,7 +203,19 @@ public class CrowdSimulator : MonoBehaviour
     private void Start()
     {
         if (_behaviorTree != null)
+        {
             StartCoroutine(Simulate_CR());
+            StartCoroutine(UpdateInput_CR());
+        }
+    }
+
+    private IEnumerator UpdateInput_CR()
+    {
+        while (true)
+        {
+            gazeCollision.UpdateGazeContact();
+            yield return new WaitForSeconds(stepIntervalInput);
+        }
     }
 
     private IEnumerator Simulate_CR()
@@ -213,11 +227,8 @@ public class CrowdSimulator : MonoBehaviour
             _behaviorTree.NextTick(audiences[i]);
 
         //update rounds
-        float stepPerAudience = stepExternalInterval / (float)audienceNum;
         while (true)
         {
-            gazeCollision.UpdateGazeContact();
-
             foreach (SocialGroup group in socialGroups)
                 group.isComputed = false;
 
@@ -225,7 +236,7 @@ public class CrowdSimulator : MonoBehaviour
             for (int i = 0; i < audienceNum; ++i)
             {
                 _behaviorTree.NextTick(audiences[i]);
-                yield return new WaitForSeconds(stepPerAudience);
+                yield return new WaitForSeconds(stepIntervalExt);
             }
         }
     }

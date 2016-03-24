@@ -182,8 +182,9 @@ public class CrowdSimulatorInspector : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL3"), true);
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
         sim.crowdConfigFileName = EditorGUILayout.TextField("Crowd Config File Name", sim.crowdConfigFileName);
-        sim.stepInterval = EditorGUILayout.FloatField("Step Interval", sim.stepInterval);
-        sim.stepExternalInterval = EditorGUILayout.FloatField("External Step Interval", sim.stepExternalInterval);
+        sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);
+        sim.stepIntervalExt = EditorGUILayout.FloatField("Step Interval Ext", sim.stepIntervalExt);
+        sim.stepIntervalInput = EditorGUILayout.FloatField("Step Interval Input", sim.stepIntervalInput);
         sim.deterministic = EditorGUILayout.Toggle("Deterministic", sim.deterministic);
         EditorGUILayout.Separator();
 

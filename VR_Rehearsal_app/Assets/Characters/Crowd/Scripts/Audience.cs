@@ -76,7 +76,7 @@ public class Audience : MonoBehaviour, IAgent
     public SocialGroup socialGroup = null;
 
     public bool inertiaLock = false;
-
+    public float simInternalOffset = 0f;
     private void Awake()
     {
         _animHandler = GetComponent<AudienceAnimHandler>();
