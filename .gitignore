@@ -44,3 +44,12 @@ Output/
 *.asset.meta
 *.exr
 *.exr.meta
+
+# ===================================== #
+# Android Studio File #
+# ===================================== #
+pluginTest/.idea/
+pluginTest/app/*
+!pluginTest/app/src/
+!pluginTest/app/libs/
+*.iml
