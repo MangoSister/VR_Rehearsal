@@ -19,7 +19,7 @@ public class SlidesPlayerCtrl : MonoBehaviour
     public float autoAdvanceInterval = 60f;
 
     public float doubleClickInterval = 0.5f;
-    private int clickCounter = 0;
+    private int _clickCounter = 0;
 
     private SlidesPlayer _player { get { return GetComponent<SlidesPlayer>(); } }
     private void Start()
@@ -43,8 +43,8 @@ public class SlidesPlayerCtrl : MonoBehaviour
 
     private void OnTriggerPulled()
     {
-        clickCounter++;
-        if (clickCounter == 1)
+        _clickCounter++;
+        if (_clickCounter == 1)
             StartCoroutine(DoubleClick_CR());
 
     }
@@ -53,10 +53,10 @@ public class SlidesPlayerCtrl : MonoBehaviour
     {
         yield return new WaitForSeconds(doubleClickInterval);
 
-        if (clickCounter == 1)
+        if (_clickCounter == 1)
             _player.NextSlide();
-        else if (clickCounter > 1)
+        else if (_clickCounter > 1)
             _player.PrevSlide();
-        clickCounter = 0;
+        _clickCounter = 0;
     }
 }
