@@ -42,8 +42,10 @@
 			<category android:name="android.intent.category.BROWSABLE"/>
 			<category android:name="android.intent.category.DEFAULT" />
 		  </intent-filter>
-		</activity>
-
+	</activity>
+	
+	<activity android:name="com.studio272.googledriveplugin.GoogleDrivePluginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar">
+	</activity>	
 
 
 
@@ -61,6 +63,12 @@
 
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
   <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+  
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
+	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+	
+
   <uses-feature android:name="android.hardware.microphone" android:required="true" />
 
 </manifest>

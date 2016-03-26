@@ -31,14 +31,14 @@ public static class GlobalManager
     public static GlobalBehaviorCleaner globalBehaviorCleaner;
     public static GlobalBehaviorTest globalBehaviorTest;
     public static VRSceneTransition screenTransition;
-    public static DownloadManager downloadManager;
+ //   public static DownloadManager downloadManager;
 
     static GlobalManager()
     {
         globalBehaviorCleaner = FindGlobalBehavior<GlobalBehaviorCleaner>();
         globalBehaviorTest = FindGlobalBehavior<GlobalBehaviorTest>();
         screenTransition = FindGlobalBehavior<VRSceneTransition>();
-        downloadManager = FindGlobalBehavior<DownloadManager>();
+    //    downloadManager = FindGlobalBehavior<DownloadManager>();
     }
 
     private static T FindGlobalBehavior<T>() where T : GlobalBehaviorBase

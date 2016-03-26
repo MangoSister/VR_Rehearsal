@@ -14,12 +14,12 @@ public class PrepHouseKeeper : MonoBehaviour
 
     public Text transitionTxt;
 
-    private DownloadManager downloadManager
-    { get { return GlobalManager.downloadManager; } }
-
+   // private DownloadManager downloadManager
+    //{ get { return GlobalManager.downloadManager; } }
+	/*
     public void StartDownload()
     {
-        if (downloadManager == null)
+      //  if (downloadManager == null)
         {
 #if UNITY_EDITOR
             Debug.Log("Nothing downloaded");
@@ -27,7 +27,7 @@ public class PrepHouseKeeper : MonoBehaviour
             return;
         }
         else {
-            downloadManager.LaunchDownload(urlField.text, dbNumField.text);
+           // downloadManager.LaunchDownload(urlField.text, dbNumField.text);
             downloadBtn.interactable = false;
 #if UNITY_EDITOR
             Debug.Log("Something downloading");
@@ -58,7 +58,7 @@ public class PrepHouseKeeper : MonoBehaviour
             downloadBtn.interactable = true;
         }
     }
-
+*/
     private void Start()
     {
         transitionTxt.gameObject.SetActive(false);
@@ -66,10 +66,11 @@ public class PrepHouseKeeper : MonoBehaviour
         dbNumField.gameObject.SetActive(true);
         downloadBtn.gameObject.SetActive(true);
 
+		/* Obsolete 3/25/2016 by Byunghwan Lee
         if (downloadManager != null)
         {
             downloadManager.OnPostDownload.AddListener(FinishDownload);
-        }
+        }*/
 
     }
 
