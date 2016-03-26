@@ -122,7 +122,6 @@ public class UIManager : MonoBehaviour {
                 bDriveAPI.GetCurrParentFileList(delegate (string resJson)
                 {
                     isReseting = true;
-                    // DeletePanels__(true, "dd");
                     if (storedButton.Count != 0)
                     {
                         DeletePanels__(true, "dd");
