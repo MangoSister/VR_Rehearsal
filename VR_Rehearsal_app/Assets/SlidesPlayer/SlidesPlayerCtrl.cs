@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SlidesPlayerCtrl : MonoBehaviour
 {
@@ -21,6 +22,10 @@ public class SlidesPlayerCtrl : MonoBehaviour
     public float doubleClickInterval = 0.5f;
     private int _clickCounter = 0;
 
+    private List<KeyValuePair<float, int>> _transitionRecord;
+    public List<KeyValuePair<float, int>> outputTransitionRecord
+    { get { return new List<KeyValuePair<float, int>>(_transitionRecord); } }
+
     private SlidesPlayer _player { get { return GetComponent<SlidesPlayer>(); } }
     private void Start()
     {
@@ -29,6 +34,8 @@ public class SlidesPlayerCtrl : MonoBehaviour
         else if (ctrlType == SlidesCtrlType.AutoAdvance)
             StartCoroutine(AutoAdvance_CR());
 
+        _transitionRecord = new List<KeyValuePair<float, int>>();
+        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, 0));
         _player.Play();
     }
 
@@ -38,6 +45,7 @@ public class SlidesPlayerCtrl : MonoBehaviour
         {
             yield return new WaitForSeconds(autoAdvanceInterval);
             _player.NextSlide();
+            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, _player.CurrIdx));
         }
     }
 
@@ -57,6 +65,9 @@ public class SlidesPlayerCtrl : MonoBehaviour
             _player.NextSlide();
         else if (_clickCounter > 1)
             _player.PrevSlide();
+
+        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, _player.CurrIdx));
+
         _clickCounter = 0;
     }
 }

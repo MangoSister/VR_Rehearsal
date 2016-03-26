@@ -18,6 +18,7 @@ public class SlidesPlayer : MonoBehaviour
     private bool _isPlaying;
     private bool _isBlending;
     private int _currIdx;
+    public int CurrIdx { get { return _currIdx; } }
 
     private Material _mat
     {
