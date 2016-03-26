@@ -25,6 +25,7 @@ public class RoomCenter : MonoBehaviour
 
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
+    public SlidesPlayerCtrl slidesPlayerCtrl;
     public ExitTrigger exitTrigger;
 
     private AudioUnit _ambientUnit = null;
@@ -107,7 +108,8 @@ public class RoomCenter : MonoBehaviour
                 heatmapTracker.verticalFOVDeg,
                 heatmapTracker.aspect,
                 heatmapTracker.output,
-                heatmapTracker.scn
+                heatmapTracker.scn,
+                slidesPlayerCtrl.outputTransitionRecord
             );
     }
 
