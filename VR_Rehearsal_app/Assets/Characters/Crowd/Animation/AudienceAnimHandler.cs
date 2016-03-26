@@ -35,23 +35,33 @@ public class AudienceAnimHandler : MonoBehaviour
     public float SwitchFollowDegSpeed = 60f;
     private Transform _currTarget;
     private bool _isFollowing = false;
-    private bool _isTransiting = false;
     private Quaternion _defaultHeadLocalRotation;
+
+    private Coroutine _currStartFollowCR = null;
+    private Coroutine _currStopFollowCR = null;
     private Coroutine _currLookAtCR = null;
 
     //Animator layer index, must be consistent with the actual animator
     private const int neckConstraintLayerIdx = 0;
     private const int defaultLayerIdx = 1;
-
+    public int blabla = 0;
     //Use me to start following target!
     //will do nothing if the audience has already been in following state
     //will do nothing during transition
     public void StartToFollow(Transform target)
     {
-        if (_isFollowing || _isTransiting)
-            return;
+       
+        //if (_isFollowing /*|| _isTransiting*/)
+        //    return;
         _defaultHeadLocalRotation = _audience.headTransform.localRotation;
-        StartCoroutine(StartToFollow_CR(target));
+        if (_currStartFollowCR != null)
+            StopCoroutine(_currStartFollowCR);
+        if (_currStopFollowCR != null)
+            StopCoroutine(_currStopFollowCR);
+        if (_currLookAtCR != null)
+            StopCoroutine(_currLookAtCR);
+        blabla = 1;
+        _currStartFollowCR = StartCoroutine(StartToFollow_CR(target));
     }
 
     //Use me to stop following!
@@ -59,14 +69,18 @@ public class AudienceAnimHandler : MonoBehaviour
     //will do nothing during transisiton
     public void StopToFollow()
     {
-        if (!_isFollowing || _isTransiting)
-            return;
-        StartCoroutine(StopToFollow_CR());
+        if (_currStartFollowCR != null)
+            StopCoroutine(_currStartFollowCR);
+        if (_currStopFollowCR != null)
+            StopCoroutine(_currStopFollowCR);
+        if (_currLookAtCR != null)
+            StopCoroutine(_currLookAtCR);
+        blabla = 0;
+        _currStopFollowCR = StartCoroutine(StopToFollow_CR());
     }
 
     private IEnumerator StartToFollow_CR(Transform target)
     {
-        _isTransiting = true;
         //1. gradually switch animator layer
         float initWeight = anim.GetLayerWeight(defaultLayerIdx);
         float timeElapsed = 0f;
@@ -94,15 +108,14 @@ public class AudienceAnimHandler : MonoBehaviour
         _audience.headTransform.rotation = lookRot;
 
         _currTarget = target;
-        _isFollowing = true;
         if (_currTarget != null)
            _currLookAtCR = StartCoroutine(LookAt_CR());
-        _isTransiting = false;
+
+        _currStartFollowCR = null;
     }
 
     private IEnumerator StopToFollow_CR()
     {
-        _isTransiting = true;
         if (_currLookAtCR != null)
         {
             StopCoroutine(_currLookAtCR);
@@ -110,8 +123,6 @@ public class AudienceAnimHandler : MonoBehaviour
         }
 
         _currTarget = null;
-        _isFollowing = false;
-
         //1. lerp neck rotation to default
         while (Quaternion.Angle(_defaultHeadLocalRotation,
             _audience.headTransform.localRotation) > 0.5f)
@@ -122,7 +133,6 @@ public class AudienceAnimHandler : MonoBehaviour
             yield return null;
         }
         _audience.headTransform.localRotation = _defaultHeadLocalRotation;
-
 
         //2. gradually switch animator layer
         float initWeight = anim.GetLayerWeight(defaultLayerIdx);
@@ -137,7 +147,7 @@ public class AudienceAnimHandler : MonoBehaviour
         }
         anim.SetLayerWeight(defaultLayerIdx, 1f);
 
-        _isTransiting = false;
+        _currStopFollowCR = null;
     }
 
     //private void Update()

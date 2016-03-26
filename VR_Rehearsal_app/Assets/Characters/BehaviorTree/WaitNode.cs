@@ -14,13 +14,11 @@ namespace MangoBehaviorTree
         }
 
         private Dictionary<int, NodeInfo> _agentExecInfo;
-        private bool _initSucc;
         public float waitTime { get; set; }
 
-        public WaitNode(float waitTime, bool initSucc = false) : base()
+        public WaitNode(float waitTime) : base()
         {
             this.waitTime = waitTime;
-            _initSucc = initSucc;
             _agentExecInfo = new Dictionary<int, NodeInfo>();
         }
 
@@ -37,7 +35,7 @@ namespace MangoBehaviorTree
 
             if (!_agentExecInfo.ContainsKey(tick.target.agentId))
             {
-                NodeInfo info = new NodeInfo(_initSucc ? Time.time - waitTime : Time.time);
+                NodeInfo info = new NodeInfo(Time.time - (tick.target as Audience).simInternalOffset);
                 _agentExecInfo.Add(tick.target.agentId, info);
 
             }

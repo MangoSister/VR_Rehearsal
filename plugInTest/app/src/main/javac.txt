@@ -1,0 +1,14 @@
+/*
+javac source\edu\cmu\artbytes\ArtBytesUnityPlayerActivity.java -d . -target 1.6 -source 1.6 -cp "..\art_bytes\Assets\Plugins\Android\UnityARPlayer.jar;..\art_bytes\Assets\Plugins\Android\BT200Ctrl.jar;C:\Program Files\Unity\Editor\Data\PlaybackEngines\androidplayer\release\bin\classes.jar;C:\Users\Hilman\AppData\Local\Android\android-sdk\platforms\android-21\android.jar"
+
+jar cvf artbytes.jar edu
+
+cp artbytes.jar ..\art_bytes\Assets\Plugins\Android\artbytes.jar
+*/
+
+run command fro main folder :
+javac java\com\example\byunghwl\plugintest\MainActivity.java -d test -target 1.6 -source 1.6 -cp "C:\Users\byunghwl\AppData\Local\Android\android-sdk\platforms\android-23\android.jar;C:\androidTest\plugInTest\app\src\androidTest\classes.jar;C:\androidTest\plugInTest\app\src\androidTest\unityvractivity.jar;C:\androidTest\plugInTest\app\src\androidTest\dropbox-android-sdk-1.6.3.jar;C:\androidTest\plugInTest\app\src\androidTest\json_simple-1.1.jar" 
+
+cd test
+
+jar cvf vrre_Plugin.jar com

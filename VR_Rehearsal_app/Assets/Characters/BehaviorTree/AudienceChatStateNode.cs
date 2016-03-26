@@ -31,7 +31,6 @@ public class AudienceChatStateNode : BaseNode<Audience>
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
         tick.target.currState = State.Chatting;
-        tick.target.socialGroup.requestChat = true;
 #if DEBUG
         /*
         Debug.Log(string.Format("{0} ({1}): {2}",

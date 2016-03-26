@@ -27,9 +27,9 @@ public class AudienceStateSelectorNode : RandomSelectorNode<Audience>
 
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
-        if (tick.target.inertiaLock)
+        if (tick.target.updateLock)
         {
-            tick.target.inertiaLock = false;
+            tick.target.updateLock = false;
             return base.Tick(tick);
         }
         else return children[(int)tick.target.currState].Execute(tick);

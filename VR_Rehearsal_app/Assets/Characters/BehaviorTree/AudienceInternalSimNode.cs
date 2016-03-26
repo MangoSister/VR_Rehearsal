@@ -18,21 +18,18 @@ public class AudienceInternalSimNode : BaseNode<Audience>
 
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
-#if UNITY_EDITOR
-        Debug.Log("internal sim");
-#endif
         Audience target = tick.target;
         for (int i = 0; i < target.stateMassFunction.Length; ++i)
             target.stateMassFunctionInternal[i] = 1f / target.stateMassFunction.Length;
 
         ProcessGlobal(target);
         ProcessSeatDistribution(target);
-        ProcessSocialGroup(target); //override
 
         for (int i = 0; i < target.stateMassFunction.Length; ++i)
             target.stateMassFunction[i] = target.stateMassFunctionInternal[i];
 
-        target.inertiaLock = true;
+        if (target.currState != State.Chatting)
+            target.updateLock = true;
 
         return NodeStatus.SUCCESS;
     }
@@ -53,7 +50,7 @@ public class AudienceInternalSimNode : BaseNode<Audience>
         if ((sim.simModule & SimModule.SeatDistribution) == 0x00)
             return;
 
-        float pos = sim.seatPosAttentionFactor.Evaluate(target.normalizedPos);
+        float pos = sim.seatPosAttentionCurve.Evaluate(target.normalizedPos);
         pos = Mathf.Clamp(pos, -1f, 1f);
         target.stateMassFunctionInternal[(int)State.Focused] += pos;
         target.stateMassFunctionInternal[(int)State.Bored] -= pos;
@@ -65,44 +62,6 @@ public class AudienceInternalSimNode : BaseNode<Audience>
             target.stateMassFunctionInternal[(int)State.Bored] = 0f;
         if (target.stateMassFunctionInternal[(int)State.Chatting] < 0f)
             target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
-    }
-
-    private void ProcessSocialGroup(Audience target)
-    {
-        CrowdSimulator sim = CrowdSimulator.currSim;
-        if ((sim.simModule & SimModule.SocialGroup) == 0x00)
-        {
-            target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
-            return;
-        }
-
-        if (target.socialGroup == null)
-            target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
-        else if (!target.socialGroup.isComputed)
-        {
-            if (Random.value < target.stateMassFunctionInternal[(int)State.Chatting])
-            {
-                target.socialGroup.requestChat = true;
-                target.stateMassFunctionInternal[(int)State.Focused] = 0f;
-                target.stateMassFunctionInternal[(int)State.Bored] = 0f;
-                target.stateMassFunctionInternal[(int)State.Chatting] = 1f;
-            }
-            else
-            {
-                target.socialGroup.requestChat = false;
-                target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
-            }
-            target.socialGroup.isComputed = true;
-
-        }
-        else if (target.socialGroup.isComputed && target.socialGroup.requestChat)
-        {
-            target.stateMassFunctionInternal[(int)State.Focused] = 0f;
-            target.stateMassFunctionInternal[(int)State.Bored] = 0f;
-            target.stateMassFunctionInternal[(int)State.Chatting] = 1f;
-        }
-        else target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
-
     }
 
     private void ProcessGlobal(Audience target)

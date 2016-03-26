@@ -182,8 +182,9 @@ public class CrowdSimulatorInspector : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL3"), true);
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
         sim.crowdConfigFileName = EditorGUILayout.TextField("Crowd Config File Name", sim.crowdConfigFileName);
-        sim.stepInterval = EditorGUILayout.FloatField("Step Interval", sim.stepInterval);
-        sim.stepExternalInterval = EditorGUILayout.FloatField("External Step Interval", sim.stepExternalInterval);
+        sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);
+        sim.stepIntervalExt = EditorGUILayout.FloatField("Step Interval Ext", sim.stepIntervalExt);
+        sim.stepIntervalInput = EditorGUILayout.FloatField("Step Interval Input", sim.stepIntervalInput);
         sim.deterministic = EditorGUILayout.Toggle("Deterministic", sim.deterministic);
         EditorGUILayout.Separator();
 
@@ -206,7 +207,9 @@ public class CrowdSimulatorInspector : Editor
 
         EditorGUILayout.BeginVertical(voiceBlockStyle);
         groupSwitch[SimModule.VoiceVolume] = EditorGUILayout.BeginToggleGroup(SimModule.VoiceVolume.ToString(), groupSwitch[SimModule.VoiceVolume]);
-
+        sim.recordWrapper = EditorGUILayout.ObjectField("Record Wrapper", sim.recordWrapper, typeof(RecordingWrapper), true) as RecordingWrapper;
+        sim.voiceUpdatePeriod = EditorGUILayout.FloatField("Voice Update Period", sim.voiceUpdatePeriod);
+        sim.fluencyCurve = EditorGUILayout.CurveField("Fluency Score Curve", sim.fluencyCurve);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 
@@ -218,12 +221,16 @@ public class CrowdSimulatorInspector : Editor
 
         EditorGUILayout.BeginVertical(seatBlockStyle);
         groupSwitch[SimModule.SeatDistribution] = EditorGUILayout.BeginToggleGroup(SimModule.SeatDistribution.ToString(), groupSwitch[SimModule.SeatDistribution]);
-        sim.seatPosAttentionFactor = EditorGUILayout.CurveField("Seat Attention Distribution", sim.seatPosAttentionFactor);
+        sim.seatPosAttentionCurve = EditorGUILayout.CurveField("Seat Attention Distribution", sim.seatPosAttentionCurve);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.BeginVertical(socialBlockStyle);
         groupSwitch[SimModule.SocialGroup] = EditorGUILayout.BeginToggleGroup(SimModule.SocialGroup.ToString(), groupSwitch[SimModule.SocialGroup]);
+        sim.noChatThreshold = EditorGUILayout.FloatField("Forced No Chat Threshold", sim.noChatThreshold);
+        sim.avgChatThreshold = EditorGUILayout.FloatField("Average No Chat Threshold", sim.avgChatThreshold);
+        sim.chatLength = EditorGUILayout.FloatField("Chat Length", sim.chatLength);
+        sim.genChatPeriod = EditorGUILayout.FloatField("Generate Chat Period", sim.genChatPeriod);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 

@@ -31,14 +31,14 @@ public static class GlobalManager
     public static GlobalBehaviorCleaner globalBehaviorCleaner;
     public static GlobalBehaviorTest globalBehaviorTest;
     public static VRSceneTransition screenTransition;
-    public static DownloadManager downloadManager;
+ //   public static DownloadManager downloadManager;
 
     static GlobalManager()
     {
         globalBehaviorCleaner = FindGlobalBehavior<GlobalBehaviorCleaner>();
         globalBehaviorTest = FindGlobalBehavior<GlobalBehaviorTest>();
         screenTransition = FindGlobalBehavior<VRSceneTransition>();
-        downloadManager = FindGlobalBehavior<DownloadManager>();
+    //    downloadManager = FindGlobalBehavior<DownloadManager>();
     }
 
     private static T FindGlobalBehavior<T>() where T : GlobalBehaviorBase
@@ -93,13 +93,15 @@ public static class GlobalManager
             float HGVertFOVDeg,
             float HGAspect,
             List<GazeSnapshot> HGGazeData,
-            Texture2D screenshot
+            Texture2D screenshot,
+            List<KeyValuePair<float, int>> transitionRecord
         )
     {
         PresentationData.out_HGVertFOVDeg = HGVertFOVDeg;
         PresentationData.out_HGAspect = HGAspect;
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
+        PresentationData.out_SlidesTransitionRecord = transitionRecord;
         PresentationData.out_ExitTime = Time.time;
 		
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
@@ -168,6 +170,6 @@ public static class PresentationData
     public static float out_HGAspect;
     public static List<GazeSnapshot> out_HGGazeData;
     public static Texture2D out_Screenshot;
-
+    public static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
 
 }
