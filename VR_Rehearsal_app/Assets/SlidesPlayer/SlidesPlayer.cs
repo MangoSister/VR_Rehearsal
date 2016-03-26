@@ -1,18 +1,24 @@
-﻿using UnityEngine;
+﻿/* SlidesPlayer.cs
+ * Yang Zhou, last modified on March 25, 2016
+ * The SlidesPlayer play a series of texture2d as slides, and provides blending transition
+ */
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
 [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(SlidesPlayerCtrl))]
 public class SlidesPlayer : MonoBehaviour
 {
-    public bool pptKaraoke;
     public float blendInterval = 1f;
 
     private List<Texture2D> _slides;
     private bool _isPlaying;
     private bool _isBlending;
     private int _currIdx;
+    public int CurrIdx { get { return _currIdx; } }
 
     private Material _mat
     {
@@ -31,21 +37,15 @@ public class SlidesPlayer : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         Stop();
-        
-        if (!pptKaraoke)
-        {
-            if (!string.IsNullOrEmpty(PresentationData.in_SlidePath))
-                LoadSlidesFromDisk(PresentationData.in_SlidePath);
-            else
-                LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
-        }
+
+        if (!string.IsNullOrEmpty(PresentationData.in_SlidePath))
+            LoadSlidesFromDisk(PresentationData.in_SlidePath);
         else
-        {
             LoadSlides(new List<Texture2D>(Resources.LoadAll<Texture2D>("DefaultSlides")));
-        }
+
     }
 
     public bool LoadSlides(List<Texture2D> slides)

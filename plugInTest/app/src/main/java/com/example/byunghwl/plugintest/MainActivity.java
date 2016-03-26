@@ -223,6 +223,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private Thread recordingThread = null ;
 
+    private int lastActivityType = -1;
+    private int lastActivityDuration = 0;
     public String getRecord(){ //in JSON
         if (isRecording == false)
             return "";
@@ -233,8 +235,24 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         //start to put in activities
         for (int i=0; i<VADRecord.size(); i++)
         {
-            result+="{\"status\":"+VADRecord.get(i).getType()+", \"time\":"+VADRecord.get(i).getTime()+"}";
-            if (i<VADRecord.size()-1) result += ",";
+            if ((i==0) && (lastActivityType != -1)) //information about part of the first activity had already been picked by Unity
+            {
+                result+="{\"status\":"+VADRecord.get(i).getType()+", \"time\":"+(VADRecord.get(i).getTime()-lastActivityDuration)+"}";
+            }
+            else
+            {
+                result+="{\"status\":"+VADRecord.get(i).getType()+", \"time\":"+VADRecord.get(i).getTime()+"}";
+            }
+
+            result += ",";
+
+            if ((i==VADRecord.size()-1)) //last record
+            {
+                //add in current activity
+                lastActivityType = sCurrent;
+                lastActivityDuration = tCurrent;
+                result+="{\"status\":"+lastActivityType+", \"time\":"+lastActivityDuration+"}";
+            }
         }
         result += "]}";
 

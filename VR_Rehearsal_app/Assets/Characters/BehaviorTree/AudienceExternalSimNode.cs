@@ -25,7 +25,7 @@ public class AudienceExternalSimNode : BaseNode<Audience>
 //#endif
         CrowdSimulator sim = CrowdSimulator.currSim;
         Audience target = tick.target;
-
+        ProcessSocialGroup(target);
         ProcessFillerWord(target);
         ProcessVoiceVolume(target);
         ProcessGaze(target); //override
@@ -79,7 +79,12 @@ public class AudienceExternalSimNode : BaseNode<Audience>
             target.stateMassFunction[(int)State.Focused] = 1f;
             target.stateMassFunction[(int)State.Bored] = 0f;
             target.stateMassFunction[(int)State.Chatting] = 0f;
-            target.inertiaLock = true;
+            target.updateLock = true;
+            if (target.socialGroup != null)
+            {
+                target.socialGroup.shouldChat = false;
+                target.socialGroup.StopAllCoroutines();
+            }
         }
     }
 
@@ -88,6 +93,10 @@ public class AudienceExternalSimNode : BaseNode<Audience>
         CrowdSimulator sim = CrowdSimulator.currSim;
         if ((sim.simModule & SimModule.VoiceVolume) == 0x00)
             return;
+
+        target.stateMassFunctionInternal[(int)State.Focused] += sim.recordWrapper.fluencyFactor;
+        target.stateMassFunctionInternal[(int)State.Bored] -= sim.recordWrapper.fluencyFactor;
+        target.stateMassFunctionInternal[(int)State.Chatting] -= sim.recordWrapper.fluencyFactor;
     }
 
     private void ProcessFillerWord(Audience target)
@@ -95,6 +104,29 @@ public class AudienceExternalSimNode : BaseNode<Audience>
         CrowdSimulator sim = CrowdSimulator.currSim;
         if ((sim.simModule & SimModule.FillerWords) == 0x00)
             return;
+    }
+
+    private void ProcessSocialGroup(Audience target)
+    {
+        CrowdSimulator sim = CrowdSimulator.currSim;
+        if ((sim.simModule & SimModule.SocialGroup) == 0x00 || target.socialGroup == null)
+        {
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+            return;
+        }
+
+        if (target.socialGroup.shouldChat)
+        {
+            target.stateMassFunction[(int)State.Chatting] = 1f;
+            if (target.currState != State.Chatting)
+                target.updateLock = true;
+        }
+        else
+        {
+            target.stateMassFunction[(int)State.Chatting] = 0f;
+            if (target.currState == State.Chatting)
+                target.updateLock = true;
+        }
     }
 }
 

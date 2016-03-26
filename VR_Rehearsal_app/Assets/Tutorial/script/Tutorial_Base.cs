@@ -10,7 +10,7 @@ using System.Collections;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Tutorial_Base : MonoBehaviour {
 
-    public SlidesPlayerTest slidePlayer;
+    public SlidesPlayer slidePlayer;
     public clockTimer timerPlayer;
 
 	protected SpriteRenderer spriteRend;
