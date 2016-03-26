@@ -27,9 +27,6 @@ public class Audience : MonoBehaviour, IAgent
     }
 
     [Range(0f, 1f)]
-    public float attention = 1.0f;
-
-    [Range(0f, 1f)]
     public float normalizedPos = 0.0f;
 
     [Range(0f, 1f)]
@@ -75,8 +72,12 @@ public class Audience : MonoBehaviour, IAgent
 
     public SocialGroup socialGroup = null;
 
-    public bool inertiaLock = false;
+    public bool updateLock = false;
     public float simInternalOffset = 0f;
+
+    public float attention
+    { get { return stateMassFunction[(int)States.Focused]; } }
+
     private void Awake()
     {
         _animHandler = GetComponent<AudienceAnimHandler>();

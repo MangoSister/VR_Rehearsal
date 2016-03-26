@@ -53,18 +53,18 @@ public class CrowdSimulator : MonoBehaviour
     public float globalAttentionAmp;
     public float globalAttentionConstOffset;
 
-    public AnimationCurve seatPosAttentionFactor;
+    public AnimationCurve seatPosAttentionCurve;
     public float seatPosAttentionUpper
     {
         get
         {
-            return seatPosAttentionFactor.keys[0].value;
+            return seatPosAttentionCurve.keys[0].value;
         }
         set
         {
-            var keys = seatPosAttentionFactor.keys;
+            var keys = seatPosAttentionCurve.keys;
             keys[0].value = value;
-            seatPosAttentionFactor = new AnimationCurve(keys);
+            seatPosAttentionCurve = new AnimationCurve(keys);
 
         }
     }
@@ -72,24 +72,32 @@ public class CrowdSimulator : MonoBehaviour
     {
         get
         {
-            return seatPosAttentionFactor.keys[1].value;
+            return seatPosAttentionCurve.keys[1].value;
         }
         set
         {
-            var keys = seatPosAttentionFactor.keys;
+            var keys = seatPosAttentionCurve.keys;
             keys[1].value = value;
-            seatPosAttentionFactor = new AnimationCurve(keys);
+            seatPosAttentionCurve = new AnimationCurve(keys);
         }
     }
 
     public SimpleGazeCollision gazeCollision;
+    public RecordingWrapper recordWrapper;
 
     [Range(0f,1f)]
     public float gazeCumulativeIntensity;
 
+    public float voiceUpdatePeriod;
+    public AnimationCurve fluencyCurve;
+
     private List<Audience> audiences;
     public int audienceNum { get { return audiences.Count; } }
     private List<SocialGroup> socialGroups;
+    public float noChatThreshold;
+    public float avgChatThreshold;
+    public float chatLength;
+    public float genChatPeriod;
 
     //private BehaviorTree<Audience> _audienceBt = null;
     private BehaviorTree<Audience> _behaviorTree;
@@ -179,10 +187,12 @@ public class CrowdSimulator : MonoBehaviour
             if (neighbors.Count > 0)
             {
                 neighbors.Add(audiences[idx]);
-                SocialGroup group = new SocialGroup(neighbors);
-                socialGroups.Add(group);
+                var groupObj = new GameObject("Social Group", typeof(SocialGroup));
+                groupObj.transform.parent = transform;
+                groupObj.GetComponent<SocialGroup>().members = neighbors;
+                socialGroups.Add(groupObj.GetComponent<SocialGroup>());
                 foreach (Audience person in neighbors)
-                    person.socialGroup = group;
+                    person.socialGroup = groupObj.GetComponent<SocialGroup>();
             }
 
         }
@@ -205,11 +215,13 @@ public class CrowdSimulator : MonoBehaviour
         if (_behaviorTree != null)
         {
             StartCoroutine(Simulate_CR());
-            StartCoroutine(UpdateInput_CR());
+            StartCoroutine(UpdateSocialGroup_CR());
+            StartCoroutine(UpdateGazeEffect_CR());
+            StartCoroutine(UpdateVoice_CR());
         }
     }
 
-    private IEnumerator UpdateInput_CR()
+    private IEnumerator UpdateGazeEffect_CR()
     {
         while (true)
         {
@@ -218,20 +230,33 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
+    private IEnumerator UpdateSocialGroup_CR()
+    {
+        while (true)
+        {
+            socialGroups[URandom.Range(0, socialGroups.Count)].UpdateChatStatus();
+            yield return new WaitForSeconds(genChatPeriod);
+        }
+    }
+
+    private IEnumerator UpdateVoice_CR()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(voiceUpdatePeriod);
+            recordWrapper.UpdateFluencyScore();
+        }
+    }
+
     private IEnumerator Simulate_CR()
     {
         //init round
-        foreach (SocialGroup group in socialGroups)
-            group.isComputed = false;
         for (int i = 0; i < audienceNum; ++i)
             _behaviorTree.NextTick(audiences[i]);
 
         //update rounds
         while (true)
         {
-            foreach (SocialGroup group in socialGroups)
-                group.isComputed = false;
-
             //(audiences);
             for (int i = 0; i < audienceNum; ++i)
             {

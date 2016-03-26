@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SocialGroup
+public class SocialGroup : MonoBehaviour
 {
-    //public int groupId;
     public List<Audience> members;
     public Vector3 centerPos
     {
@@ -22,23 +20,49 @@ public class SocialGroup
         }
     }
 
-    public bool isComputed = false;
-    public bool requestChat = false;
+    public bool shouldChat = false;
 
-    public SocialGroup(List<Audience> members)
+    public void UpdateChatStatus()
     {
-        this.members = members;
-       // groupId = NextGlobalId;
+        double avgAttention = 0f;
+        foreach (Audience member in members)
+        {
+            if (member.attention > CrowdSimulator.currSim.noChatThreshold)
+            {
+                shouldChat = false;
+                return;
+            }
+            avgAttention += member.attention;
+        }
+
+        avgAttention /= members.Count;
+        if (avgAttention < CrowdSimulator.currSim.avgChatThreshold)
+        {
+            shouldChat = true;
+            StopAllCoroutines();
+            StartCoroutine(Chat_CR());
+        }
+        else shouldChat = false;
     }
 
-    //private static int _globalId = 0;
-    //public static int NextGlobalId
-    //{
-    //    get
-    //    {
-    //        if (_globalId == int.MaxValue)
-    //            throw new Exception("cannot assign id anymore");
-    //        return _globalId++;
-    //    }
-    //}
+    private IEnumerator Chat_CR()
+    {
+        yield return new WaitForSeconds(CrowdSimulator.currSim.chatLength);
+        shouldChat = false;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (members.Count == 0 || !shouldChat)
+            return;
+
+        Color oldColor = Gizmos.color;
+        Gizmos.color = Color.red;
+        foreach (Audience ad in members)
+            Gizmos.DrawCube(ad.transform.position, Vector3.one * 0.5f);
+        Gizmos.color = oldColor;
+    }
+#endif
+
 }
