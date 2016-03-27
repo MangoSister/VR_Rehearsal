@@ -23,8 +23,7 @@ public class ShowCaseButton : MonoBehaviour {
 
     public void OnShowCaseBUttonClicked()
     {
-        GameObject.Find("CanvasManager").GetComponent<UIManager>().ShowRotation();
-        //GlobalManager.EnterPresentation(_localPath,PresentationData.EnvType.RPIS);
+       // GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().ShowRotationView();
         PresentationData.in_SlidePath = _localPath;
 		// the unit of in_ExpectedTime is second
 		PresentationData.in_ExpectedTime = _expectedTime * 60;
