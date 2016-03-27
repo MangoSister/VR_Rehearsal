@@ -79,7 +79,7 @@ public class AudienceExternalSimNode : BaseNode<Audience>
             target.stateMassFunction[(int)State.Focused] = 1f;
             target.stateMassFunction[(int)State.Bored] = 0f;
             target.stateMassFunction[(int)State.Chatting] = 0f;
-            target.updateLock = true;
+            target.lazyUpdateLock = true;
             if (target.socialGroup != null)
             {
                 target.socialGroup.shouldChat = false;
@@ -123,13 +123,13 @@ public class AudienceExternalSimNode : BaseNode<Audience>
         {
             target.stateMassFunction[(int)State.Chatting] = 1f;
             if (target.currState != State.Chatting)
-                target.updateLock = true;
+                target.lazyUpdateLock = true;
         }
         else
         {
             target.stateMassFunction[(int)State.Chatting] = 0f;
             if (target.currState == State.Chatting)
-                target.updateLock = true;
+                target.lazyUpdateLock = true;
         }
     }
 }

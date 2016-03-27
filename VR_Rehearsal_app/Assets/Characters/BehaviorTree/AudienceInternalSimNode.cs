@@ -29,7 +29,7 @@ public class AudienceInternalSimNode : BaseNode<Audience>
             target.stateMassFunction[i] = target.stateMassFunctionInternal[i];
 
         if (target.currState != State.Chatting)
-            target.updateLock = true;
+            target.lazyUpdateLock = true;
 
         return NodeStatus.SUCCESS;
     }

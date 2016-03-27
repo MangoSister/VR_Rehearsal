@@ -13,7 +13,7 @@ public class AudienceFocusStateNode : BaseNode<Audience>
     {
         Audience target = tick.target;
         if (target.detailLevel == DetailLevel.FullSize_Bump_FullAnim ||
-            target.detailLevel == DetailLevel.FullSize_VL_FullAnim)
+            target.detailLevel == DetailLevel.FullSize_FullAnim)
             target.animHandler.StartToFollow(target.followingTransform);
     }
 
@@ -39,7 +39,7 @@ public class AudienceFocusStateNode : BaseNode<Audience>
     {
         Audience target = tick.target;
         if (target.detailLevel == DetailLevel.FullSize_Bump_FullAnim ||
-            target.detailLevel == DetailLevel.FullSize_VL_FullAnim)
+            target.detailLevel == DetailLevel.FullSize_FullAnim)
             target.animHandler.StopToFollow();
     }
 }

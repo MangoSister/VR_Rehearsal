@@ -14,10 +14,11 @@ public class RecordingWrapper : MonoBehaviour
     private AndroidJavaClass unity;
     private AndroidJavaObject currentActivity;
 #else 
+    //Debug purpose, to fake the result from voice plugin
     [Range(0f, 1f)]
     public float fakeFluencyFactor;
 #endif
-
+    //Debug purpose
     public TextMesh debugText;
 
     public void StartRecording()
