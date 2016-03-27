@@ -89,6 +89,7 @@ public class CrowdSimulator : MonoBehaviour
     public float gazeCumulativeIntensity;
 
     public float voiceUpdatePeriod;
+    public float fluencySignificantThreshold;
     public AnimationCurve fluencyCurve;
 
     private List<Audience> audiences;
@@ -245,6 +246,11 @@ public class CrowdSimulator : MonoBehaviour
         {
             yield return new WaitForSeconds(voiceUpdatePeriod);
             recordWrapper.UpdateFluencyScore();
+            if (Mathf.Abs(recordWrapper.fluencyDelta) > fluencySignificantThreshold)
+            {
+                foreach (Audience ad in audiences)
+                    ad.updateLock = true;
+            }
         }
     }
 

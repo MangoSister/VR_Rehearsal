@@ -209,7 +209,9 @@ public class CrowdSimulatorInspector : Editor
         groupSwitch[SimModule.VoiceVolume] = EditorGUILayout.BeginToggleGroup(SimModule.VoiceVolume.ToString(), groupSwitch[SimModule.VoiceVolume]);
         sim.recordWrapper = EditorGUILayout.ObjectField("Record Wrapper", sim.recordWrapper, typeof(RecordingWrapper), true) as RecordingWrapper;
         sim.voiceUpdatePeriod = EditorGUILayout.FloatField("Voice Update Period", sim.voiceUpdatePeriod);
+        sim.fluencySignificantThreshold = EditorGUILayout.FloatField("Fluency Significance Threshold", sim.fluencySignificantThreshold);
         sim.fluencyCurve = EditorGUILayout.CurveField("Fluency Score Curve", sim.fluencyCurve);
+        
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 

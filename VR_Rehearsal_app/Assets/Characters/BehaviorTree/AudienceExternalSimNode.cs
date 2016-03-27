@@ -94,9 +94,13 @@ public class AudienceExternalSimNode : BaseNode<Audience>
         if ((sim.simModule & SimModule.VoiceVolume) == 0x00)
             return;
 
-        target.stateMassFunctionInternal[(int)State.Focused] += sim.recordWrapper.fluencyFactor;
-        target.stateMassFunctionInternal[(int)State.Bored] -= sim.recordWrapper.fluencyFactor;
-        target.stateMassFunctionInternal[(int)State.Chatting] -= sim.recordWrapper.fluencyFactor;
+        target.stateMassFunction[(int)State.Focused] += sim.recordWrapper.fluencyFactor;
+        target.stateMassFunction[(int)State.Bored] -= sim.recordWrapper.fluencyFactor;
+
+        if (target.stateMassFunction[(int)State.Focused] < 0f)
+            target.stateMassFunction[(int)State.Focused] = 0f;
+        if (target.stateMassFunction[(int)State.Bored] < 0f)
+            target.stateMassFunction[(int)State.Bored] = 0f;
     }
 
     private void ProcessFillerWord(Audience target)
