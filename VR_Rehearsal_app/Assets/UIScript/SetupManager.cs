@@ -1,6 +1,7 @@
 ﻿public class SetupManager {
 
     bShowcaseManager _bShowcaseMgr;
+
     public bShowcaseManager BShowcaseMgr  
     {
         get

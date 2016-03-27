@@ -34,9 +34,6 @@ public class ShowCaseView : MonoBehaviour {
             {
                 _bDriveAPI.GetFileListFromPath("/", CreatePanels);
             });
-      
-
-
         _bShowcaseMgr = new bShowcaseManager();
         _bShowcaseMgr.Start();
     }

@@ -17,35 +17,16 @@ public class CustomizeView : MonoBehaviour  {
     public int roomNumber;
 
     //percentage of audience
-    public Slider sliderVla;
-    public float sliderVal;
-
-    //set timer
+    public Slider sliderVal;
+       //set timer
     public InputField timer;
     public string time;
 
     //local ppt ID
     private string _pptID;
     // Use this for initialization
-
-    public struct CustomData
-    {
-        public string title;
-        public int sizeRoom, timer;
-        public float audience;
- 
-        public CustomData(string _title,int _sizeRoom, float _audience, int _timer)
-        {
-            title = _title;
-            sizeRoom = _sizeRoom;
-            audience = _audience;
-            timer = _timer;
-        }
-    }
-
-    CustomData cData = new CustomData("",0,0f,0);
-
-    void Start () {
+    bShowcaseManager.showcase_Data customData;
+     void Start () {
         isCustomizeDone = false;
     }
 
@@ -55,43 +36,42 @@ public class CustomizeView : MonoBehaviour  {
         {
             case 0:
                 Debug.Log("Fucking Large");
-                cData.sizeRoom = 0;
+                customData._mapIdx = (ushort)1;
                 break;
             case 1:
                 Debug.Log("Fucking Medi");
-                cData.sizeRoom = 1;
+                customData._mapIdx = (ushort)2;
                 break;
             case 2:
                 Debug.Log("Fucking small");
-                cData.sizeRoom = 2;
+                customData._mapIdx = (ushort)3;
                 break;
             default:
-                cData.sizeRoom = -1;
+                customData._mapIdx = (ushort)0;
                 break;
         }
     }
-
+  
     public void CheckSliderValue()
     {
-        cData.audience = sliderVla.value;
+        customData._percentageOfAudience =(ushort) sliderVal.value; 
     }
 
     public void SetTimer()
     {
-        cData.timer = int.Parse(timer.text);
-        Debug.Log("TIMER : " + time);
+        customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+         Debug.Log("TIMER : " + customData._expetedTime_min);
     }
 
     public void SetShowCaseName()
     {
-        cData.title = showCaseTitle.text;
-        Debug.Log("ShowCase name : " + showCaseName);
+        customData._showcaseName = showCaseTitle.text;
+        Debug.Log("ShowCase name : " + customData._showcaseName);
     }
-
     public void CustomCompleteClicked()
     {
         Debug.Log("PHAN!!");
-        _setManager.BShowcaseMgr.EditShowcase(_pptID, showCaseName, 0, Application.persistentDataPath + "/" + _pptID, (int)sliderVal, 5);
+        _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min);
         if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
         {
             foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)
