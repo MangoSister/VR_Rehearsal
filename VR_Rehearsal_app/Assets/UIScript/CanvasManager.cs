@@ -33,87 +33,44 @@ public class CanvasManager : MonoBehaviour {
         
         if (LogoView.isLogoSceneDone)
         {
-            ShowLocalShowCaseView();
-            //localShowCase.SetActive(true);
-            //  LogoView.isLogoSceneDone = false;
-            //  fileTranser.SetActive(false);
-        }
-        if (LocalCaseView.isLocalCaseDone)
-        {
-            ShowFileTransferView();
-          //  fileTranser.SetActive(true);
-          //  LocalCaseView.isLocalCaseDone = false;
-        }
-        if (FileTransferView.isFileTransferViewDone)
-        {
-            ShowNavigationView();
-          //  int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
-          //    navigation.SetActive(true);
-          //    Debug.Log(transferType);
-          //    navigation.GetComponent<NavigationView>().SetupCloud(transferType);
-          //    FileTransferView.isFileTransferViewDone = false;
-        }
-        if (NavigationView.isNavigationDone)
-        {
-            ShowNavigationView();
-         //   NavigationView.isNavigationDone = false;
-         //   customize.SetActive(true);
-        }
-        if (CustomizeView.isCustomizeDone)
-        {
-            ShowCustomizeView();
-          //  CustomizeView.isCustomizeDone = false;
-          //  calibration.SetActive(true);
-        }
-        if (CalibrationView.isCalibrationDone)
-        {
-            ShowRotationView();
-          //  CalibrationView.isCalibrationDone = false;
-          //   rotation.SetActive(true);
-          //   rotation.GetComponent<RotationView>().SetRotation(true);
-        }
-        
-        /*
-        ShowLocalShowCaseView();
-        ShowFileTransferView();
-        ShowNavigationView();
-        ShowCustomizeView();
-        ShowRotationView();
-        NavigationBetweenView();
-        */
-    }
-    public void ShowLocalShowCaseView()
-    {
             localShowCase.SetActive(true);
             LogoView.isLogoSceneDone = false;
             fileTranser.SetActive(false);
-    }
-    public void ShowFileTransferView()
-    {
+        }
+        if (LocalCaseView.isLocalCaseDone)
+        {
             fileTranser.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
+        }
+        if (FileTransferView.isFileTransferViewDone)
+        {
+            int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
+            navigation.SetActive(true);
+            Debug.Log(transferType);
+            navigation.GetComponent<NavigationView>().SetupCloud(transferType);
+            FileTransferView.isFileTransferViewDone = false;
+        }
+        if (NavigationView.isNavigationDone)
+        {
+            NavigationView.isNavigationDone = false;
+            customize.SetActive(true);
+        }
+        if (CustomizeView.isCustomizeDone)
+        {
+            CustomizeView.isCustomizeDone = false;
+            calibration.SetActive(true);
+        }
+        if (CalibrationView.isCalibrationDone)
+        {
+            CalibrationView.isCalibrationDone = false;
+            rotation.SetActive(true);
+            rotation.GetComponent<RotationView>().SetRotation(true);
+        }
+        NavigationBetweenView();
+
+
     }
 
-    public void ShowNavigationView()
-    {
-        int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
-        navigation.SetActive(true);
-        Debug.Log(transferType);
-        navigation.GetComponent<NavigationView>().SetupCloud(transferType);
-
-    }
-    public void ShowCustomizeView()
-    {
-        NavigationView.isNavigationDone = false;
-        customize.SetActive(true);
-    }
-    public void ShowRotationView()
-    {
-        CalibrationView.isCalibrationDone = false;
-        rotation.SetActive(true);
-        rotation.GetComponent<RotationView>().SetRotation(true);
-
-    }
     void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))

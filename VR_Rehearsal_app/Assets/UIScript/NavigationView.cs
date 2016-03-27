@@ -6,7 +6,8 @@ using System.Collections.Generic;
 
 public class NavigationView : MonoBehaviour {
     // Dropbox API
-    private bhClowdDriveAPI _bDriveAPI;
+    bUserCloudDrive _userDrive;
+    public bGoogleDriveAPI _googleDirve;
     private SetupManager _setManager;
     string _pptID;
 
@@ -47,6 +48,9 @@ public class NavigationView : MonoBehaviour {
     int roomSize;
     int timer;
 
+    
+
+
     void Start() {
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
@@ -58,9 +62,9 @@ public class NavigationView : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         
-        if (_bDriveAPI != null)
+        if (_userDrive != null)
         {
-            _bDriveAPI.Update();
+            _userDrive.Update();
         }
         if (isReseting == false)
         {
@@ -68,23 +72,23 @@ public class NavigationView : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (gameObject.activeSelf && _bDriveAPI.GetRecentPath() == "/")
+            if (gameObject.activeSelf && _userDrive.GetRecentPath() == "/")
             {
                 // go back fileTransfer
             }
-            else if (gameObject.activeSelf && _bDriveAPI.GetRecentPath() == empty)
+            else if (gameObject.activeSelf && _userDrive.GetRecentPath() == empty)
             { 
                 // go back fileTransfer
             }
             else {
-                _bDriveAPI.GetCurrParentFileList(delegate (string resJson)
+                _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
                     isReseting = true;
                     if (storedButton.Count != 0)
                     {
                         DeletePanels(true, "dd");
                     }
-                    _bDriveAPI.JobDone();
+                    _userDrive.JobDone();
                     CreatePanels(resJson);
                     isReseting = false;
                 });
@@ -93,45 +97,39 @@ public class NavigationView : MonoBehaviour {
     }
     public string RecentPath()
     {
-        return _bDriveAPI.GetRecentPath();
+        return _userDrive.GetRecentPath();
     }
     public void SetSetupManager(SetupManager mg)
     {
         _setManager = mg;
     
     }
-
+ 
+    
     public void SetupCloud(int cloudType)
     {
-        Debug.Log(cloudType);
-        if(cloudType == 1)
+        Debug.Log("cloudType" + cloudType);
+        if (_userDrive == null)
+            _userDrive = new bUserCloudDrive();
+
+        _userDrive.Setup(_googleDirve);
+        _userDrive.Initialize(cloudType);
+        _userDrive.StartAuthentication(delegate ()
         {
-            _bDriveAPI = new bDropboxAPI();
-            _bDriveAPI.StartAuthentication(delegate ()
-            {
-                _bDriveAPI.GetFileListFromPath("/", CreatePanels);
-            });
-        }
-        else if (cloudType == 2)
-        {
-            // Google
-        }
-        else if(cloudType == 3)
-        {
-            // Local
-        }
+            _userDrive.GetFileListFromPath("/", CreatePanels);
+        });
+
     }
     public void CreateButtons(string _folder)
     {
-        Debug.Log(_bDriveAPI.GetRecentPath());
-        _bDriveAPI.GetSelectedFolderFileList(_folder, delegate (string resJson)
+        _userDrive.GetSelectedFolderFileList(_folder, delegate (string resJson)
         {
             isReseting = true;
             if (storedButton.Count != 0)
             {
                 DeletePanels(true, "dd");
             }
-            _bDriveAPI.JobDone();
+            _userDrive.JobDone();
             CreatePanels(resJson);
             isReseting = false;
         });
@@ -139,7 +137,7 @@ public class NavigationView : MonoBehaviour {
 
     public void UpdateButtons(string _folderName)
     {
-        _bDriveAPI.GetSelectedFolderFileList(_folderName, CreatePanels);
+        _userDrive.GetSelectedFolderFileList(_folderName, CreatePanels);
     }
 
     void StoreAllButtonStatus(GameObject button)
@@ -196,7 +194,7 @@ public class NavigationView : MonoBehaviour {
             StoreAllButtonStatus(createInstance);
         }
 
-        _bDriveAPI.JobDone();
+        _userDrive.JobDone();
         isButtonSelected = false;
     }
 
@@ -233,12 +231,12 @@ public class NavigationView : MonoBehaviour {
         if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
         {
             ShowLoadingPanel();
-            string str = _bDriveAPI.GetRecentPath();
+            string str = _userDrive.GetRecentPath();
             
             _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
             customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
             Debug.Log("pptID : " + _pptID);
-            _bDriveAPI.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
+            _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
             {
                 Debug.Log("fileDownLoad Complete");
                 StartCoroutine("CompleteDownloading");

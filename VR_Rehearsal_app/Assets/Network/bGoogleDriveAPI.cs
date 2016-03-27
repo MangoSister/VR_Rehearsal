@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class bGoogleDriveAPI : MonoBehaviour {
 
-
+    /*
 	void Start(){
 		_filesDictionary = new Dictionary<string, GoogleDrive.File> ();
 
@@ -19,7 +19,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			});
 		});
 
-	}
+	}*/
 
 	//Internal usage
 	private GoogleDrive _drive;
@@ -27,8 +27,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	private bool _revokeInProgress = false;
 
 	//For Function
-	string parentFolderID = "none";
+	string parentFolderID = "";
 	string recentFolderID = "none";
+    string recentFolderName = "none";
 
 	//For Callback
 	//1. Authentication
@@ -86,14 +87,21 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		}
 			
 	}
+    private void Initialize() {
+        if (_filesDictionary == null) {
+            _filesDictionary = new Dictionary<string, GoogleDrive.File>();
+        }
+        
+    }
 
 	public void StartAuthentication(bhClowdDriveAPI.Authentication_Callback callback){
-		/*
+        /*
 		 * Autentciation checking
 		 * If _initInProgress == false, this means drive need autentication
 		 * and _initInProgress == true, this means drive doesn't need autentication process
 		 */
-		_authen_callback = callback;
+        Initialize();
+        _authen_callback = callback;
 
 		if (_initInProgress == false) { 
 			_isAuthenticationDone = false;
@@ -111,10 +119,12 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			return;
 
 		_isUpdateListDone = false;
-		_updateList_callback = callback; 
+		_updateList_callback = callback;
 
-		parentFolderID = recentFolderID;
-
+        if (recentFolderID != "none") {
+            parentFolderID = recentFolderID;
+        }
+		
 		string id = "";
 		if (_selectedFolderName != "") {
 			if (_filesDictionary != null &&_filesDictionary.ContainsKey(_selectedFolderName)) {
@@ -122,8 +132,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			}
 		}
 		recentFolderID = id;
+        recentFolderName = _selectedFolderName;
 
-		StartCoroutine (GetFileLists_internal (id, delegate() {
+        StartCoroutine (GetFileLists_internal (id, delegate() {
 			_isUpdateListDone = true;
 		}));
 	}
@@ -139,13 +150,20 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		if (parentFolderID != "none") {
 			id = parentFolderID;
 		}
+        recentFolderID = id;
+        recentFolderName = _filesDictionary[id].Title;
 
-		StartCoroutine (GetFileLists_internal (id, delegate() {
+        StartCoroutine (GetFileLists_internal (id, delegate() {
 			_isUpdateListDone = true;
 		}));
 	}
 
-	public void FileDownloadAll(string loadFolderName, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback,  bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback ){
+    public string GetRecentPath()
+    {
+        return recentFolderName;
+    }
+
+    public void FileDownloadAll(string loadFolderName, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback,  bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback ){
 
 		if (_isFileDownloadProcessing == true)
 			return;
@@ -194,10 +212,10 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		foreach(KeyValuePair<string, GoogleDrive.File> file in Dict){
 			if (file.Value.MimeType == "application/vnd.google-apps.folder") {
-				jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\"" + file.Key + " \",\n },\n ";
+                jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\"" + file.Key + " \",\n },\n ";
 			} else {
-				jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\""+  file.Key + " \",\n },\n ";
-			}
+                jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\"" + file.Key + " \",\n },\n ";
+            }
 		}
 
 		jsonStr += " ],\n }";
