@@ -55,7 +55,7 @@ public class LocalCaseView : MonoBehaviour {
         else
         {
             showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span * caseDatas.Length) / 3));
+            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((caseDatas.Length) / 3));
         }
         for (int i = 0; i < caseDatas.Length; ++i)
         {
