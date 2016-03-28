@@ -208,7 +208,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_fileDownload_callback = callback;
 		_fileDownload_proceed_callback= proceed_callback;
 
-		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath));
+		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath) );
 	} 
 
 		
@@ -309,8 +309,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			
 		var listFiles = _drive.ListFolders(recentFolderID);
 
-		yield return StartCoroutine(listFiles);
+		yield return null;//StartCoroutine(listFiles);
 		var files = GoogleDrive.GetResult<List<GoogleDrive.File>>(listFiles);
+
 
 		if (files != null){
 			
@@ -330,6 +331,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			_NumberOfProcessedFile = 0;
 			_isSingleFileDownloadDone = true;
 
+
 			//Download Start;
 			foreach (var file in files){
 				#if UNITY_EDITOR
@@ -340,27 +342,35 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					yield return StartCoroutine(download);
 
 					var data = GoogleDrive.GetResult<byte[]>(download);
+					//---
+					//Try Catch Problem;;;fuck~!!!!!!!!!!!!!
 
-					try{
-						FileStream fs = new FileStream (saveFolderPath + "/" + file.Title, FileMode.Create);
-						fs.Write(data, 0, data.Length);
-					}catch(IOException e){
+				
+					FileStream fs = new FileStream (saveFolderPath + "/" + file.Title, FileMode.Create);
+					fs.Write(data, 0, data.Length);
+
+					/*
+					catch(IOException e){
 						#if UNITY_EDITOR
-						Debug.LogAssertion (e);
+						Debug.Log (e);
 						#endif
 						break;
 					}
+					*/
+					//-----
 					++_NumberOfProcessedFile;
 					_isSingleFileDownloadDone = true;
 				}
 			}
+
 		}else{
 			#if UNITY_EDITOR
-			Debug.LogError(listFiles.Current);
+			Debug.Log(listFiles.Current);
 			#endif
 		}
 
 		_isFileDownloadDone = true;
+
 	}
 
 
