@@ -34,7 +34,7 @@ public class AudienceAnimHandler : MonoBehaviour
     //Neck rotatin angular speed during following transition
     public float SwitchFollowDegSpeed = 60f;
     private Transform _currTarget;
-    private bool _isFollowing = false;
+    //private bool _isFollowing = false;
     private Quaternion _defaultHeadLocalRotation;
 
     private Coroutine _currStartFollowCR = null;

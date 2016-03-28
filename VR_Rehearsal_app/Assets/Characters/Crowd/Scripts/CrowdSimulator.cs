@@ -89,6 +89,7 @@ public class CrowdSimulator : MonoBehaviour
     public float gazeCumulativeIntensity;
 
     public float voiceUpdatePeriod;
+    public float fluencySignificantThreshold;
     public AnimationCurve fluencyCurve;
 
     private List<Audience> audiences;
@@ -132,12 +133,12 @@ public class CrowdSimulator : MonoBehaviour
             if (i % tx.seat_ColNum < 2)
             {
                 ad = Instantiate(prefabsL1[rand], Vector3.zero, Quaternion.identity) as Audience;
-                ad.detailLevel = Audience.DetailLevel.FullSize_VL_FullAnim;
+                ad.detailLevel = Audience.DetailLevel.FullSize_FullAnim;
             }
             else
             {
                 ad = Instantiate(prefabsL2[rand], Vector3.zero, Quaternion.identity) as Audience;
-                ad.detailLevel = Audience.DetailLevel.HalfSize_VL_FullAnim;
+                ad.detailLevel = Audience.DetailLevel.HalfSize_FullAnim;
             }
             ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
@@ -245,6 +246,11 @@ public class CrowdSimulator : MonoBehaviour
         {
             yield return new WaitForSeconds(voiceUpdatePeriod);
             recordWrapper.UpdateFluencyScore();
+            if (Mathf.Abs(recordWrapper.fluencyDelta) > fluencySignificantThreshold)
+            {
+                foreach (Audience ad in audiences)
+                    ad.lazyUpdateLock = true;
+            }
         }
     }
 

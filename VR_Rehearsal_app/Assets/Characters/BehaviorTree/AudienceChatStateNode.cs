@@ -12,6 +12,10 @@ public class AudienceChatStateNode : BaseNode<Audience>
     protected override void Open(Tick<Audience> tick)
     {
         Audience target = tick.target;
+#if DEBUG
+        if (target.socialGroup == null)
+            Debug.LogError("null social group: " + target.agentId);
+#endif
         Vector3 center = target.socialGroup.centerPos;
         Vector3 proj = Vector3.ProjectOnPlane((center - target.transform.position), target.transform.up);
         proj.Normalize();

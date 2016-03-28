@@ -29,7 +29,7 @@ public class AudienceInternalSimNode : BaseNode<Audience>
             target.stateMassFunction[i] = target.stateMassFunctionInternal[i];
 
         if (target.currState != State.Chatting)
-            target.updateLock = true;
+            target.lazyUpdateLock = true;
 
         return NodeStatus.SUCCESS;
     }
@@ -54,14 +54,11 @@ public class AudienceInternalSimNode : BaseNode<Audience>
         pos = Mathf.Clamp(pos, -1f, 1f);
         target.stateMassFunctionInternal[(int)State.Focused] += pos;
         target.stateMassFunctionInternal[(int)State.Bored] -= pos;
-        target.stateMassFunctionInternal[(int)State.Chatting] -= pos;
 
         if (target.stateMassFunctionInternal[(int)State.Focused] < 0f)
             target.stateMassFunctionInternal[(int)State.Focused] = 0f;
         if (target.stateMassFunctionInternal[(int)State.Bored] < 0f)
             target.stateMassFunctionInternal[(int)State.Bored] = 0f;
-        if (target.stateMassFunctionInternal[(int)State.Chatting] < 0f)
-            target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
     }
 
     private void ProcessGlobal(Audience target)
@@ -75,14 +72,11 @@ public class AudienceInternalSimNode : BaseNode<Audience>
         global = Mathf.Clamp(global, -1f, 1f);
         target.stateMassFunctionInternal[(int)State.Focused] += global;
         target.stateMassFunctionInternal[(int)State.Bored] -= global;
-        target.stateMassFunctionInternal[(int)State.Chatting] -= global;
 
         if (target.stateMassFunctionInternal[(int)State.Focused] < 0f)
             target.stateMassFunctionInternal[(int)State.Focused] = 0f;
         if (target.stateMassFunctionInternal[(int)State.Bored] < 0f)
             target.stateMassFunctionInternal[(int)State.Bored] = 0f;
-        if (target.stateMassFunctionInternal[(int)State.Chatting] < 0f)
-            target.stateMassFunctionInternal[(int)State.Chatting] = 0f;
 
     }
 
