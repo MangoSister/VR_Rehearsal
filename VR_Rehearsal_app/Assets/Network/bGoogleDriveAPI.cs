@@ -121,18 +121,31 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_isUpdateListDone = false;
 		_updateList_callback = callback;
 
+		/*
         if (recentFolderID != "none") {
             parentFolderID = recentFolderID;
-        }
+        }*/
 		
 		string id = "";
 		if (_selectedFolderName != "") {
-			if (_filesDictionary != null &&_filesDictionary.ContainsKey(_selectedFolderName)) {
-				id = _filesDictionary [_selectedFolderName].ID;
+			string removedLastWhiteSpace = "";
+
+			for (int i = 0; i < _selectedFolderName.Length - 1; i++) {
+				removedLastWhiteSpace += _selectedFolderName [i];
 			}
+
+			bool res = _filesDictionary.ContainsKey (removedLastWhiteSpace);
+			if (_filesDictionary != null &&_filesDictionary.ContainsKey(removedLastWhiteSpace)) {
+				id = _filesDictionary [removedLastWhiteSpace].ID;
+			}
+
+			recentFolderID = id;
+			recentFolderName = removedLastWhiteSpace;
+		}else{
+			recentFolderID = id;
+			recentFolderName = _selectedFolderName;
 		}
-		recentFolderID = id;
-        recentFolderName = _selectedFolderName;
+
 
         StartCoroutine (GetFileLists_internal (id, delegate() {
 			_isUpdateListDone = true;
@@ -150,8 +163,25 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		if (parentFolderID != "none") {
 			id = parentFolderID;
 		}
+
         recentFolderID = id;
-        recentFolderName = _filesDictionary[id].Title;
+		if (recentFolderID == "") {
+			recentFolderName = "";
+		} else {
+			try{
+				foreach(KeyValuePair<string, GoogleDrive.File> file in _filesDictionary){
+					if (file.Value.ID == id) {
+						recentFolderName = file.Value.Title;
+					}
+				}
+			}catch(Exception e){
+				#if UNITY_EDITOR
+				Debug.Log (e);
+				#endif
+			}
+
+		}
+       
 
         StartCoroutine (GetFileLists_internal (id, delegate() {
 			_isUpdateListDone = true;

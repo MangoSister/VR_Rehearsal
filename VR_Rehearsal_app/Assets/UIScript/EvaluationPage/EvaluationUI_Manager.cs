@@ -28,12 +28,7 @@ public class EvaluationUI_Manager : MonoBehaviour {
 
 	public void HearReplay()
 	{
-		//currentActivity.Call("replayAll");
-		AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-		string res = currentActivity.Call<string>("prepareReplay");
-
-		//try to play the PCM file!
+		
 
 		if (audioSource == null)
 		{
@@ -47,7 +42,7 @@ public class EvaluationUI_Manager : MonoBehaviour {
 		{
 			UnityEngine.Debug.Log("read from file"); 
 
-			byte[] byteArray = File.ReadAllBytes( Application.persistentDataPath + "\record.pcm"); //change this
+			byte[] byteArray = File.ReadAllBytes( Application.persistentDataPath + "/record.pcm"); //change this
 
 			//PCM file is 16bit PCM, need byte > unity float transform
 			// UnityEngine.Debug.Log("size = " + byteArray.Length);
