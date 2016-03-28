@@ -52,9 +52,14 @@ public class PresenterRaycaster : MonoBehaviour
     {
         if (!headTransform)
             return;
+        Gizmos.color = Color.green;
         Gizmos.DrawLine
             (headTransform.position + headTransform.up * upOffset, 
             headTransform.position + headTransform.up * upOffset + headTransform.forward * range);
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine
+            (headTransform.position + headTransform.up * upOffset,
+            headTransform.position + headTransform.up * upOffset + headTransform.forward * range * 5);
     }
 #endif
 }
