@@ -245,17 +245,13 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             }
 
             result += ",";
-
-            if ((i==VADRecord.size()-1)) //last record
-            {
-                //add in current activity
-                lastActivityType = sCurrent;
-                lastActivityDuration = tCurrent;
-                result+="{\"status\":"+lastActivityType+", \"time\":"+lastActivityDuration+"}";
-            }
         }
-        result += "]}";
 
+        //the current ongoing activity
+        lastActivityType = sCurrent;
+        lastActivityDuration = tCurrent;
+        result += "{\"status\":"+lastActivityType+", \"time\":"+lastActivityDuration+"}";
+        result += "]}";
         VADRecord.clear();
         return result;
     }
