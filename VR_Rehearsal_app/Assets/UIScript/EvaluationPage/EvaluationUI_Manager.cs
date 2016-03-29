@@ -21,8 +21,8 @@ public class EvaluationUI_Manager : MonoBehaviour {
 		float maxTime;
 		heatMapGen.GenerateMap (PresentationData.out_HGGazeData, 0, PresentationData.out_ExitTime, out tempTex, out maxTime);
 
-		heatmapHolder.GetComponent<Image> ().sprite = Sprite.Create (tempTex, new Rect(0,0,tempTex.width, tempTex.height), new Vector2(0.5f, 0.5f));
-		screenshotHolder.GetComponent<Image> ().sprite = Sprite.Create (PresentationData.out_Screenshot, new Rect(0,0,PresentationData.out_Screenshot.width, PresentationData.out_Screenshot.height), new Vector2(0.5f, 0.5f));
+		//heatmapHolder.GetComponent<Image> ().sprite = Sprite.Create (tempTex, new Rect(0,0,tempTex.width, tempTex.height), new Vector2(0.5f, 0.5f));
+		//screenshotHolder.GetComponent<Image> ().sprite = Sprite.Create (PresentationData.out_Screenshot, new Rect(0,0,PresentationData.out_Screenshot.width, PresentationData.out_Screenshot.height), new Vector2(0.5f, 0.5f));
 
 	}
 
