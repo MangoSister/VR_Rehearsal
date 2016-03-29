@@ -23,6 +23,7 @@ public class AudienceFocusStateNode : BaseNode<Audience>
     protected override NodeStatus Tick(Tick<Audience> tick)
     {
         tick.target.currState = State.Focused;
+        tick.target.animHandler.eyeIconToggle = tick.target.gazeFactor > 0.7f;
 #if DEBUG
         /*
         Debug.Log(string.Format("{0} ({1}): {2}",

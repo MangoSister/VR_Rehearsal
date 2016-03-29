@@ -180,6 +180,7 @@ public class CrowdSimulatorInspector : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL1"), true);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL2"), true);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL3"), true);
+        sim.prefabEyeIcon = EditorGUILayout.ObjectField("Eye Icon Prefab", sim.prefabEyeIcon, typeof(GameObject), true) as GameObject;
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
         sim.crowdConfigFileName = EditorGUILayout.TextField("Crowd Config File Name", sim.crowdConfigFileName);
         sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);
