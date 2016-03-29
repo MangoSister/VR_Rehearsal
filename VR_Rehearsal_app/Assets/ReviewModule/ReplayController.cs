@@ -10,12 +10,20 @@ using System;
 public class ReplayController : MonoBehaviour {
     private const int FREQUENCY = 44100; //in Hz //CHANGE TO 8000
     private readonly LinkedList<float> recordData = new LinkedList<float>();
-    public Slider playbackSlider;
     private AudioSource audioSource;
-    public bool preventTrigger = false;
     private PLAY_STATUS playStatus = PLAY_STATUS.STOP;
+
+    [Header("Playback Slider Control")]
+    public Slider playbackSlider;
+    public bool preventTrigger = false;
+    [Header("Playback Button Control")]
     public Image playButton;
     public Sprite sprPlaying, sprPausing;
+    [Header("Time Stamp Control")]
+    public Text quarterTime;
+    public Text halfTime;
+    public Text softTime;
+    public Text endTime;
 
     enum PLAY_STATUS
     {
@@ -25,6 +33,14 @@ public class ReplayController : MonoBehaviour {
     }
 
     //public Text t1, t2, t3, t4;
+
+    private String getTimeString(float time)
+    {
+        if (time > 60.0f)
+            return (int)(time / 60.0f) + ":" + (time - (time / 60) * 60) + "." + (int)((time - (int)(time)) * 100.0f);
+        else
+            return (int)(time) + "." + (int)((time - (int)(time)) * 100.0f);
+    }
 
     public void jumpInPlayback()
     {
@@ -122,32 +138,12 @@ public class ReplayController : MonoBehaviour {
         }
         floatArr[i / 2] = '\0';
 
-        /*
-            float totaltime = (floatArr.Length) / 8000.0f;
-            int quarter = (int)(totaltime / 4.0f);
-
-            if (quarter > 60)
-            {
-                t1.text = "0:0.00";
-                t2.text = quarter / 60 + ":" + (quarter - (quarter / 60) * 60) + "." + (int)((((float)totaltime) / 4.0f - quarter) * 100.0f);
-            }
-            else
-            {
-                t1.text = "0.00";
-                t2.text = quarter + "." + (int)((((float)totaltime) / 4.0f - quarter) * 100.0f);
-            }
-
-            int soft = quarter * 3;
-            if  (soft>60)
-                t3.text = soft / 60 + ":" + (soft - (soft / 60) * 60) + "." + (int)((((float)totaltime) * 0.75f - soft) * 100.0f);
-            else
-                t3.text = soft + "." + (int)((((float)totaltime) * 0.75f - soft) * 100.0f);
-
-            if (totaltime > 60)
-                t4.text = totaltime / 60 + ":" + (totaltime - (totaltime / 60) * 60) + "." + (int)((((float)totaltime) - (int)totaltime) * 100.0f);
-            else
-                t4.text = totaltime.ToString("0.00");
-        */
+        //time stamp update
+        float totaltime = (floatArr.Length) / 8000.0f;
+        quarterTime.text = getTimeString(totaltime / 4.0f);
+        halfTime.text = getTimeString(totaltime / 2.0f);
+        softTime.text = getTimeString(totaltime * 0.75f);
+        endTime.text = getTimeString(totaltime);
 
         AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, 8000, false, false);
         myClip.SetData(floatArr, 0);
