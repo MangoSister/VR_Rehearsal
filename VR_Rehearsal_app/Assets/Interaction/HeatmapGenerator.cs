@@ -84,8 +84,8 @@ public class HeatmapGenerator : MonoBehaviour
             }
             else
             {
-                int mapX = Mathf.RoundToInt(projX * (float)(heatmap.width - 1));
-                int mapY = Mathf.RoundToInt(projY * (float)(heatmap.height - 1));
+                int mapX = Mathf.FloorToInt(projX * (float)(heatmap.width));
+                int mapY = Mathf.FloorToInt(projY * (float)(heatmap.height));
 
                 outputTime[mapX + mapY * heatmap.width] += (snapshot.timeStamp - lastTime);
             }

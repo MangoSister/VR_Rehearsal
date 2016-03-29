@@ -33,6 +33,36 @@ public class AudienceAnimHandler : MonoBehaviour
     
     //Neck rotatin angular speed during following transition
     public float SwitchFollowDegSpeed = 60f;
+
+    public static readonly Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.1f;
+    public static float eyeIconScale = 0.05f;
+    public static float eyeIconFreq = 6f;
+    public GameObject eyeIcon;
+    public bool eyeIconToggle
+    {
+        get { return eyeIcon != null && eyeIcon.activeSelf; }
+        set
+        {
+            if (eyeIcon != null)
+            {
+                eyeIcon.SetActive(value);
+                if (value == true)
+                {
+                    _currEyeIconCR = StartCoroutine(IconAnimation_CR());
+                }
+                else
+                {
+                    if (_currEyeIconCR != null)
+                    {
+                        StopCoroutine(_currEyeIconCR);
+                        _currEyeIconCR = null;
+                    }
+                }
+            }
+        }
+    }
+    private Coroutine _currEyeIconCR = null
+        ;
     private Transform _currTarget;
     //private bool _isFollowing = false;
     private Quaternion _defaultHeadLocalRotation;
@@ -44,7 +74,6 @@ public class AudienceAnimHandler : MonoBehaviour
     //Animator layer index, must be consistent with the actual animator
     private const int neckConstraintLayerIdx = 0;
     private const int defaultLayerIdx = 1;
-    public int blabla = 0;
     //Use me to start following target!
     //will do nothing if the audience has already been in following state
     //will do nothing during transition
@@ -60,7 +89,6 @@ public class AudienceAnimHandler : MonoBehaviour
             StopCoroutine(_currStopFollowCR);
         if (_currLookAtCR != null)
             StopCoroutine(_currLookAtCR);
-        blabla = 1;
         _currStartFollowCR = StartCoroutine(StartToFollow_CR(target));
     }
 
@@ -75,7 +103,6 @@ public class AudienceAnimHandler : MonoBehaviour
             StopCoroutine(_currStopFollowCR);
         if (_currLookAtCR != null)
             StopCoroutine(_currLookAtCR);
-        blabla = 0;
         _currStopFollowCR = StartCoroutine(StopToFollow_CR());
     }
 
@@ -198,6 +225,16 @@ public class AudienceAnimHandler : MonoBehaviour
         while (true)
         {
             _audience.headTransform.LookAt(_currTarget);
+            yield return null;
+        }
+    }
+
+    private IEnumerator IconAnimation_CR()
+    {
+        while (true)
+        {
+            eyeIcon.transform.localScale = Vector3.one * 
+                eyeIconScale * (0.1f * Mathf.Sin(Time.time * eyeIconFreq) + 1f);
             yield return null;
         }
     }
