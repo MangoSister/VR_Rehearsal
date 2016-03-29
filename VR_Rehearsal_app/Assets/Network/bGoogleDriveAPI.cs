@@ -31,6 +31,8 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	string recentFolderID = "none";
     string recentFolderName = "none";
 
+	List<string> currPath;
+
 	//For Callback
 	//1. Authentication
 	bool _isAuthenticationDone = false;
@@ -91,7 +93,13 @@ public class bGoogleDriveAPI : MonoBehaviour {
         if (_filesDictionary == null) {
             _filesDictionary = new Dictionary<string, GoogleDrive.File>();
         }
-        
+
+		if (currPath == null) {
+			currPath = new List<string> ();
+		} else {
+			currPath.Clear ();
+		}
+
     }
 
 	public void StartAuthentication(bhClowdDriveAPI.Authentication_Callback callback){
@@ -138,12 +146,24 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			if (_filesDictionary != null &&_filesDictionary.ContainsKey(removedLastWhiteSpace)) {
 				id = _filesDictionary [removedLastWhiteSpace].ID;
 			}
-
-			recentFolderID = id;
 			recentFolderName = removedLastWhiteSpace;
+
+			bool isDuplicated = false;
+			foreach(string Path in currPath){
+				if (Path == id) {
+					isDuplicated = true;
+				}
+			}
+			if (!isDuplicated) {
+				currPath.Add (id);
+			}
+
+
 		}else{
 			recentFolderID = id;
 			recentFolderName = _selectedFolderName;
+			//parentFolderID = "";
+			currPath.Add ("");
 		}
 
 
@@ -159,31 +179,18 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_isUpdateListDone = false;
 		_updateList_callback = callback; 
 
-		string id = "";
-		if (parentFolderID != "none") {
-			id = parentFolderID;
+		int parentIdx = currPath.Count - 2;
+		if (parentIdx < 0)
+			parentIdx = 0;
+		
+		string bbbRes = currPath[parentIdx];
+
+		if (parentIdx != 0) {
+			currPath.RemoveAt(currPath.Count - 1);
 		}
 
-        recentFolderID = id;
-		if (recentFolderID == "") {
-			recentFolderName = "";
-		} else {
-			try{
-				foreach(KeyValuePair<string, GoogleDrive.File> file in _filesDictionary){
-					if (file.Value.ID == id) {
-						recentFolderName = file.Value.Title;
-					}
-				}
-			}catch(Exception e){
-				#if UNITY_EDITOR
-				Debug.Log (e);
-				#endif
-			}
 
-		}
-       
-
-        StartCoroutine (GetFileLists_internal (id, delegate() {
+		StartCoroutine (GetFileLists_internal (bbbRes, delegate() {
 			_isUpdateListDone = true;
 		}));
 	}
@@ -201,7 +208,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_fileDownload_callback = callback;
 		_fileDownload_proceed_callback= proceed_callback;
 
-		DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath);
+		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath) );
 	} 
 
 		
@@ -257,6 +264,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		yield return StartCoroutine(listFiles);
 		var files = GoogleDrive.GetResult<List<GoogleDrive.File>>(listFiles);
 
+		recentFolderID = Id;
+		//parentFolderID = _filesDictionary [removedLastWhiteSpace].Parents [0];
+
 		if (files != null){
 			_filesDictionary.Clear ();
 			foreach (GoogleDrive.File file in files){
@@ -270,6 +280,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					#endif
 				} else {
 					_filesDictionary.Add (file.Title, file);
+					if (file.IsFolder == true) {
+						parentFolderID = file.Parents [0];
+					}
 				}
 			}
 			callback ();
@@ -294,18 +307,32 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			}
 		}
 			
-		var listFiles = _drive.ListFolders(targetId);
+		var listFiles = _drive.ListFolders(recentFolderID);
 
-		yield return StartCoroutine(listFiles);
+		yield return null;//StartCoroutine(listFiles);
 		var files = GoogleDrive.GetResult<List<GoogleDrive.File>>(listFiles);
+
 
 		if (files != null){
 			
 			//Processing Number Initialize !!
-			_NumberOfTotalDownloadFile = files.Count;
+			if (!Directory.Exists (saveFolderPath)) {
+				Directory.CreateDirectory(saveFolderPath);
+			}
+
+
+			//Processed file count
+			_NumberOfTotalDownloadFile = 0;
+			foreach (var file in files) {
+				if (file.Title.EndsWith(".jpg") || file.Title.EndsWith(".png") || file.Title.EndsWith(".JPG") || file.Title.EndsWith(".PNG") ){
+					_NumberOfTotalDownloadFile += 1;
+				}
+			}
 			_NumberOfProcessedFile = 0;
 			_isSingleFileDownloadDone = true;
 
+
+			//Download Start;
 			foreach (var file in files){
 				#if UNITY_EDITOR
 				Debug.Log(file);
@@ -315,27 +342,35 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					yield return StartCoroutine(download);
 
 					var data = GoogleDrive.GetResult<byte[]>(download);
+					//---
+					//Try Catch Problem;;;fuck~!!!!!!!!!!!!!
 
-					try{
-						FileStream fs = new FileStream (saveFolderPath + "/" + file.Title, FileMode.Create);
-						fs.Write(data, 0, data.Length);
-					}catch(IOException e){
+				
+					FileStream fs = new FileStream (saveFolderPath + "/" + file.Title, FileMode.Create);
+					fs.Write(data, 0, data.Length);
+
+					/*
+					catch(IOException e){
 						#if UNITY_EDITOR
-						Debug.LogAssertion (e);
+						Debug.Log (e);
 						#endif
 						break;
 					}
+					*/
+					//-----
 					++_NumberOfProcessedFile;
 					_isSingleFileDownloadDone = true;
 				}
 			}
+
 		}else{
 			#if UNITY_EDITOR
-			Debug.LogError(listFiles.Current);
+			Debug.Log(listFiles.Current);
 			#endif
 		}
 
-		_isSingleFileDownloadDone = true;
+		_isFileDownloadDone = true;
+
 	}
 
 
