@@ -34,6 +34,7 @@ public class CrowdSimulator : MonoBehaviour
     public Audience[] prefabsL1;
     public Audience[] prefabsL2;
     public Audience[] prefabsL3;
+    public GameObject prefabEyeIcon;
 
     public Transform crowdParent;
     public string crowdConfigFileName;
@@ -143,6 +144,12 @@ public class CrowdSimulator : MonoBehaviour
             ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
             ad.GetComponent<AudienceAnimHandler>().repeatPeriodBound = new Vector2(10000f, 400000f);
+
+            var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+            icon.transform.parent = ad.headTransform;
+            icon.transform.localPosition = AudienceAnimHandler.eyeIconOffset;
+            ad.GetComponent<AudienceAnimHandler>().eyeIcon = icon;
+            //ad.GetComponent<AudienceAnimHandler>().eyeIconToggle = false;
 
             //to Phan: fix the layout here
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;

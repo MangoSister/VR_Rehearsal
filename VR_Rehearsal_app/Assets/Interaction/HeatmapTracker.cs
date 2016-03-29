@@ -29,18 +29,48 @@ public class HeatmapTracker : MonoBehaviour
     //heatmaptracker works similar to a camera, i.e., projects the presenter's view direction on a XY plane at z = 1
     //vertical "field of view" (in degrees) of heatmap, horizontal FOV can be computed with it and (screen) aspect
     //view direction outside FOV would contribute to "out of bound" component
-    public float verticalFOVDeg = 60f;
+    public float _verticalFOVDeg = 60f;
 
-    public float horizontalFOVDeg = 120f;
+    public float verticalFOVDeg
+    {
+        get { return _verticalFOVDeg; }
+        set
+        {
+            _verticalFOVDeg = value;
+            _aspect = Mathf.Tan(Mathf.Deg2Rad * 0.5f * _horizontalFOVDeg) /
+              Mathf.Tan(Mathf.Deg2Rad * 0.5f * _verticalFOVDeg);
+        }
+    }
+
+    public float _horizontalFOVDeg = 120f;
+
+    public float horizontalFOVDeg
+    {
+        get { return _horizontalFOVDeg;}
+        set
+        {
+            _horizontalFOVDeg = value;
+            _aspect = Mathf.Tan(Mathf.Deg2Rad * 0.5f * _horizontalFOVDeg) /
+              Mathf.Tan(Mathf.Deg2Rad * 0.5f * _verticalFOVDeg);
+        }
+    }
+
+    private float? _aspect;
 
     //Screen aspect ratio
     public float aspect
     {
         get
         {
-            return Mathf.Tan(Mathf.Deg2Rad * 0.5f * horizontalFOVDeg) /
-              Mathf.Tan(Mathf.Deg2Rad * 0.5f * verticalFOVDeg);
+            if (!_aspect.HasValue)
+            {
+                _aspect = Mathf.Tan(Mathf.Deg2Rad * 0.5f * _horizontalFOVDeg) /
+              Mathf.Tan(Mathf.Deg2Rad * 0.5f * _verticalFOVDeg);
+            }
+            return _aspect.Value;
         }
+        set
+        { _aspect = value; }
     }
 
     //Gaze data: a series of GazeSnapshot (temporal)
@@ -134,9 +164,10 @@ public class HeatmapTracker : MonoBehaviour
         }
     }
 
-    public Texture2D CaptureScreenshot()
+    public void CaptureScreenshot()
     {
         scnCam.gameObject.SetActive(true);
+        scnCam.gameObject.transform.position = RoomCenter.currRoom.presenterHead.position;
         scnCam.fieldOfView = verticalFOVDeg;
         scnCam.aspect = aspect;
 
@@ -154,9 +185,6 @@ public class HeatmapTracker : MonoBehaviour
         RenderTexture.active = oldActive;
 
         scnCam.gameObject.SetActive(false);
-
-        return scn;
-
     }
 
     private IEnumerator Capture_CR()
@@ -166,7 +194,22 @@ public class HeatmapTracker : MonoBehaviour
         CaptureScreenshot();
     }
 
-    //#if UNITY_EDITOR
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Matrix4x4 oldMat = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(RoomCenter.currRoom.presenterHead.position, 
+                                        RoomCenter.currRoom.presenter.transform.rotation, 
+                                        Vector3.one);
+        Gizmos.DrawFrustum
+        (RoomCenter.currRoom.presenterHead.position, verticalFOVDeg, 5f, 1f, aspect);
+        Gizmos.matrix = oldMat;
+        Gizmos.color = Color.white;
+
+    }
+
+
     //    //screen overlay routine in editor ONLY
     //    //need to be plugged to Cardboard post render object
     //    public void RenderOverlay()
@@ -197,5 +240,5 @@ public class HeatmapTracker : MonoBehaviour
 
     //        GL.PopMatrix();
     //    }
-    //#endif
+    #endif
 }

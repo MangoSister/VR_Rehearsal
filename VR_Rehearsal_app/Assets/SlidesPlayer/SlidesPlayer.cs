@@ -8,10 +8,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-[RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(SlidesPlayerCtrl))]
 public class SlidesPlayer : MonoBehaviour
 {
+    public List<MeshRenderer> displays;
     public float blendInterval = 1f;
 
     private List<Texture2D> _slides;
@@ -20,20 +20,20 @@ public class SlidesPlayer : MonoBehaviour
     private int _currIdx;
     public int CurrIdx { get { return _currIdx; } }
 
-    private Material _mat
+    private Material _mat;
+
+    private Material mat
     {
         get
         {
-            Material mat = GetComponent<MeshRenderer>().material;
-            if (mat != null)
-                return mat;
-            else
+            if (_mat == null)
             {
-                Material mat_new = new Material(Shader.Find("VR_Rehearsal_app/sh_Slides_Blend"));
-                mat_new.name = "mat_Slides_Blend";
-                GetComponent<MeshRenderer>().material = mat_new;
-                return mat_new;
+                _mat = new Material(Shader.Find("VR_Rehearsal_app/sh_Slides_Blend"));
+                _mat.name = "mat_Slides_Blend";
+                foreach (MeshRenderer mr in displays)
+                    mr.material = _mat;
             }
+            return _mat;
         }
     }
 
@@ -137,9 +137,9 @@ public class SlidesPlayer : MonoBehaviour
     {
         _isPlaying = false;
         _isBlending = false;
-        _mat.SetTexture("_CurrTex", Texture2D.blackTexture);
-        _mat.SetTexture("_NextTex", Texture2D.blackTexture);
-        _mat.SetFloat("_Blend", 0f);
+        mat.SetTexture("_CurrTex", Texture2D.blackTexture);
+        mat.SetTexture("_NextTex", Texture2D.blackTexture);
+        mat.SetFloat("_Blend", 0f);
     }
 
     public void NextSlide()
@@ -147,7 +147,7 @@ public class SlidesPlayer : MonoBehaviour
         if (!_isPlaying || _isBlending || _currIdx >= _slides.Count - 1)
             return;
         _currIdx++;
-        _mat.SetTexture("_NextTex", _slides[_currIdx]);
+        mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
     }
 
@@ -156,7 +156,7 @@ public class SlidesPlayer : MonoBehaviour
         if (!_isPlaying || _isBlending || _currIdx <= 0)
             return;
         _currIdx--;
-        _mat.SetTexture("_NextTex", _slides[_currIdx]);
+        mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
     }
 
@@ -167,13 +167,13 @@ public class SlidesPlayer : MonoBehaviour
         float deltaTime = 0f;
         while (deltaTime < blendInterval)
         {
-            _mat.SetFloat("_Blend", Mathf.Clamp01(deltaTime / blendInterval));
+            mat.SetFloat("_Blend", Mathf.Clamp01(deltaTime / blendInterval));
             deltaTime += Time.deltaTime;
             yield return null;
         }
        
-        _mat.SetTexture("_CurrTex", _mat.GetTexture("_NextTex"));
-        _mat.SetFloat("_Blend", 0f);
+        mat.SetTexture("_CurrTex", mat.GetTexture("_NextTex"));
+        mat.SetFloat("_Blend", 0f);
 
         _isBlending = false;
     }
