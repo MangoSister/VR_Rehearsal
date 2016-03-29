@@ -19,11 +19,12 @@ public class EvaluationUI_Manager : MonoBehaviour {
 		heatMapGen = this.GetComponent<HeatmapGenerator> ();
 		Texture2D tempTex;
 		float maxTime;
-		heatMapGen.GenerateMap (PresentationData.out_HGGazeData, 0, PresentationData.out_ExitTime, out tempTex, out maxTime);
-
-		heatmapHolder.GetComponent<Image> ().sprite = Sprite.Create (tempTex, new Rect(0,0,tempTex.width, tempTex.height), new Vector2(0.5f, 0.5f));
-		screenshotHolder.GetComponent<Image> ().sprite = Sprite.Create (PresentationData.out_Screenshot, new Rect(0,0,PresentationData.out_Screenshot.width, PresentationData.out_Screenshot.height), new Vector2(0.5f, 0.5f));
-
+		if (PresentationData.out_HGGazeData!=null)
+        { 
+            heatMapGen.GenerateMap (PresentationData.out_HGGazeData, 0, PresentationData.out_ExitTime, out tempTex, out maxTime);
+            heatmapHolder.GetComponent<Image> ().sprite = Sprite.Create (tempTex, new Rect(0,0,tempTex.width, tempTex.height), new Vector2(0.5f, 0.5f));
+		    screenshotHolder.GetComponent<Image> ().sprite = Sprite.Create (PresentationData.out_Screenshot, new Rect(0,0,PresentationData.out_Screenshot.width, PresentationData.out_Screenshot.height), new Vector2(0.5f, 0.5f));
+        }
 	}
 
 	public void HearReplay()

@@ -61,11 +61,12 @@ public class PrepHouseKeeper : MonoBehaviour
 */
     private void Start()
     {
-       transitionTxt.gameObject.SetActive(false);
+        /*
+        transitionTxt.gameObject.SetActive(false);
         urlField.gameObject.SetActive(true);
         dbNumField.gameObject.SetActive(true);
         downloadBtn.gameObject.SetActive(true);
-
+        */
 		/* Obsolete 3/25/2016 by Byunghwan Lee
         if (downloadManager != null)
         {
