@@ -90,6 +90,16 @@ public class bShowcaseManager  {
 
 		LoadShowcaseBinaryFromLocal ();
 
+		try{
+			string targetFolderPath = _showcaseTable[caseID]._pptFolderPath;
+			if(File.Exists (targetFolderPath)){
+				Directory.Delete(targetFolderPath);
+			}
+
+		}catch(IOException e){
+			
+		}
+
 		_showcaseTable.Remove (caseID);
 
 		SaveShowcasesBinaryInLocal ();
