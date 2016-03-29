@@ -41,11 +41,13 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 	//2. Filelist 
 	bhClowdDriveAPI.fileList_Callback _updateList_callback;
+	bool _isUpdateListProcessing = false;
 	bool _isUpdateListDone = false;
 
 	//3. FileDownload
 	bhClowdDriveAPI.fileDownload_Callback _fileDownload_callback; 
 	bhClowdDriveAPI.fileDownload_Process_Callback _fileDownload_proceed_callback;
+
 	bool _isFileDownloadDone = false;
 	bool _isSingleFileDownloadDone = false;
 	bool _isFileDownloadProcessing = false;
@@ -123,12 +125,12 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	}
 		
 	public void GetSelectedFolderFileList(string _selectedFolderName, bhClowdDriveAPI.fileList_Callback callback){
-		if (_drive == null)
+		if (_drive == null || _isUpdateListProcessing == true)
 			return;
 
 		_isUpdateListDone = false;
 		_updateList_callback = callback;
-
+		_isUpdateListProcessing = true;
 		/*
         if (recentFolderID != "none") {
             parentFolderID = recentFolderID;
@@ -169,15 +171,17 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
         StartCoroutine (GetFileLists_internal (id, delegate() {
 			_isUpdateListDone = true;
+			_isUpdateListProcessing = false;
 		}));
 	}
 
 	public void  GetCurrParentFileList (bhClowdDriveAPI.fileList_Callback callback){
-		if (_drive == null)
+		if (_drive == null || _isUpdateListProcessing == true)
 			return;
 
 		_isUpdateListDone = false;
 		_updateList_callback = callback; 
+		_isUpdateListProcessing = true;
 
 		int parentIdx = currPath.Count - 2;
 		if (parentIdx < 0)
@@ -192,6 +196,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		StartCoroutine (GetFileLists_internal (bbbRes, delegate() {
 			_isUpdateListDone = true;
+			_isUpdateListProcessing = false;
 		}));
 	}
 

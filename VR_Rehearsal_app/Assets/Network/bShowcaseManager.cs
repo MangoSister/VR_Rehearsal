@@ -24,6 +24,7 @@ public class bShowcaseManager  {
 		}
 	}
 
+	/*
 	public bool Start(){
 		if (_showcaseTable != null)
 			_showcaseTable.Clear ();
@@ -38,8 +39,11 @@ public class bShowcaseManager  {
 		_showcaseTable.Clear ();
 		return res;
 	}
+	*/
 
     public showcase_Data[] GetAllShowcases(){
+		LoadShowcaseBinaryFromLocal ();
+
         showcase_Data[] arr = new showcase_Data[_showcaseTable.Count];
         int index = 0;
         foreach (KeyValuePair<string, showcase_Data> pair in _showcaseTable){
@@ -50,10 +54,13 @@ public class bShowcaseManager  {
     }
 
     public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
+		LoadShowcaseBinaryFromLocal ();
 
 		string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
 		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage, (ushort)expTime);
 		_showcaseTable.Add (tempId, tempShowcase);
+
+		SaveShowcasesBinaryInLocal ();
 		return tempId;
 	}
 
@@ -61,6 +68,8 @@ public class bShowcaseManager  {
 
 		if (!_showcaseTable.ContainsKey(caseID))
 			return false;
+
+		LoadShowcaseBinaryFromLocal ();
 
 		showcase_Data tempShowcase = (showcase_Data)_showcaseTable [caseID];
 		tempShowcase._showcaseName = caseName;
@@ -70,6 +79,8 @@ public class bShowcaseManager  {
 		tempShowcase._expetedTime_min = (ushort)expTime;
 
 		_showcaseTable [caseID] = tempShowcase;
+
+		SaveShowcasesBinaryInLocal ();
 		return true;
 	}
 
@@ -77,7 +88,11 @@ public class bShowcaseManager  {
 		if (!_showcaseTable.ContainsKey(caseID))
 			return false;
 
+		LoadShowcaseBinaryFromLocal ();
+
 		_showcaseTable.Remove (caseID);
+
+		SaveShowcasesBinaryInLocal ();
 		return true;
 	}
 		
@@ -99,8 +114,14 @@ public class bShowcaseManager  {
 					_numOfShowcase = r.ReadInt32 ();
 
 					//3. Load Showcases
-					for (int i = 0; i < _numOfShowcase; ++i) {
+					if(_showcaseTable == null){
+						_showcaseTable = new Dictionary<string, showcase_Data>();
+					}else{
+						_showcaseTable.Clear();
+					}
 						
+					for (int i = 0; i < _numOfShowcase; ++i) {
+
 						showcase_Data tempCase = new showcase_Data ();
 						tempCase._showcaseID = r.ReadString ();
 						tempCase._showcaseName = r.ReadString ();
