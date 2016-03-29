@@ -43,6 +43,7 @@ public class LocalCaseView : MonoBehaviour {
     {
         DeleteShowCase();
         bShowcaseManager.showcase_Data[] caseDatas = _setManager.BShowcaseMgr.GetAllShowcases();
+        Debug.Log(caseDatas[0]._pptFolderPath);
         GridLayoutGroup gLayout_showCase = contentRect.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout_showCase.cellSize.y;
         float span = gLayout_showCase.spacing.y;
@@ -55,15 +56,18 @@ public class LocalCaseView : MonoBehaviour {
         else
         {
             showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((caseDatas.Length) / 3));
+            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span+caseDatas.Length) / 3));
         }
         for (int i = 0; i < caseDatas.Length; ++i)
         {
             Debug.Log(i + ": " + caseDatas[i]._showcaseID + "," + caseDatas[i]._showcaseName);
             GameObject createShowCase = Instantiate(showCasePrefab) as GameObject;
             Debug.Log("name" + caseDatas[i]._showcaseName);
-            createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
-            createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
+
+          //  createShowCase.GetComponentInChildren<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
+              createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
+           
+              createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
             //showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, -1 * (totalSizeofRect / 2));
             createShowCase.transform.SetParent(showCaseContentRect, false);
             showCaseButtonList.Add(createShowCase);
@@ -93,5 +97,12 @@ public class LocalCaseView : MonoBehaviour {
     {
         isLocalCaseDone = true;
         gameObject.SetActive(false);
+    }
+
+    public void DeleteLocalShowcase(string deleteID)
+    {
+        Debug.Log("call Delete function");
+        _setManager.BShowcaseMgr.DeleteShowcase(deleteID);
+     
     }
 }
