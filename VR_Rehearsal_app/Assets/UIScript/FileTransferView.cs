@@ -22,12 +22,15 @@ public class FileTransferView : MonoBehaviour {
      }
     public void GoogleButtonClicked()
     {
-       transferNumber = 2;
+        transferNumber = 2;
         gameObject.SetActive(false);
         isFileTransferViewDone = true;
     }
     public void USBButtonClicked()
     {
+
         transferNumber = 3;
+        gameObject.SetActive(false);
+        isFileTransferViewDone = true;
     }
 }

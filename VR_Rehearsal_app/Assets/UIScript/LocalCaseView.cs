@@ -42,8 +42,12 @@ public class LocalCaseView : MonoBehaviour {
     void CheckLocalPPT()
     {
         DeleteShowCase();
+        
         bShowcaseManager.showcase_Data[] caseDatas = _setManager.BShowcaseMgr.GetAllShowcases();
-        Debug.Log(caseDatas[0]._pptFolderPath);
+        if (caseDatas == null)
+        {
+            return;
+        }
         GridLayoutGroup gLayout_showCase = contentRect.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout_showCase.cellSize.y;
         float span = gLayout_showCase.spacing.y;

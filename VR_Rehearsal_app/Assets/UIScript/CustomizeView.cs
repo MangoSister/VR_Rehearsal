@@ -72,6 +72,7 @@ public class CustomizeView : MonoBehaviour  {
     {
         Debug.Log("PHAN!!");
         _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min);
+        Debug.Log(_pptID);
         if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
         {
             foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)
