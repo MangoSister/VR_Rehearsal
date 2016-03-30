@@ -354,6 +354,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 					//Name Duplicator checker
 					string finalFileTitle = file.Title;
+
 					bool bIsDuplicatedFileName = false;
 					int duplicatedNumber = 0;
 					foreach (string title in fileNameList) {
@@ -362,7 +363,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 							duplicatedNumber++;
 						}
 					}
-					finalFileTitle += duplicatedNumber;
+
+					if(bIsDuplicatedFileName)
+					finalFileTitle += duplicatedNumber.ToString();
 
 					FileStream fs = new FileStream (saveFolderPath + "/" + finalFileTitle, FileMode.Create);
 					fs.Write(data, 0, data.Length);
