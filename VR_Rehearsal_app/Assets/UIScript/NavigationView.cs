@@ -207,8 +207,9 @@ public class NavigationView : MonoBehaviour {
                 _button.GetComponent<Button>().interactable = false;
                
             }
-            if (_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
+            if (_button.GetComponent<ButtonType>().isSelected == true )//&& isButtonSelected == false)
             {
+                Debug.Log("333333333333333333333");
                 if (isCopy == false)
                 {
                     if (GameObject.Find("PPT_Practice(Clone)(Clone)"))

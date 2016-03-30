@@ -30,7 +30,7 @@ public class CanvasManager : MonoBehaviour {
     
 	
 	void Update () {
-        
+        /*
         if (LogoView.isLogoSceneDone)
         {
             localShowCase.SetActive(true);
@@ -66,6 +66,13 @@ public class CanvasManager : MonoBehaviour {
             rotation.SetActive(true);
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
+        */
+        ShowLocasShowView();
+        ShowFileTransferView();
+        ShowNavigationView();
+        ShowCustomView();
+        ShowCalibrationView();
+        ShowRotationView();
         NavigationBetweenView();
         
     }
@@ -97,7 +104,31 @@ public class CanvasManager : MonoBehaviour {
             navigation.GetComponent<NavigationView>().SetupCloud(transferType);
             FileTransferView.isFileTransferViewDone = false;
         }
-
+    }
+    public void ShowCustomView()
+    {
+        if (NavigationView.isNavigationDone)
+        {
+            NavigationView.isNavigationDone = false;
+            customize.SetActive(true);
+        }
+    }
+    public void ShowCalibrationView()
+    {
+        if (CustomizeView.isCustomizeDone)
+        {
+            CustomizeView.isCustomizeDone = false;
+            calibration.SetActive(true);
+        }
+    }
+    public void ShowRotationView()
+    {
+        if (CalibrationView.isCalibrationDone)
+        {
+            CalibrationView.isCalibrationDone = false;
+            rotation.SetActive(true);
+            rotation.GetComponent<RotationView>().SetRotation(true);
+        }
     }
     void NavigationBetweenView()
     {
@@ -113,7 +144,7 @@ public class CanvasManager : MonoBehaviour {
             {
                 string str = navigation.GetComponent<NavigationView>().RecentPath();
                 Debug.Log(str);
-                if (str == "/"){
+                if (str == "/" || str == ""){
                     navigation.SetActive(false);
                     NavigationView.isNavigationDone = false;
                     navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
