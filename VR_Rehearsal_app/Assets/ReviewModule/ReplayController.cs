@@ -12,6 +12,8 @@ public class ReplayController : MonoBehaviour {
     private readonly LinkedList<float> recordData = new LinkedList<float>();
     private AudioSource audioSource;
     private PLAY_STATUS playStatus = PLAY_STATUS.STOP;
+    private static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
+    private static List<KeyValuePair<float, int>> out_PauseRecord;
 
     [Header("Playback Slider Control")]
     public Slider playbackSlider;
@@ -24,6 +26,13 @@ public class ReplayController : MonoBehaviour {
     public Text halfTime;
     public Text softTime;
     public Text endTime;
+    [Header("Marker Control")]
+    public bool isTransitionDisplay = true;
+    public bool isPauseDisplay = true;
+    public GameObject groupTransitionMarker;
+    public GameObject prefabTransitionMarker;
+    public GameObject groupPauseMarker;
+    public GameObject prefabPauseMarker;
 
     enum PLAY_STATUS
     {
@@ -98,6 +107,7 @@ public class ReplayController : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
+        //set up audio source
         if (audioSource == null)
         {
             //UnityEngine.Debug.Log("get audio source"); 
@@ -155,6 +165,57 @@ public class ReplayController : MonoBehaviour {
         playbackSlider.maxValue = audioSource.clip.length;
         playbackSlider.value = 0;
         preventTrigger = false;
+
+        if (PresentationData.out_SlidesTransitionRecord!=null)
+            out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
+        //if (PresentationData.out_PauseRecord != null)
+        //    out_PauseRecord = PresentationData.out_PauseRecord;
+
+        //for testing
+        out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+
+        //instantiate markers
+        if (isTransitionDisplay == true)
+        { 
+            foreach (KeyValuePair<float, int> transitionRecord in out_SlidesTransitionRecord)
+            {
+                var go = Instantiate(prefabTransitionMarker) as GameObject;
+                go.transform.parent = groupTransitionMarker.transform;
+
+                //calculate x coord
+                float xPos = -54f + (379f - (-54f)) * (transitionRecord.Key / totaltime);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, -110.2937f);
+            }
+        }
+
+        //for testing
+        out_PauseRecord = new List<KeyValuePair<float, int>>();
+        out_PauseRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+
+        //instantiate markers
+        if (isPauseDisplay == true)
+        {
+            foreach (KeyValuePair<float, int> pauseRecord in out_PauseRecord)
+            {
+                var go = Instantiate(prefabPauseMarker) as GameObject;
+                go.transform.parent = groupPauseMarker.transform;
+
+                //calculate x coord
+                float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
+            }
+        }
 	}
 	
 	// Update is called once per frame
