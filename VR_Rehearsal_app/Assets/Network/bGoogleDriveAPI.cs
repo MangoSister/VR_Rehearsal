@@ -314,7 +314,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			
 		var listFiles = _drive.ListFolders(recentFolderID);
 
-		yield return null;//StartCoroutine(listFiles);
+		yield return StartCoroutine(listFiles);
 		var files = GoogleDrive.GetResult<List<GoogleDrive.File>>(listFiles);
 
 

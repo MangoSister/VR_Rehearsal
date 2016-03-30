@@ -32,8 +32,20 @@ public class bShowcaseManager  {
 	public bool Start(){
 		if (_showcaseTable != null)
 			_showcaseTable.Clear ();
+		else
+			_showcaseTable = new Dictionary<string, showcase_Data> ();
 
-		_showcaseTable = new Dictionary<string, showcase_Data> ();
+		#if UNITY_EDITOR
+		string loadPath = Application.dataPath + "/" + _binaryFileName + ".bytes";
+		Debug.Log (Application.persistentDataPath);
+		#elif UNITY_ANDROID 
+		string loadPath = Application.persistentDataPath + "/" + _binaryFileName + ".bytes";
+		#endif
+
+		if (!File.Exists (loadPath)) {
+			SaveShowcasesBinaryInLocal ();
+		}
+			
 		bool res = LoadShowcaseBinaryFromLocal ();
 		return res;
 	}
@@ -102,12 +114,14 @@ public class bShowcaseManager  {
         try
         {
 			string targetFolderPath = _showcaseTable[caseID]._pptFolderPath;
-			if(File.Exists (targetFolderPath)){
-				Directory.Delete(targetFolderPath);
+			if(Directory.Exists (targetFolderPath)){
+				Directory.Delete(targetFolderPath,true);
 			}
 
 		}catch(IOException e){
-			
+			#if UNITY_EDITOR
+			Debug.Log (e);
+			#endif
 		}
 
 		_showcaseTable.Remove (caseID);
@@ -182,10 +196,11 @@ public class bShowcaseManager  {
 			using(var w = new BinaryWriter(File.OpenWrite(savePath))){
 				//1. Header checking in order to check file corruption
 				w.Write(_fileHeaderValidChecker);
-				//2. Number Of Showcase
-				w.Write(_showcaseTable.Count);
 
-				//3.save each showcase 
+				//2. Number Of Showcase
+					w.Write(_showcaseTable.Count);
+
+				//3.save each showcase
 				foreach (KeyValuePair<string, showcase_Data> pair in _showcaseTable){
 					
 					w.Write(((showcase_Data)pair.Value)._showcaseID);
