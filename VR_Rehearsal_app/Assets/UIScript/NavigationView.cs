@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using SimpleJSON;
 using System.Collections.Generic;
+using System;
 
 public class NavigationView : MonoBehaviour {
     // Dropbox API
@@ -41,6 +42,7 @@ public class NavigationView : MonoBehaviour {
      //Download button components
     public GameObject progressCircle;
     public GameObject loadingView;
+    public GameObject downloadButton;
 
     //Customize Data
     string showCaseName;
@@ -205,10 +207,11 @@ public class NavigationView : MonoBehaviour {
             if(_button.GetComponent<ButtonType>().buttonType != "folder")
             {
                 _button.GetComponent<Button>().interactable = false;
-               
+                            
             }
-            if (_button.GetComponent<ButtonType>().isSelected == true)// && isButtonSelected == false)
+            if (_button.GetComponent<ButtonType>().isSelected == true )//&& isButtonSelected == false)
             {
+                Debug.Log("333333333333333333333");
                 if (isCopy == false)
                 {
                     if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
@@ -222,37 +225,48 @@ public class NavigationView : MonoBehaviour {
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
                 }
+
+				_button.GetComponent<ButtonType> ().isSelected = false; 
             }
         }
     }
 
     public void DownloadButtonClicked()
     {
-        if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
-        {
-            ShowLoadingPanel();
-            string str = _userDrive.GetRecentPath();
-            
-            _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
-            customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
-            Debug.Log("pptID : " + _pptID);
-            _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
+      
+            try { 
+            if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
             {
-                Debug.Log("fileDownLoad Complete");
-                StartCoroutine("CompleteDownloading");
-              //  isNavigationDone = true;
-              //  gameObject.SetActive(false);
-             //   CustomizePanel();
+                ShowLoadingPanel();
+                string str = _userDrive.GetRecentPath();
 
-            }, delegate (int totalFileNum, int completedFileNum) {
-                progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
-            });
-            Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
-        }
-        else
-        {
-            Debug.Log("you can;t download");
-        }
+                _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
+                customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
+                Debug.Log("pptID : " + _pptID);
+                _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
+                {
+                    Debug.Log("fileDownLoad Complete");
+                    StartCoroutine("CompleteDownloading");
+                    //  isNavigationDone = true;
+                    //  gameObject.SetActive(false);
+                    //   CustomizePanel();
+
+                }, delegate (int totalFileNum, int completedFileNum)
+                {
+                    progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+                });
+                Debug.Log("Folder : " + str + "path : " + Application.persistentDataPath);
+            }
+            else
+            {
+                Debug.Log("you can;t download");
+            }
+            }
+            catch(Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        
     }
     public void ShowLoadingPanel()
     {

@@ -82,7 +82,7 @@ public class UIManager : MonoBehaviour {
         InitialCanvasScrollSize = new Vector2(RootRect.rect.height, RootRect.rect.width);
         //bDriveAPI = new bDropboxAPI();
         bShowcaseMgr = new bShowcaseManager();
-        bShowcaseMgr.Start();
+        //bShowcaseMgr.Start();
 
         //bDriveAPI.StartAuthentication();
         ShowLogoPanel();
@@ -388,12 +388,12 @@ public class UIManager : MonoBehaviour {
     {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
-            bShowcaseMgr.End();
+            //bShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
-            bShowcaseMgr.End();
+            //bShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
   }
