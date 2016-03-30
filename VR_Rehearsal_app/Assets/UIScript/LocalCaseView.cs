@@ -26,6 +26,7 @@ public class LocalCaseView : MonoBehaviour {
         CheckLocalPPT();
         GetComponent<RectTransform>().SetAsLastSibling();
         originalRect = showCaseContentRect.offsetMin.y;
+        Debug.Log(originalRect);
         GetComponent<RectTransform>().SetAsLastSibling();
         _initialScrollContentSize = new Vector2(showCaseContentRect.rect.height, showCaseContentRect.rect.width);
     }
@@ -51,7 +52,9 @@ public class LocalCaseView : MonoBehaviour {
         GridLayoutGroup gLayout_showCase = contentRect.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout_showCase.cellSize.y;
         float span = gLayout_showCase.spacing.y;
-        float totalSizeofRect = (cellSize - span) * caseDatas.Length;
+        float totalSizeofRect = (cellSize - (span/2)) * caseDatas.Length;
+       
+        Debug.Log("####" + originalRect);
         if (caseDatas!=null)
         {
             if (caseDatas.Length < 7)
@@ -61,8 +64,12 @@ public class LocalCaseView : MonoBehaviour {
             }
             else
             {
+                gLayout_showCase.padding.top = -68;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-                showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span + caseDatas.Length) / 3));
+                //showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span + caseDatas.Length) / 3));
+                //showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (originalRect +((cellSize - span) * (caseDatas.Length - 5))));
+                Debug.Log("total rect : " + (originalRect + (totalSizeofRect / 2)));
+               showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, -(originalRect+(totalSizeofRect/2)));
             }
 
             for (int i = 0; i < caseDatas.Length; ++i)
