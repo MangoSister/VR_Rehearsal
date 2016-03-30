@@ -35,7 +35,7 @@ public class ShowCaseView : MonoBehaviour {
                 _bDriveAPI.GetFileListFromPath("/", CreatePanels);
             });
         _bShowcaseMgr = new bShowcaseManager();
-        _bShowcaseMgr.Start();
+        //_bShowcaseMgr.Start();
     }
 	
 	// Update is called once per frame

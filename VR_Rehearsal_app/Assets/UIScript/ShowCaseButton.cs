@@ -41,10 +41,15 @@ public class ShowCaseButton : MonoBehaviour {
        
 
     }
-    public void DeleteShowcaseButtonClicked()
+
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int _expectedTime)
     {
-        deletedShowcaseID = _id;
-        GameObject.Find("LocalCaseCanvas").GetComponent<LocalCaseView>().DeleteLocalShowcase(deletedShowcaseID);
+        _showCaseName = showCanseName;
+        _sizeOfRoom = sizeOfRoom;
+        _numberOfAudience = numberOfAudience;
+        _localPath = localPath;
+        _id = id;
+        _expectedTime = _expectedTime;
     }
     public void OnShowCaseBUttonClicked()
     {
@@ -64,14 +69,14 @@ public class ShowCaseButton : MonoBehaviour {
          */
 
     }
-    
-    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int _expectedTime)
+
+    public void DeleteShowcaseButtonClicked()
     {
-        _showCaseName = showCanseName;
-        _sizeOfRoom = sizeOfRoom;
-        _numberOfAudience = numberOfAudience;
-        _localPath = localPath;
-        _id = id;
-		_expectedTime = _expectedTime;
+        deletedShowcaseID = _id;
+        GameObject.Find("LocalCaseCanvas").GetComponent<LocalCaseView>().DeleteLocalShowcase(deletedShowcaseID);
+    }
+    public void CustomeButtonClicked()
+    {
+
     }
 }

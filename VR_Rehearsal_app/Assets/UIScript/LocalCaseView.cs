@@ -48,31 +48,37 @@ public class LocalCaseView : MonoBehaviour {
         float cellSize = gLayout_showCase.cellSize.y;
         float span = gLayout_showCase.spacing.y;
         float totalSizeofRect = (cellSize - span) * caseDatas.Length;
-        if (caseDatas.Length < 7)
+        if (caseDatas!=null)
         {
-            showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, originalRect);
-        }
-        else
-        {
-            showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-            showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span+caseDatas.Length) / 3));
-        }
-        for (int i = 0; i < caseDatas.Length; ++i)
-        {
-            Debug.Log(i + ": " + caseDatas[i]._showcaseID + "," + caseDatas[i]._showcaseName);
-            GameObject createShowCase = Instantiate(showCasePrefab) as GameObject;
-            Debug.Log("name" + caseDatas[i]._showcaseName);
+            if (caseDatas.Length < 7)
+            {
+                showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
+                showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, originalRect);
+            }
+            else
+            {
+                showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
+                showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, (-1 * totalSizeofRect / 2) + ((span + caseDatas.Length) / 3));
+            }
 
-          //  createShowCase.GetComponentInChildren<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
-              createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
-           
-              createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
-            //showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, -1 * (totalSizeofRect / 2));
-            createShowCase.transform.SetParent(showCaseContentRect, false);
-            showCaseButtonList.Add(createShowCase);
-            StoreShowCaseButtons(createShowCase);
+            for (int i = 0; i < caseDatas.Length; ++i)
+            {
+                Debug.Log(i + ": " + caseDatas[i]._showcaseID + "," + caseDatas[i]._showcaseName);
+                GameObject createShowCase = Instantiate(showCasePrefab) as GameObject;
+                Debug.Log("name" + caseDatas[i]._showcaseName);
+
+
+                //  createShowCase.GetComponentInChildren<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
+                createShowCase.GetComponent<ShowCaseButton>().SetData(caseDatas[i]._showcaseName, caseDatas[i]._mapIdx, caseDatas[i]._percentageOfAudience, caseDatas[i]._pptFolderPath, caseDatas[i]._showcaseID, caseDatas[i]._expetedTime_min);
+
+                createShowCase.GetComponent<RectTransform>().FindChild("nameOfShowCase").GetComponent<Text>().text = caseDatas[i]._showcaseName;
+                //showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, -1 * (totalSizeofRect / 2));
+                createShowCase.transform.SetParent(showCaseContentRect, false);
+                showCaseButtonList.Add(createShowCase);
+                StoreShowCaseButtons(createShowCase);
+            }
         }
+
     }
     void StoreShowCaseButtons(GameObject obj)
     {

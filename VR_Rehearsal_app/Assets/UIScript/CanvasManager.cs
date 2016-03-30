@@ -67,10 +67,38 @@ public class CanvasManager : MonoBehaviour {
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
         NavigationBetweenView();
-
-
+        
+    }
+    public void ShowLocasShowView()
+    {
+        if (LogoView.isLogoSceneDone)
+        {
+            localShowCase.SetActive(true);
+            LogoView.isLogoSceneDone = false;
+            fileTranser.SetActive(false);
+        }
     }
 
+    public void ShowFileTransferView()
+    {
+        if (LocalCaseView.isLocalCaseDone)
+        {
+            fileTranser.SetActive(true);
+            LocalCaseView.isLocalCaseDone = false;
+        }
+    }
+    public void ShowNavigationView()
+    {
+        if (FileTransferView.isFileTransferViewDone)
+        {
+            int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
+            navigation.SetActive(true);
+            Debug.Log(transferType);
+            navigation.GetComponent<NavigationView>().SetupCloud(transferType);
+            FileTransferView.isFileTransferViewDone = false;
+        }
+
+    }
     void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))

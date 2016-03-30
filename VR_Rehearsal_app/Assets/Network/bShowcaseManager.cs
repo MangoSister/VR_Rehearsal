@@ -24,7 +24,11 @@ public class bShowcaseManager  {
 		}
 	}
 
-	/*
+    public bShowcaseManager (){
+        Start();
+    }
+
+    
 	public bool Start(){
 		if (_showcaseTable != null)
 			_showcaseTable.Clear ();
@@ -33,7 +37,7 @@ public class bShowcaseManager  {
 		bool res = LoadShowcaseBinaryFromLocal ();
 		return res;
 	}
-
+    /*
     public bool End(){
 		bool res = SaveShowcasesBinaryInLocal ();
 		_showcaseTable.Clear ();
@@ -42,7 +46,8 @@ public class bShowcaseManager  {
 	*/
 
     public showcase_Data[] GetAllShowcases(){
-		LoadShowcaseBinaryFromLocal ();
+		bool res = LoadShowcaseBinaryFromLocal ();
+        if(!res) return null;
 
         showcase_Data[] arr = new showcase_Data[_showcaseTable.Count];
         int index = 0;
@@ -54,9 +59,10 @@ public class bShowcaseManager  {
     }
 
     public string AddShowcase(string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
-		LoadShowcaseBinaryFromLocal ();
+        bool res = LoadShowcaseBinaryFromLocal();
+        if (!res) return null;
 
-		string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
+        string tempId = System.DateTime.Now.ToString ("yyyy_MM_dd_hh_mm_ss");
 		showcase_Data tempShowcase = new showcase_Data(tempId, caseName, (ushort)mapIdx, pptFolderPath, (ushort)percentage, (ushort)expTime);
 		_showcaseTable.Add (tempId, tempShowcase);
 
@@ -66,12 +72,13 @@ public class bShowcaseManager  {
 
 	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
 
-		if (!_showcaseTable.ContainsKey(caseID))
-			return false;
+        bool res = LoadShowcaseBinaryFromLocal();
+        if (!res) return false;
 
-		LoadShowcaseBinaryFromLocal ();
+        if (!_showcaseTable.ContainsKey(caseID))
+            return false;
 
-		showcase_Data tempShowcase = (showcase_Data)_showcaseTable [caseID];
+        showcase_Data tempShowcase = (showcase_Data)_showcaseTable [caseID];
 		tempShowcase._showcaseName = caseName;
 		tempShowcase._mapIdx = (ushort)mapIdx;
 		tempShowcase._pptFolderPath = pptFolderPath;
@@ -85,12 +92,15 @@ public class bShowcaseManager  {
 	}
 
 	public bool DeleteShowcase(string caseID){
-		if (!_showcaseTable.ContainsKey(caseID))
-			return false;
 
-		LoadShowcaseBinaryFromLocal ();
+        bool res = LoadShowcaseBinaryFromLocal();
+        if (!res) return false;
 
-		try{
+        if (!_showcaseTable.ContainsKey(caseID))
+            return false;
+
+        try
+        {
 			string targetFolderPath = _showcaseTable[caseID]._pptFolderPath;
 			if(File.Exists (targetFolderPath)){
 				Directory.Delete(targetFolderPath);
