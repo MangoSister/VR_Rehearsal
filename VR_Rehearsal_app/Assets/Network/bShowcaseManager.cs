@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.IO;
+using System.Linq;
+using System;
 
 public class bShowcaseManager  {
 	
@@ -18,17 +20,20 @@ public class bShowcaseManager  {
 		public ushort _percentageOfAudience;
 		public ushort _expetedTime_min;
 
+		public System.DateTime _updatedDate;
+	
 		public showcase_Data(string id, string name, ushort mapIdx, string pptPath, ushort percentage,ushort expectedTime){
 			 _showcaseID = id; _showcaseName = name; _mapIdx = mapIdx; _pptFolderPath = pptPath;  _percentageOfAudience = percentage;
 			_expetedTime_min = expectedTime;
+
+			_updatedDate = System.DateTime.Now;
 		}
 	}
 
     public bShowcaseManager (){
         Start();
     }
-
-    
+		
 	public bool Start(){
 		if (_showcaseTable != null)
 			_showcaseTable.Clear ();
@@ -49,6 +54,7 @@ public class bShowcaseManager  {
 		bool res = LoadShowcaseBinaryFromLocal ();
 		return res;
 	}
+
     /*
     public bool End(){
 		bool res = SaveShowcasesBinaryInLocal ();
@@ -57,16 +63,23 @@ public class bShowcaseManager  {
 	}
 	*/
 
+	//Purpose for DateTime Sorting 
+	private int DateTime_Compare(showcase_Data x, showcase_Data y){
+		return System.DateTime.Compare (y._updatedDate, x._updatedDate);
+	}
+
     public showcase_Data[] GetAllShowcases(){
 		bool res = LoadShowcaseBinaryFromLocal ();
         if(!res) return null;
 
         showcase_Data[] arr = new showcase_Data[_showcaseTable.Count];
-        int index = 0;
+		int index = 0;
         foreach (KeyValuePair<string, showcase_Data> pair in _showcaseTable){
             arr[index] = (showcase_Data)pair.Value;
             index++;
         }
+			
+		Array.Sort (arr, DateTime_Compare);
         return arr;
     }
 
@@ -96,6 +109,7 @@ public class bShowcaseManager  {
 		tempShowcase._pptFolderPath = pptFolderPath;
 		tempShowcase._percentageOfAudience = (ushort)percentage;
 		tempShowcase._expetedTime_min = (ushort)expTime;
+		tempShowcase._updatedDate = System.DateTime.Now;
 
 		_showcaseTable [caseID] = tempShowcase;
 
@@ -163,6 +177,9 @@ public class bShowcaseManager  {
 						tempCase._pptFolderPath = r.ReadString ();
 						tempCase._percentageOfAudience = (ushort)r.ReadInt16 ();
 						tempCase._expetedTime_min = (ushort)r.ReadInt16 ();
+						//string -> DateTime
+						string strToDateTime = r.ReadString ();
+						tempCase._updatedDate = System.Convert.ToDateTime(strToDateTime);
 
 						_showcaseTable.Add (tempCase._showcaseID, tempCase);
 					}
@@ -209,6 +226,8 @@ public class bShowcaseManager  {
 					w.Write(((showcase_Data)pair.Value)._pptFolderPath);
 					w.Write(((showcase_Data)pair.Value)._percentageOfAudience);
 					w.Write(((showcase_Data)pair.Value)._expetedTime_min);
+					//DateTime -> string
+					w.Write(((showcase_Data)pair.Value)._updatedDate.ToString("yyyy/MM/dd HH:mm:ss"));
 				}
 					
 				//4. End

@@ -225,6 +225,8 @@ public class NavigationView : MonoBehaviour {
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
                 }
+
+				_button.GetComponent<ButtonType> ().isSelected = false; 
             }
         }
     }

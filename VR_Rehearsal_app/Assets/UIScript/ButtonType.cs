@@ -45,7 +45,9 @@ public class ButtonType : MonoBehaviour// UIBehaviour,IPointerClickHandler, IPoi
         if (isSelected == false && isReleased == false)
         {
             isSelected = true;
+			#if UNITY_EDITOR
             Debug.Log("Clicked");
+			#endif
         }
     }
     public void GetButtonRealse()
@@ -54,7 +56,9 @@ public class ButtonType : MonoBehaviour// UIBehaviour,IPointerClickHandler, IPoi
         {
             isSelected = false;
             isReleased = true;
+			#if UNITY_EDITOR
             Debug.Log("Releasd!");
+			#endif
         }
         isReleased = false;
     }
