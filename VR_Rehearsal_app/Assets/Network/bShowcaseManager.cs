@@ -27,8 +27,7 @@ public class bShowcaseManager  {
     public bShowcaseManager (){
         Start();
     }
-
-    
+		
 	public bool Start(){
 		if (_showcaseTable != null)
 			_showcaseTable.Clear ();
@@ -49,6 +48,7 @@ public class bShowcaseManager  {
 		bool res = LoadShowcaseBinaryFromLocal ();
 		return res;
 	}
+
     /*
     public bool End(){
 		bool res = SaveShowcasesBinaryInLocal ();

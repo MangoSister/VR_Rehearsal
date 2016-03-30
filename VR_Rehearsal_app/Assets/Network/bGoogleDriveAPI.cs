@@ -338,6 +338,10 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 
 			//Download Start;
+
+			//fileName Duplicator Check
+			List<string> fileNameList = new List<string>();
+
 			foreach (var file in files){
 				#if UNITY_EDITOR
 				Debug.Log(file);
@@ -347,13 +351,23 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					yield return StartCoroutine(download);
 
 					var data = GoogleDrive.GetResult<byte[]>(download);
-					//---
-					//Try Catch Problem;;;fuck~!!!!!!!!!!!!!
 
-				
-					FileStream fs = new FileStream (saveFolderPath + "/" + file.Title, FileMode.Create);
+					//Name Duplicator checker
+					string finalFileTitle = file.Title;
+					bool bIsDuplicatedFileName = false;
+					int duplicatedNumber = 0;
+					foreach (string title in fileNameList) {
+						if (title == file.Title) {
+							bIsDuplicatedFileName = true;
+							duplicatedNumber++;
+						}
+					}
+					finalFileTitle += duplicatedNumber;
+
+					FileStream fs = new FileStream (saveFolderPath + "/" + finalFileTitle, FileMode.Create);
 					fs.Write(data, 0, data.Length);
 
+					fileNameList.Add (file.Title);
 					/*
 					catch(IOException e){
 						#if UNITY_EDITOR
