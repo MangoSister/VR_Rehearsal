@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 //using UnityEngine.Events;
 //using UnityEngine.EventSystems;
-using UnityEngine;
 using System;
 
 public class ButtonType : MonoBehaviour// UIBehaviour,IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
@@ -22,7 +21,6 @@ public class ButtonType : MonoBehaviour// UIBehaviour,IPointerClickHandler, IPoi
     private bool isPointerDown = false;
     private bool longPressTriggered = false;
     private float timePressStarted;
-
     private void Update()
     {/*
         if (isPointerDown && !longPressTriggered)

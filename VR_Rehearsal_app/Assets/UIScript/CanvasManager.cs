@@ -111,8 +111,10 @@ public class CanvasManager : MonoBehaviour {
         {
             NavigationView.isNavigationDone = false;
             customize.SetActive(true);
+            loading.SetActive(false);
         }
     }
+   
     public void ShowCalibrationView()
     {
         if (CustomizeView.isCustomizeDone)
