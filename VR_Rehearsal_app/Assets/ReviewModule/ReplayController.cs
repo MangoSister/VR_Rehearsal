@@ -43,6 +43,22 @@ public class ReplayController : MonoBehaviour {
 
     //public Text t1, t2, t3, t4;
 
+    public void redoRehearsal()
+    {
+        if (audioSource != null)
+        {
+            if (audioSource.isPlaying == true)
+                audioSource.Stop();
+        }
+
+        GlobalManager.EnterPresentation();
+    }
+
+    public void exitRehearsal()
+    {
+
+    }
+
     private String getTimeString(float time)
     {
         if (time > 60.0f)
@@ -214,6 +230,7 @@ public class ReplayController : MonoBehaviour {
                 float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
 
                 go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
+                go.GetComponent<PauseController>().time = pauseRecord.Key;
             }
         }
 	}

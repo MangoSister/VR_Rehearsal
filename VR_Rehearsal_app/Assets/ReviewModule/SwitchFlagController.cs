@@ -4,27 +4,44 @@ using System;
 
 public class SwitchFlagController : MonoBehaviour {
     public GameObject btnTransition, grpTransition, btnPause, grpPause;
+    public Sprite transitionOn, transitionOff, pauseOn, pauseOff;
+    private bool isTransition = false, isPause = false;
 
 
 	// Use this for initialization
 	void Start () {
-	
 	}
 	
-    public void toTransition()
+    public void triggerTransition()
     {
-        btnTransition.SetActive(true);
-        grpTransition.SetActive(true);
-        btnPause.SetActive(false);
-        grpPause.SetActive(false);
+        if (isTransition == false)
+        {
+            btnTransition.GetComponent<Image>().sprite = transitionOn;
+            grpTransition.SetActive(true);
+            isTransition = true;
+        }
+        else
+        {
+            btnTransition.GetComponent<Image>().sprite = transitionOff;
+            grpTransition.SetActive(false);
+            isTransition = false;
+        }
     }
 
-    public void toPause()
+    public void triggerPause()
     {
-        btnTransition.SetActive(false);
-        grpTransition.SetActive(false);
-        btnPause.SetActive(true);
-        grpPause.SetActive(true);
+        if (isPause == false)
+        {
+            btnPause.GetComponent<Image>().sprite = pauseOn;
+            grpPause.SetActive(true);
+            isPause = true;
+        }
+        else
+        {
+            btnPause.GetComponent<Image>().sprite = pauseOff;
+            grpPause.SetActive(false);
+            isPause = false;
+        }
     }
 
 	// Update is called once per frame
