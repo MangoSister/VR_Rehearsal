@@ -14,6 +14,12 @@ public class CanvasManager : MonoBehaviour {
     private SetupManager _setupManager;
    
 	void Awake () {
+		
+		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Visible;
+
+		// Makes the status bar and navigation bar visible over the content (different content resize method) 
+		//ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+
         localShowCase.SetActive(false);
         fileTranser.SetActive(false);
         navigation.SetActive(false);
@@ -30,7 +36,7 @@ public class CanvasManager : MonoBehaviour {
     
 	
 	void Update () {
-        
+        /*
         if (LogoView.isLogoSceneDone)
         {
             localShowCase.SetActive(true);
@@ -66,11 +72,72 @@ public class CanvasManager : MonoBehaviour {
             rotation.SetActive(true);
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
+        */
+        ShowLocasShowView();
+        ShowFileTransferView();
+        ShowNavigationView();
+        ShowCustomView();
+        ShowCalibrationView();
+        ShowRotationView();
         NavigationBetweenView();
-
-
+        
+    }
+    public void ShowLocasShowView()
+    {
+        if (LogoView.isLogoSceneDone)
+        {
+            localShowCase.SetActive(true);
+            LogoView.isLogoSceneDone = false;
+            fileTranser.SetActive(false);
+        }
     }
 
+    public void ShowFileTransferView()
+    {
+        if (LocalCaseView.isLocalCaseDone)
+        {
+            fileTranser.SetActive(true);
+            LocalCaseView.isLocalCaseDone = false;
+        }
+    }
+    public void ShowNavigationView()
+    {
+        if (FileTransferView.isFileTransferViewDone)
+        {
+            int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
+            navigation.SetActive(true);
+            Debug.Log(transferType);
+            navigation.GetComponent<NavigationView>().SetupCloud(transferType);
+            FileTransferView.isFileTransferViewDone = false;
+        }
+    }
+    public void ShowCustomView()
+    {
+        if (NavigationView.isNavigationDone)
+        {
+            NavigationView.isNavigationDone = false;
+            customize.SetActive(true);
+            loading.SetActive(false);
+        }
+    }
+   
+    public void ShowCalibrationView()
+    {
+        if (CustomizeView.isCustomizeDone)
+        {
+            CustomizeView.isCustomizeDone = false;
+            calibration.SetActive(true);
+        }
+    }
+    public void ShowRotationView()
+    {
+        if (CalibrationView.isCalibrationDone)
+        {
+            CalibrationView.isCalibrationDone = false;
+            rotation.SetActive(true);
+            rotation.GetComponent<RotationView>().SetRotation(true);
+        }
+    }
     void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -85,7 +152,7 @@ public class CanvasManager : MonoBehaviour {
             {
                 string str = navigation.GetComponent<NavigationView>().RecentPath();
                 Debug.Log(str);
-                if (str == "/"){
+                if (str == "/" || str == ""){
                     navigation.SetActive(false);
                     NavigationView.isNavigationDone = false;
                     navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");

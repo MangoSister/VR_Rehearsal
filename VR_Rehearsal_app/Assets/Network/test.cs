@@ -14,11 +14,11 @@ public class test : MonoBehaviour {
 	void Start () {
 		
 		showcaseMgr = new bShowcaseManager ();
-		showcaseMgr.Start ();
+		//showcaseMgr.Start ();
 		//showcaseMgr.AddShowcase ("jake1", 1, "coll/coll", 30);
 		//showcaseMgr.AddShowcase ("jake2", 1, "coll/coll", 30);
 		//showcaseMgr.AddShowcase ("jake3", 1, "coll/coll", 30);
-		showcaseMgr.End ();
+		///showcaseMgr.End ();
 	}
 	
 	// Update is called once per frame

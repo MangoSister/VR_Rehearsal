@@ -10,12 +10,29 @@ using System;
 public class ReplayController : MonoBehaviour {
     private const int FREQUENCY = 44100; //in Hz //CHANGE TO 8000
     private readonly LinkedList<float> recordData = new LinkedList<float>();
-    public Slider playbackSlider;
     private AudioSource audioSource;
-    public bool preventTrigger = false;
     private PLAY_STATUS playStatus = PLAY_STATUS.STOP;
+    private static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
+    private static List<KeyValuePair<float, int>> out_PauseRecord;
+
+    [Header("Playback Slider Control")]
+    public Slider playbackSlider;
+    public bool preventTrigger = false;
+    [Header("Playback Button Control")]
     public Image playButton;
     public Sprite sprPlaying, sprPausing;
+    [Header("Time Stamp Control")]
+    public Text quarterTime;
+    public Text halfTime;
+    public Text softTime;
+    public Text endTime;
+    [Header("Marker Control")]
+    public bool isTransitionDisplay = true;
+    public bool isPauseDisplay = true;
+    public GameObject groupTransitionMarker;
+    public GameObject prefabTransitionMarker;
+    public GameObject groupPauseMarker;
+    public GameObject prefabPauseMarker;
 
     enum PLAY_STATUS
     {
@@ -25,6 +42,30 @@ public class ReplayController : MonoBehaviour {
     }
 
     //public Text t1, t2, t3, t4;
+
+    public void redoRehearsal()
+    {
+        if (audioSource != null)
+        {
+            if (audioSource.isPlaying == true)
+                audioSource.Stop();
+        }
+
+        GlobalManager.EnterPresentation();
+    }
+
+    public void exitRehearsal()
+    {
+
+    }
+
+    private String getTimeString(float time)
+    {
+        if (time > 60.0f)
+            return (int)(time / 60.0f) + ":" + (time - (time / 60) * 60) + "." + (int)((time - (int)(time)) * 100.0f);
+        else
+            return (int)(time) + "." + (int)((time - (int)(time)) * 100.0f);
+    }
 
     public void jumpInPlayback()
     {
@@ -82,6 +123,7 @@ public class ReplayController : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
+        //set up audio source
         if (audioSource == null)
         {
             //UnityEngine.Debug.Log("get audio source"); 
@@ -91,8 +133,12 @@ public class ReplayController : MonoBehaviour {
         if (audioSource.clip != null)
             audioSource.clip = null;
 
+        byte[] byteArray;
         //HARDCODED =====================================================================
-        byte[] byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
+        //if (PresentationData.out_FileName!=null)
+        //    byteArray = File.ReadAllBytes(PresentationData.out_FileName);
+        //else
+        byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
 
         //byte > unity float
         float[] floatArr = new float[byteArray.Length / 2 + 1];
@@ -122,32 +168,12 @@ public class ReplayController : MonoBehaviour {
         }
         floatArr[i / 2] = '\0';
 
-        /*
-            float totaltime = (floatArr.Length) / 8000.0f;
-            int quarter = (int)(totaltime / 4.0f);
-
-            if (quarter > 60)
-            {
-                t1.text = "0:0.00";
-                t2.text = quarter / 60 + ":" + (quarter - (quarter / 60) * 60) + "." + (int)((((float)totaltime) / 4.0f - quarter) * 100.0f);
-            }
-            else
-            {
-                t1.text = "0.00";
-                t2.text = quarter + "." + (int)((((float)totaltime) / 4.0f - quarter) * 100.0f);
-            }
-
-            int soft = quarter * 3;
-            if  (soft>60)
-                t3.text = soft / 60 + ":" + (soft - (soft / 60) * 60) + "." + (int)((((float)totaltime) * 0.75f - soft) * 100.0f);
-            else
-                t3.text = soft + "." + (int)((((float)totaltime) * 0.75f - soft) * 100.0f);
-
-            if (totaltime > 60)
-                t4.text = totaltime / 60 + ":" + (totaltime - (totaltime / 60) * 60) + "." + (int)((((float)totaltime) - (int)totaltime) * 100.0f);
-            else
-                t4.text = totaltime.ToString("0.00");
-        */
+        //time stamp update
+        float totaltime = (floatArr.Length) / 8000.0f;
+        quarterTime.text = getTimeString(totaltime / 4.0f);
+        halfTime.text = getTimeString(totaltime / 2.0f);
+        softTime.text = getTimeString(totaltime * 0.75f);
+        endTime.text = getTimeString(totaltime);
 
         AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, 8000, false, false);
         myClip.SetData(floatArr, 0);
@@ -159,6 +185,58 @@ public class ReplayController : MonoBehaviour {
         playbackSlider.maxValue = audioSource.clip.length;
         playbackSlider.value = 0;
         preventTrigger = false;
+
+        if (PresentationData.out_SlidesTransitionRecord!=null)
+            out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
+        //if (PresentationData.out_PauseRecord != null)
+        //    out_PauseRecord = PresentationData.out_PauseRecord;
+
+        //for testing
+        out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+
+        //instantiate markers
+        if (isTransitionDisplay == true)
+        { 
+            foreach (KeyValuePair<float, int> transitionRecord in out_SlidesTransitionRecord)
+            {
+                var go = Instantiate(prefabTransitionMarker) as GameObject;
+                go.transform.parent = groupTransitionMarker.transform;
+
+                //calculate x coord
+                float xPos = -54f + (379f - (-54f)) * (transitionRecord.Key / totaltime);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, -110.2937f);
+            }
+        }
+
+        //for testing
+        out_PauseRecord = new List<KeyValuePair<float, int>>();
+        out_PauseRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        out_PauseRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+
+        //instantiate markers
+        if (isPauseDisplay == true)
+        {
+            foreach (KeyValuePair<float, int> pauseRecord in out_PauseRecord)
+            {
+                var go = Instantiate(prefabPauseMarker) as GameObject;
+                go.transform.parent = groupPauseMarker.transform;
+
+                //calculate x coord
+                float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
+                go.GetComponent<PauseController>().time = pauseRecord.Key;
+            }
+        }
 	}
 	
 	// Update is called once per frame

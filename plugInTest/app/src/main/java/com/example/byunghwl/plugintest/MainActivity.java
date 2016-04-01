@@ -191,6 +191,99 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
+    //threshold detection
+    private int latestAverage = 0;
+    private int volumeTestSum = 0, volumeTestSampleCount = 0;
+    public void startTestThreshold () {
+        am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        am.setMode(AudioManager.STREAM_MUSIC);
+        am.setSpeakerphoneOn(false);
+
+        Log.i("MainActivity", "Start volume testing");
+        volumeTestSampleCount = 0;
+        volumeTestSum = 0;
+
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        (new Thread()
+        {
+            @Override
+            public void run()
+            {
+                volumeTest();
+            }
+        }).start();
+
+        initRecordAndTrack();
+        startRecordAndPlay();
+    }
+
+    public int getNowAvg() {
+        return latestAverage;
+    }
+
+    public int stopTestThreshold () {
+        Log.i("MainActivity", "Stop volume testing");
+
+        isRecording = false;
+        record.stop();
+        track.stop();
+        record.release();
+        track.release();
+
+        if (volumeTestSampleCount == 0)
+            return 0;
+        else
+            return volumeTestSum / volumeTestSampleCount;
+    }
+
+    private void volumeTest() //this is on second thread
+    {
+        int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+        byte byteData[] = new byte[bufferSizeInBytes];
+        am.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        while (true)
+        {
+            if (isKilled)
+                break;
+
+            if (isRecording) {
+                int bufferReadByte = record.read(byteData, 0, bufferSizeInBytes);
+
+                //write to playback track
+                track.write(byteData, 0, bufferReadByte);
+
+                //byte > short array for VAD
+                int bufferReadShort = bufferReadByte / 2;
+                short[] shortArray = new short[bufferReadShort + 1];
+                if (bufferReadByte == 0)
+                    continue;
+
+                int j = 0;
+                for (j = 0; j < bufferReadByte; j += 2) {
+                    ByteBuffer bb = ByteBuffer.allocate(2);
+                    bb.order(ByteOrder.LITTLE_ENDIAN);
+                    bb.put(byteData[j]);
+                    bb.put(byteData[j + 1]);
+                    short shortVal = bb.getShort(0);
+                    shortArray[j / 2] = shortVal;
+                }
+                shortArray[j / 2] = '\0';
+
+                int nowSum = volumeTestSum, nowCount = volumeTestSampleCount;
+                for (int i = 0; i < bufferReadShort; i++) {
+                    volumeTestSum += Math.abs((int) shortArray[i]);
+                    volumeTestSampleCount += 1;
+                }
+                if ((volumeTestSampleCount - nowCount) == 0)
+                    latestAverage = 0;
+                else
+                    latestAverage = (volumeTestSum-nowSum) / (volumeTestSampleCount - nowCount);
+            }
+        }
+    }
+
     //record variables
     String filepath = "";
     FileOutputStream outputStream = null;

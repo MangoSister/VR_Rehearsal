@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Text.RegularExpressions;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -51,6 +51,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	bool _isDownloadMultipleFilesDone = false;
 	fileDownload_Callback _downloadMultipleFile_callback;
 	int processIdx = 0;
+	struct dropboxFile{
+		public string _id;
+		public string _name;
+	}
+	List<dropboxFile> _filteredFiles;
+
+
 
 	public override void StartAuthentication (Authentication_Callback callback){
 
@@ -250,6 +257,10 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 	} 
 		
+
+
+
+
 	private bool DonwloadAllFilesInFolder_internal(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback,fileDownload_Process_Callback proceed_callback){
 
 		if (_downloadFile_bw.IsBusy == true || _updateList_bw.IsBusy == true) {
@@ -272,17 +283,54 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		if (!Directory.Exists (saveFolderPath)) {
 			Directory.CreateDirectory(saveFolderPath);
 		}
+			
+		if (proceed_callback != null ) {
+			/*
+			 * downloadable Files filtering
+			 * 
+			 */
+			if (processIdx == 0) {
 
+				JSONNode parseResult = JSON.Parse(_updateList_result);
 
-		JSONNode parseResult = JSON.Parse(_updateList_result);
+				for (int i = 0; i < parseResult ["entries"].Count; i++) {
+					string fileName = parseResult ["entries"] [i] ["name"].Value;
 
-		if(proceed_callback != null)
-		proceed_callback (parseResult ["entries"].Count, processIdx);
+					//extention name check
+					string[] elements = fileName.Split ('.');
 
+					if ( (elements [elements.Length - 1] == "png" || elements [elements.Length - 1] == "jpg" || elements [elements.Length - 1] == "PNG" || elements [elements.Length - 1] == "JPG") &&
+							parseResult ["entries"] [i] [".tag"].Value == "file") {
 
-		if (processIdx < parseResult ["entries"].Count) {
+						dropboxFile tempFile = new dropboxFile ();
+						tempFile._id = parseResult ["entries"] [i] ["id"].Value;
+						tempFile._name = parseResult ["entries"] [i] ["name"].Value;
+						_filteredFiles.Add (tempFile);
+					}
+				}
+			}
+			//Filtered file count
+			proceed_callback (_filteredFiles.Count, processIdx);
+		} else {
+			return false;
+		}
+			
+		#if UNITY_EDITOR
+		Debug.Log (_updateList_result);
+		#endif
+
+		if (processIdx < _filteredFiles.Count) {
+			
+			DownloadFile_internal (_filteredFiles[processIdx]._id, saveFolderPath, _filteredFiles[processIdx]._name, delegate() {
+				processIdx++;
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
+			});
+
+			/*
 			//Ignore the folder
 			if (parseResult ["entries"] [processIdx] [".tag"].Value == "file") {
+
+				//JpG, Png Blocking Needed
 				DownloadFile_internal (parseResult ["entries"] [processIdx] ["id"].Value, saveFolderPath, parseResult ["entries"] [processIdx] ["name"].Value, delegate() {
 					processIdx++;
 					DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
@@ -291,10 +339,11 @@ public class bDropboxAPI : bhClowdDriveAPI{
 				processIdx++;
 				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 			}
-
+			*/
 		} else {
 			/*Done*/
 			_isDownloadMultipleFilesDone = true;
+			_filteredFiles.Clear ();
 			processIdx = 0;
 		}
 
@@ -338,6 +387,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			_authen_callback();
 		}
 		*/
+
+		if (_filteredFiles == null) {
+			_filteredFiles = new List<dropboxFile> ();
+		} else {
+			_filteredFiles.Clear ();
+		}
+
 	}
 		
 	private void bw_DownloadFilesFromPath_do(object sender,  DoWorkEventArgs e){

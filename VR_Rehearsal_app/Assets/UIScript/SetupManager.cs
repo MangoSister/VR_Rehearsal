@@ -17,7 +17,7 @@
 
     public void Start () {
         _bShowcaseMgr = new bShowcaseManager();
-        _bShowcaseMgr.Start();
+      //  _bShowcaseMgr.Start();
     }
 
 }

@@ -22,12 +22,12 @@ public class RotationView : MonoBehaviour {
     {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
-            _setManager.BShowcaseMgr.End();
+           // _setManager.BShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
-            _setManager.BShowcaseMgr.End();
+          ///  _setManager.BShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
     }

@@ -34,7 +34,7 @@ public class CustomizeView : MonoBehaviour  {
     {
         switch (index)
         {
-            case 0:
+            case 2:
                 Debug.Log("Fucking Large");
                 customData._mapIdx = (ushort)1;
                 break;
@@ -42,7 +42,7 @@ public class CustomizeView : MonoBehaviour  {
                 Debug.Log("Fucking Medi");
                 customData._mapIdx = (ushort)2;
                 break;
-            case 2:
+            case 0:
                 Debug.Log("Fucking small");
                 customData._mapIdx = (ushort)3;
                 break;
@@ -72,6 +72,7 @@ public class CustomizeView : MonoBehaviour  {
     {
         Debug.Log("PHAN!!");
         _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min);
+        Debug.Log(_pptID);
         if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
         {
             foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)

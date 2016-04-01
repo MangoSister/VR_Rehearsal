@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
+//using UnityEngine.Events;
+//using UnityEngine.EventSystems;
 using System;
 
-public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
+public class ButtonType : MonoBehaviour// UIBehaviour,IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
 
    // public string buttonName;
@@ -16,14 +16,13 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
 
     public float durationThreshold = 0.5f;
 
-    public UnityEvent onLongPress = new UnityEvent();
+   // public UnityEvent onLongPress = new UnityEvent();
 
     private bool isPointerDown = false;
     private bool longPressTriggered = false;
     private float timePressStarted;
-
     private void Update()
-    {
+    {/*
         if (isPointerDown && !longPressTriggered)
         {
             if (Time.time - timePressStarted > durationThreshold)
@@ -36,6 +35,7 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
 
             }
          }
+         */
     }
 
     public void GetButtonStatus()
@@ -43,7 +43,9 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
         if (isSelected == false && isReleased == false)
         {
             isSelected = true;
+			#if UNITY_EDITOR
             Debug.Log("Clicked");
+			#endif
         }
     }
     public void GetButtonRealse()
@@ -52,11 +54,13 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
         {
             isSelected = false;
             isReleased = true;
+			#if UNITY_EDITOR
             Debug.Log("Releasd!");
+			#endif
         }
         isReleased = false;
     }
-
+    /*
     public void OnPointerClick(PointerEventData eventData)
     {
         
@@ -92,4 +96,5 @@ public class ButtonType : UIBehaviour,IPointerClickHandler, IPointerDownHandler,
     {
         isPointerDown = false;
     }
+    */
 }
