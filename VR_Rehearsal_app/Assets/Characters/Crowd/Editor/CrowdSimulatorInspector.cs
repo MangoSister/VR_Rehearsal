@@ -173,14 +173,27 @@ public class CrowdSimulatorInspector : Editor
 
         serializedObject.Update();
 
+        GUI.enabled = false;
         EditorGUILayout.ObjectField("Script:", MonoScript.FromMonoBehaviour(sim), typeof(MonoScript), false);
+        GUI.enabled = true;
 
         EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL0"), true);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL1"), true);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL2"), true);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("prefabsL3"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("fullSizeBody"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("halfSizeBody"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceClothAlbedos"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceClothNrms"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceSkinAlbedos"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceSkinNrms"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceClothMaterials"), true);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("audienceSkinMaterials"), true);
+
+
+        sim.bumpShader = EditorGUILayout.ObjectField("Bump Shader", sim.bumpShader, typeof(Shader), true) as Shader;
+        sim.diffuseShader = EditorGUILayout.ObjectField("Diffuse Shader", sim.diffuseShader, typeof(Shader), true) as Shader;
         sim.prefabEyeIcon = EditorGUILayout.ObjectField("Eye Icon Prefab", sim.prefabEyeIcon, typeof(GameObject), true) as GameObject;
+        sim.asseblingPos = EditorGUILayout.Vector3Field("Assebling Pos Offset", sim.asseblingPos);
+        sim.asseblingRot = Quaternion.Euler(EditorGUILayout.Vector3Field("Assembling Rot", sim.asseblingRot.eulerAngles));
+
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
         sim.crowdConfigFileName = EditorGUILayout.TextField("Crowd Config File Name", sim.crowdConfigFileName);
         sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);

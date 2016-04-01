@@ -11,11 +11,33 @@ using System.Collections.Generic;
 using System.Linq;
 using MangoBehaviorTree;
 
-[RequireComponent(typeof(AudienceAnimHandler))]
 public class Audience : MonoBehaviour, IAgent
 {
-    private AudienceAnimHandler _animHandler;
-    public AudienceAnimHandler animHandler { get { return _animHandler; } }
+    private AudienceAnimHandlerBasic _animHandler;
+    public AudienceAnimHandlerBasic animHandler
+    {
+        get
+        {
+            //if (detailLevel == DetailLevel.FullSize_Bump_FullAnim || detailLevel == DetailLevel.FullSize_Diffuse_FullAnim)
+            //{
+            //    if (_fullAnimHandler == null)
+            //        _fullAnimHandler = GetComponent<AudienceAnimHandlerFull>();
+            //    return _fullAnimHandler;
+            //}
+            //else if (detailLevel == DetailLevel.FullSize_Diffuse_FollowAnim)
+            //{
+            //    if (_followAnimHandler == null)
+            //        _followAnimHandler = GetComponent<AudienceAnimHandlerFollow>();
+            //    return _followAnimHandler;
+            //}
+            //else
+            {
+                if (_animHandler == null)
+                    _animHandler = GetComponent<AudienceAnimHandlerBasic>();
+                return _animHandler;
+            }
+        }
+    }
 
     /*
     LOD system: Different audience prefab sets for crowd simulator
@@ -24,9 +46,10 @@ public class Audience : MonoBehaviour, IAgent
     {
         //lights are all probed
         FullSize_Bump_FullAnim = 0, //whole body mesh, normal mapped, all animations (including script driven ones) 
-        FullSize_FullAnim = 1, //whole body mesh, only diffuse, all animations (including script driven ones)
-        HalfSize_FullAnim = 2, //half body mesh, only diffuse, all animations (but no script driven ones)
-        Billboard = 3, //2D billboard, no animations
+        FullSize_Diffuse_FullAnim = 1, //whole body mesh, only diffuse, all animations (including script driven ones)
+        FullSize_Diffuse_FollowAnim = 2, //whole body mesh, only diffuse, all animations (but no script driven ones)
+        FullSize_Diffuse_BasicAnim = 3, //whole body mesh, only diffuse, basic animations
+        HalfSize_Diffuse_BasicAnim = 4, //half body mesh, only diffuse, basic animations
     }
 
     /*
@@ -80,7 +103,7 @@ public class Audience : MonoBehaviour, IAgent
             if (_currState != value)
             {
                 _currState = value;
-                _animHandler.UpdateStateAnim();
+                animHandler.UpdateStateAnim();
             }
         }
     }
@@ -124,8 +147,6 @@ public class Audience : MonoBehaviour, IAgent
 
     private void Awake()
     {
-        _animHandler = GetComponent<AudienceAnimHandler>();
-
         int num = Enum.GetNames(typeof(States)).Length;
         stateMassFunctionInternal = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
         stateMassFunction = Enumerable.Repeat<float>(1f / (float)num, num).ToArray();
