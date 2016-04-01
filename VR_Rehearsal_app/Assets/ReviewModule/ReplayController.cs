@@ -43,6 +43,22 @@ public class ReplayController : MonoBehaviour {
 
     //public Text t1, t2, t3, t4;
 
+    public void redoRehearsal()
+    {
+        if (audioSource != null)
+        {
+            if (audioSource.isPlaying == true)
+                audioSource.Stop();
+        }
+
+        GlobalManager.EnterPresentation();
+    }
+
+    public void exitRehearsal()
+    {
+
+    }
+
     private String getTimeString(float time)
     {
         if (time > 60.0f)
@@ -117,8 +133,12 @@ public class ReplayController : MonoBehaviour {
         if (audioSource.clip != null)
             audioSource.clip = null;
 
+        byte[] byteArray;
         //HARDCODED =====================================================================
-        byte[] byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
+        //if (PresentationData.out_FileName!=null)
+        //    byteArray = File.ReadAllBytes(PresentationData.out_FileName);
+        //else
+        byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
 
         //byte > unity float
         float[] floatArr = new float[byteArray.Length / 2 + 1];
@@ -214,6 +234,7 @@ public class ReplayController : MonoBehaviour {
                 float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
 
                 go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
+                go.GetComponent<PauseController>().time = pauseRecord.Key;
             }
         }
 	}
