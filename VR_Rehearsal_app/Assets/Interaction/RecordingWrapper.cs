@@ -22,7 +22,40 @@ public class RecordingWrapper : MonoBehaviour
     //Debug purpose
     public TextMesh debugText;
 
-    public static string recordingFilePath = Application.persistentDataPath + "/record.pcm";
+    public string recordingFilePath;
+
+    private List<KeyValuePair<bool, int>> fluencyRecord;
+    public List<KeyValuePair<bool, int>> outputFluencyRecord
+    {
+        get
+        {
+            var result = new List<KeyValuePair<bool, int>>();
+            if (fluencyRecord != null && fluencyRecord.Count > 0)
+            {
+                bool currState = fluencyRecord[0].Key;
+                int currLength = 0;
+                foreach (var pair in fluencyRecord)
+                {
+                    if (pair.Key != currState)
+                    {
+                        result.Add(new KeyValuePair<bool, int>(currState, currLength));
+                        currState = pair.Key;
+                        currLength = pair.Value;
+                    }
+                    else
+                        currLength += pair.Value;
+                }
+                result.Add(new KeyValuePair<bool, int>(currState, currLength));
+            }           
+            return result;
+        }
+    }
+
+    private void Awake()
+    {
+        recordingFilePath = Application.persistentDataPath + "/record.pcm";
+        fluencyRecord = new List<KeyValuePair<bool, int>>();
+    }
 
     public void StartRecording()
     {
@@ -60,6 +93,7 @@ public class RecordingWrapper : MonoBehaviour
         return new Queue<KeyValuePair<bool, int>>();
 #endif
     }
+
 
     public void EndRecording()
     {
@@ -105,8 +139,10 @@ public class RecordingWrapper : MonoBehaviour
                 debugText.text += "\n" + fluencyFactor;
                 debugText.text += "\n" + "delta: " + fluencyDelta;
             }
+            
+            fluencyRecord.AddRange(statusQueue);
         }
-#else 
+#else
         float oldFactor = fluencyFactor;
         fluencyFactor = fakeFluencyFactor;
         if (debugText != null)

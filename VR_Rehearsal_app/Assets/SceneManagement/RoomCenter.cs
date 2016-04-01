@@ -109,7 +109,9 @@ public class RoomCenter : MonoBehaviour
                 heatmapTracker.aspect,
                 heatmapTracker.output,
                 heatmapTracker.scn,
-                slidesPlayerCtrl.outputTransitionRecord
+                slidesPlayerCtrl.outputTransitionRecord,
+                recordWrapper.recordingFilePath,
+                recordWrapper.outputFluencyRecord
             );
     }
 

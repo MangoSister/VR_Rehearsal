@@ -94,7 +94,9 @@ public static class GlobalManager
             float HGAspect,
             List<GazeSnapshot> HGGazeData,
             Texture2D screenshot,
-            List<KeyValuePair<float, int>> transitionRecord
+            List<KeyValuePair<float, int>> transitionRecord,
+            string recordingFilePath,
+            List<KeyValuePair<bool, int>> fluencyRecord
         )
     {
         PresentationData.out_HGVertFOVDeg = HGVertFOVDeg;
@@ -102,7 +104,8 @@ public static class GlobalManager
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
         PresentationData.out_SlidesTransitionRecord = transitionRecord;
-        PresentationData.out_RecordingFilePath = RecordingWrapper.recordingFilePath;
+        PresentationData.out_RecordingFilePath = recordingFilePath;
+        PresentationData.out_FluencyRecord = fluencyRecord;
         PresentationData.out_ExitTime = Time.time;
 		
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
@@ -173,5 +176,6 @@ public static class PresentationData
     public static Texture2D out_Screenshot;
     public static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
     public static string out_RecordingFilePath;
+    public static List<KeyValuePair<bool, int>> out_FluencyRecord;
 
 }
