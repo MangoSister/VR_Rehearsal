@@ -17,6 +17,7 @@ public class CalibrationView : MonoBehaviour
 	public GameObject descriptionPanel;
 	public GameObject circularProgress;
     public Text debugText;
+	public GameObject mainIcon;
 
 	float rate = 20f;
 	float max_time = 100f;
