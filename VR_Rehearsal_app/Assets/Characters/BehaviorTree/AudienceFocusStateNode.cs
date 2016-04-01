@@ -13,8 +13,9 @@ public class AudienceFocusStateNode : BaseNode<Audience>
     {
         Audience target = tick.target;
         if (target.detailLevel == DetailLevel.FullSize_Bump_FullAnim ||
-            target.detailLevel == DetailLevel.FullSize_FullAnim)
-            target.animHandler.StartToFollow(target.followingTransform);
+            target.detailLevel == DetailLevel.FullSize_Diffuse_FullAnim ||
+            target.detailLevel == DetailLevel.FullSize_Diffuse_FollowAnim)
+            (target.animHandler as AudienceAnimHandlerFollow).StartToFollow(target.followingTransform);
     }
 
     protected override void Enter(Tick<Audience> tick)
@@ -40,7 +41,8 @@ public class AudienceFocusStateNode : BaseNode<Audience>
     {
         Audience target = tick.target;
         if (target.detailLevel == DetailLevel.FullSize_Bump_FullAnim ||
-            target.detailLevel == DetailLevel.FullSize_FullAnim)
-            target.animHandler.StopToFollow();
+            target.detailLevel == DetailLevel.FullSize_Diffuse_FullAnim ||
+            target.detailLevel == DetailLevel.FullSize_Diffuse_FollowAnim)
+            (target.animHandler as AudienceAnimHandlerFollow).StopToFollow();
     }
 }

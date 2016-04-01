@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using MangoBehaviorTree;
 using CrowdConfigInfo = spaceInfoParser.parsedData_spaceInfo;
+using LOD = Audience.DetailLevel;
 using URandom = UnityEngine.Random;
 
 public class CrowdSimulator : MonoBehaviour
@@ -30,10 +32,20 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
-    public Audience[] prefabsL0;
-    public Audience[] prefabsL1;
-    public Audience[] prefabsL2;
-    public Audience[] prefabsL3;
+    public const int characterNum = 7;
+    public Animator[] fullSizeBody;
+    public Animator[] halfSizeBody;
+    public Vector3 asseblingPos = new Vector3(0f, -0.31f, 0f);
+    public Quaternion asseblingRot = Quaternion.Euler(0f, -180f, 0f);
+    public Shader bumpShader;
+    public Shader diffuseShader;
+    public Texture2D[] audienceClothAlbedos;
+    public Texture2D[] audienceSkinAlbedos;
+    public Texture2D[] audienceClothNrms;
+    public Texture2D[] audienceSkinNrms;
+    public Material[] audienceClothMaterials;
+    public Material[] audienceSkinMaterials;
+
     public GameObject prefabEyeIcon;
 
     public Transform crowdParent;
@@ -129,28 +141,18 @@ public class CrowdSimulator : MonoBehaviour
 
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
-            int rand = URandom.Range(0, (prefabsL1.Length - 1));
             Audience ad;
             if (i % tx.seat_ColNum < 2)
             {
-                ad = Instantiate(prefabsL1[rand], Vector3.zero, Quaternion.identity) as Audience;
-                ad.detailLevel = Audience.DetailLevel.FullSize_FullAnim;
+                ad = CreateRandomMember(LOD.FullSize_Diffuse_FullAnim, Vector3.zero, Quaternion.identity);
             }
             else
             {
-                ad = Instantiate(prefabsL2[rand], Vector3.zero, Quaternion.identity) as Audience;
-                ad.detailLevel = Audience.DetailLevel.HalfSize_FullAnim;
+                ad = CreateRandomMember(LOD.HalfSize_Diffuse_BasicAnim, Vector3.zero, Quaternion.identity);
             }
             ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
             ad.followingTransform = RoomCenter.currRoom.presenterHead;
-            ad.GetComponent<AudienceAnimHandler>().repeatPeriodBound = new Vector2(10000f, 400000f);
-
-            var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
-            icon.transform.parent = ad.headTransform;
-            icon.transform.localPosition = AudienceAnimHandler.eyeIconOffset;
-            ad.GetComponent<AudienceAnimHandler>().eyeIcon = icon;
-            //ad.GetComponent<AudienceAnimHandler>().eyeIconToggle = false;
-
+           
             //to Phan: fix the layout here
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;
             ad.transform.parent = crowdParent;
@@ -290,5 +292,212 @@ public class CrowdSimulator : MonoBehaviour
             list[k] = list[n];
             list[n] = value;
         }
+    }
+
+    public Audience CreateRandomMember(LOD lod, Vector3 pos, Quaternion rot)
+    {
+        
+        switch (lod)
+        {
+            case LOD.FullSize_Bump_FullAnim:
+                {
+                    throw new NotImplementedException();
+                }
+            case LOD.FullSize_Diffuse_FullAnim:
+                {
+                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    GameObject adObj = new GameObject("Lv "+ (int)lod + " agent", typeof(Audience));
+                    Animator body = Instantiate(fullSizeBody[idx]) as Animator;
+                    body.transform.parent = adObj.transform;
+                    body.transform.localPosition = asseblingPos;
+                    body.transform.localRotation = asseblingRot;
+
+                    Audience ad = adObj.GetComponent<Audience>();
+                    adObj.name += " " + ad.agentId;
+                    ad.headTransform = (from x in ad.transform.GetComponentsInChildren<Transform>()
+                                        where x.gameObject.name == "Head_wrapper" || x.gameObject.name == "HeadWrapper"
+                                        select x).FirstOrDefault();
+                    ad.detailLevel = lod;
+
+                    adObj.AddComponent(typeof(AudienceAnimHandlerFull)); //template version will crash Unity...
+                    var handler = adObj.GetComponent<AudienceAnimHandlerFull>();
+                    handler.controller = body;
+                    handler.repeatPeriodBound = new Vector2(30f, 60f);
+
+                    var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.transform.parent = ad.headTransform;
+                    icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
+                    ad.GetComponent<AudienceAnimHandlerFull>().eyeIcon = icon;
+
+                    Material clothMat, skinMat;
+                    GetAudienceMat(false, idx, out clothMat, out skinMat);
+                    body.transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material = skinMat;
+                    body.transform.Find("Shoes").GetComponent<SkinnedMeshRenderer>().material = clothMat;
+
+                    ad.transform.position = pos;
+                    ad.transform.rotation = rot;
+
+                    return ad;
+                }
+            case LOD.FullSize_Diffuse_FollowAnim:
+                {
+                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
+                    Animator body = Instantiate(fullSizeBody[idx]) as Animator;
+                    body.transform.parent = adObj.transform;
+                    body.transform.localPosition = asseblingPos;
+                    body.transform.localRotation = asseblingRot;
+
+                    Audience ad = adObj.GetComponent<Audience>();
+                    adObj.name += " " + ad.agentId;
+                    ad.headTransform = (from x in ad.transform.GetComponentsInChildren<Transform>()
+                                        where x.gameObject.name == "Head_wrapper" || x.gameObject.name == "HeadWrapper"
+                                        select x).FirstOrDefault();
+                    ad.detailLevel = lod;
+
+                    adObj.AddComponent(typeof(AudienceAnimHandlerFollow)); //template version will crash Unity...
+                    var handler = adObj.GetComponent<AudienceAnimHandlerFollow>();
+                    handler.controller = body;
+
+                    var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.transform.parent = ad.headTransform;
+                    icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
+                    ad.GetComponent<AudienceAnimHandlerFollow>().eyeIcon = icon;
+
+                    Material clothMat, skinMat;
+                    GetAudienceMat(false, idx, out clothMat, out skinMat);
+                    body.transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material = skinMat;
+                    body.transform.Find("Shoes").GetComponent<SkinnedMeshRenderer>().material = clothMat;
+
+                    ad.transform.position = pos;
+                    ad.transform.rotation = rot;
+
+                    return ad;
+                }
+            case LOD.FullSize_Diffuse_BasicAnim:
+                {
+                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
+                    Animator body = Instantiate(fullSizeBody[idx]) as Animator;
+                    body.transform.parent = adObj.transform;
+                    body.transform.localPosition = asseblingPos;
+                    body.transform.localRotation = asseblingRot;
+
+                    Audience ad = adObj.GetComponent<Audience>();
+                    adObj.name += " " + ad.agentId;
+                    ad.headTransform = (from x in ad.transform.GetComponentsInChildren<Transform>()
+                                        where x.gameObject.name == "Head_wrapper" || x.gameObject.name == "HeadWrapper"
+                                        select x).FirstOrDefault();
+                    ad.detailLevel = lod;
+
+                    adObj.AddComponent(typeof(AudienceAnimHandlerBasic)); //template version will crash Unity...
+                    var handler = adObj.GetComponent<AudienceAnimHandlerBasic>();
+                    handler.controller = body;
+
+                    var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.transform.parent = ad.headTransform;
+                    icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
+                    ad.GetComponent<AudienceAnimHandlerBasic>().eyeIcon = icon;
+
+                    Material clothMat, skinMat;
+                    GetAudienceMat(false, idx, out clothMat, out skinMat);
+                    body.transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material = skinMat;
+                    body.transform.Find("Shoes").GetComponent<SkinnedMeshRenderer>().material = clothMat;
+
+                    ad.transform.position = pos;
+                    ad.transform.rotation = rot;
+
+                    return ad;
+                }
+            case LOD.HalfSize_Diffuse_BasicAnim: default:
+                {
+                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
+                    Animator body = Instantiate(halfSizeBody[idx]) as Animator;
+                    body.transform.parent = adObj.transform;
+                    body.transform.localPosition = asseblingPos;
+                    body.transform.localRotation = asseblingRot;
+
+                    Audience ad = adObj.GetComponent<Audience>();
+                    adObj.name += " " + ad.agentId;
+                    ad.headTransform = (from x in ad.transform.GetComponentsInChildren<Transform>()
+                                        where x.gameObject.name == "Head_wrapper" || x.gameObject.name == "HeadWrapper"
+                                        select x).FirstOrDefault();
+                    ad.detailLevel = lod;
+
+                    adObj.AddComponent(typeof(AudienceAnimHandlerBasic)); //template version will crash Unity...
+                    var handler = adObj.GetComponent<AudienceAnimHandlerBasic>();
+                    handler.controller = body;
+
+                    var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.transform.parent = ad.headTransform;
+                    icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
+                    ad.GetComponent<AudienceAnimHandlerBasic>().eyeIcon = icon;
+
+                    Material clothMat, skinMat;
+                    GetAudienceMat(false, idx, out clothMat, out skinMat);
+                    body.transform.Find("Body").GetComponent<SkinnedMeshRenderer>().material = skinMat;
+                    body.transform.Find("Shoes").GetComponent<SkinnedMeshRenderer>().material = clothMat;
+
+                    ad.transform.position = pos;
+                    ad.transform.rotation = rot;
+
+                    return ad;
+                }
+        }
+    }
+
+    private void GetAudienceMat(bool diffuseOrBump, int idx, out Material clothMat, out Material skinMat)
+    {
+        if (audienceClothMaterials == null || audienceClothMaterials.Length == 0)
+            audienceClothMaterials = new Material[2 * characterNum];
+
+        if (audienceClothMaterials[(diffuseOrBump ? 1 : 0) * characterNum + idx] == null)
+        {
+            int offset = diffuseOrBump ? 1 : 0 * characterNum + idx;
+            if (diffuseOrBump)
+            {
+                var mat = new Material(bumpShader);
+                mat.name = string.Format("mat_cloth{0}", offset);
+                mat.mainTexture = audienceClothAlbedos[idx];
+                mat.SetTexture("_BumpMap", audienceClothNrms[idx]);
+                audienceClothMaterials[offset] = mat;
+            }
+            else
+            {
+                var mat = new Material(diffuseShader);
+                mat.name = string.Format("mat_cloth{0}", offset);
+                mat.mainTexture = audienceClothAlbedos[idx];
+                audienceClothMaterials[offset] = mat;
+            }
+        }
+
+        clothMat = audienceClothMaterials[(diffuseOrBump ? 1 : 0) * characterNum + idx];
+
+
+        if (audienceSkinMaterials == null || audienceSkinMaterials.Length == 0)
+            audienceSkinMaterials = new Material[2 * characterNum];
+
+        if (audienceSkinMaterials[(diffuseOrBump ? 1 : 0) * characterNum + idx] == null)
+        {
+            int offset = diffuseOrBump ? 1 : 0 * characterNum + idx;
+            if (diffuseOrBump)
+            {
+                var mat = new Material(bumpShader);
+                mat.name = string.Format("mat_skin{0}", offset);
+                mat.mainTexture = audienceSkinAlbedos[idx];
+                mat.SetTexture("_BumpMap", audienceSkinNrms[idx]);
+                audienceSkinMaterials[offset] = mat;
+            }
+            else
+            {
+                var mat = new Material(diffuseShader);
+                mat.name = string.Format("mat_skin{0}", offset);
+                mat.mainTexture = audienceSkinAlbedos[idx];
+                audienceSkinMaterials[offset] = mat;
+            }
+        }
+
+        skinMat = audienceSkinMaterials[(diffuseOrBump ? 1 : 0) * characterNum + idx];
     }
 }

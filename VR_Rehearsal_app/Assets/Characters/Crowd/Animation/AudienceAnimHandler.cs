@@ -9,21 +9,14 @@ using System.Collections;
 
 public class AudienceAnimHandler : MonoBehaviour
 {
-    private static int _paramIdState;
-    private static int _paramIdFaceDirX;
-    private static int _paramIdFaceDirZ;
-    private static int _paramIdSwitchPose;
-
-    AudienceAnimHandler()
-    {
-        _paramIdState = Animator.StringToHash("state");
-        _paramIdFaceDirX = Animator.StringToHash("faceDirX");
-        _paramIdFaceDirZ = Animator.StringToHash("faceDirZ");
-        _paramIdSwitchPose = Animator.StringToHash("switchPose");
-    }
+    public readonly static int _paramIdState = Animator.StringToHash("state");
+    public readonly static int _paramIdBlendFactor0 = Animator.StringToHash("blendFactor0");
+    public readonly static int _paramIdBlendFactor1 = Animator.StringToHash("blendFactor1");
+    public readonly static int _paramIdSubState = Animator.StringToHash("subState");
+    public readonly static int _paramIdMirror = Animator.StringToHash("mirror");
 
     private Audience _audience;
-    public Animator anim;
+    public Animator controller;
 
     //Random period to switch animation for variation
     public Vector2 repeatPeriodBound = new Vector2(3f, 8f);
@@ -34,7 +27,7 @@ public class AudienceAnimHandler : MonoBehaviour
     //Neck rotatin angular speed during following transition
     public float SwitchFollowDegSpeed = 60f;
 
-    public static readonly Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.1f;
+    public static Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.1f;
     public static float eyeIconScale = 0.05f;
     public static float eyeIconFreq = 6f;
     public GameObject eyeIcon;
@@ -61,8 +54,7 @@ public class AudienceAnimHandler : MonoBehaviour
             }
         }
     }
-    private Coroutine _currEyeIconCR = null
-        ;
+    private Coroutine _currEyeIconCR = null;
     private Transform _currTarget;
     //private bool _isFollowing = false;
     private Quaternion _defaultHeadLocalRotation;
@@ -109,17 +101,17 @@ public class AudienceAnimHandler : MonoBehaviour
     private IEnumerator StartToFollow_CR(Transform target)
     {
         //1. gradually switch animator layer
-        float initWeight = anim.GetLayerWeight(defaultLayerIdx);
+        float initWeight = controller.GetLayerWeight(defaultLayerIdx);
         float timeElapsed = 0f;
         float totalTime = Mathf.Abs(0f - initWeight) / LerpAnimLayerSpeed;
         while (timeElapsed < totalTime)
         {
-            anim.SetLayerWeight(defaultLayerIdx,
+            controller.SetLayerWeight(defaultLayerIdx,
                 Mathf.Lerp(initWeight, 0f, Mathf.Clamp01(timeElapsed / totalTime)));
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        anim.SetLayerWeight(defaultLayerIdx, 0f);
+        controller.SetLayerWeight(defaultLayerIdx, 0f);
 
         //2. lerp neck rotation to follow target
         Quaternion lookRot;
@@ -162,17 +154,17 @@ public class AudienceAnimHandler : MonoBehaviour
         _audience.headTransform.localRotation = _defaultHeadLocalRotation;
 
         //2. gradually switch animator layer
-        float initWeight = anim.GetLayerWeight(defaultLayerIdx);
+        float initWeight = controller.GetLayerWeight(defaultLayerIdx);
         float timeElapsed = 0f;
         float totalTime = Mathf.Abs(1f - initWeight) / LerpAnimLayerSpeed;
         while (timeElapsed < totalTime)
         {
-            anim.SetLayerWeight(defaultLayerIdx,
+            controller.SetLayerWeight(defaultLayerIdx,
                 Mathf.Lerp(initWeight, 1f, Mathf.Clamp01(timeElapsed / totalTime)));
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        anim.SetLayerWeight(defaultLayerIdx, 1f);
+        controller.SetLayerWeight(defaultLayerIdx, 1f);
 
         _currStopFollowCR = null;
     }
@@ -189,35 +181,17 @@ public class AudienceAnimHandler : MonoBehaviour
     private void Awake()
     {
         _audience = GetComponent<Audience>();
-        anim.SetLayerWeight(defaultLayerIdx, 1f);
-    }
-
-    private void Start()
-    {
-        StartCoroutine(Repeat_CR());
+        controller.SetLayerWeight(defaultLayerIdx, 1f);
     }
 
     public void UpdateStateAnim()
     {
-        
-        anim.SetInteger(_paramIdState, (int)_audience.currState);
+        controller.SetInteger(_paramIdState, (int)_audience.currState);
     }
 
     public void UpdateChatDirection(Vector2 dir)
     {
-        anim.SetFloat(_paramIdFaceDirX, dir.x);
-        anim.SetFloat(_paramIdFaceDirZ, dir.y);
-    }
-
-    private IEnumerator Repeat_CR()
-    {
-        while (true)
-        {
-            float repeatWaitTime = Mathf.Lerp(repeatPeriodBound.x, repeatPeriodBound.y, Random.value);
-            yield return new WaitForSeconds(repeatWaitTime);
-            if(Random.value > 0.5f)
-                anim.SetTrigger(_paramIdSwitchPose);
-        }
+        controller.SetFloat(_paramIdBlendFactor1, dir.y);
     }
 
     private IEnumerator LookAt_CR()
