@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 public class RecordingWrapper : MonoBehaviour
@@ -21,12 +22,16 @@ public class RecordingWrapper : MonoBehaviour
     //Debug purpose
     public TextMesh debugText;
 
+    public static string recordingFilePath = Application.persistentDataPath + "/record.pcm";
+
     public void StartRecording()
     {
+        if (File.Exists(recordingFilePath))
+            File.Delete(recordingFilePath);
 #if !UNITY_EDITOR && UNITY_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-		currentActivity.Call("initialize_recordNplayback", (Application.persistentDataPath + "/record.pcm"));
+		currentActivity.Call("initialize_recordNplayback", (recordingFilePath));
         currentActivity.Call("setReverbStrength", reverbStrength);
 #endif
     }

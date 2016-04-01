@@ -102,6 +102,7 @@ public static class GlobalManager
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
         PresentationData.out_SlidesTransitionRecord = transitionRecord;
+        PresentationData.out_RecordingFilePath = RecordingWrapper.recordingFilePath;
         PresentationData.out_ExitTime = Time.time;
 		
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
@@ -171,5 +172,6 @@ public static class PresentationData
     public static List<GazeSnapshot> out_HGGazeData;
     public static Texture2D out_Screenshot;
     public static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
+    public static string out_RecordingFilePath;
 
 }
