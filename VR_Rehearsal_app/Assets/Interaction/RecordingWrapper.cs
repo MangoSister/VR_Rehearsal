@@ -46,7 +46,16 @@ public class RecordingWrapper : MonoBehaviour
                         currLength += pair.Value;
                 }
                 result.Add(new KeyValuePair<bool, int>(currState, currLength));
-            }           
+            }
+
+            int acc = 0;
+            for (int i = 0; i < result.Count; ++i)
+            {
+                int oldVal = result[i].Value;
+                result[i] = new KeyValuePair<bool, int>(result[i].Key, acc + result[i].Value);
+                acc += oldVal;
+            }
+                      
             return result;
         }
     }
