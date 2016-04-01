@@ -133,8 +133,12 @@ public class ReplayController : MonoBehaviour {
         if (audioSource.clip != null)
             audioSource.clip = null;
 
+        byte[] byteArray;
         //HARDCODED =====================================================================
-        byte[] byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
+        //if (PresentationData.out_FileName!=null)
+        //    byteArray = File.ReadAllBytes(PresentationData.out_FileName);
+        //else
+        byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
 
         //byte > unity float
         float[] floatArr = new float[byteArray.Length / 2 + 1];
