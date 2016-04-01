@@ -98,7 +98,7 @@ public class HeatmapTracker : MonoBehaviour
     //return: whether the tracking is triggered successfully
     public bool StartTrack()
     {
-        if (_currUpdateCR == null && RoomCenter.currRoom != null)
+        if (_currUpdateCR == null && SceneController.currRoom != null)
         {
             _currUpdateCR = StartCoroutine(Update_CR());
             return true;
@@ -127,8 +127,8 @@ public class HeatmapTracker : MonoBehaviour
 
     private IEnumerator Update_CR()
     {
-        var head = RoomCenter.currRoom.presenterHead;
-        var body = RoomCenter.currRoom.presenter.transform;
+        var head = SceneController.currRoom.presenterHead;
+        var body = SceneController.currRoom.presenter.transform;
         while (true)
         {
             float z = Vector3.Dot(head.forward, body.forward);
@@ -167,7 +167,7 @@ public class HeatmapTracker : MonoBehaviour
     public void CaptureScreenshot()
     {
         scnCam.gameObject.SetActive(true);
-        scnCam.gameObject.transform.position = RoomCenter.currRoom.presenterHead.position;
+        scnCam.gameObject.transform.position = SceneController.currRoom.presenterHead.position;
         scnCam.fieldOfView = verticalFOVDeg;
         scnCam.aspect = aspect;
 
@@ -199,11 +199,11 @@ public class HeatmapTracker : MonoBehaviour
     {
         Gizmos.color = Color.blue;
         Matrix4x4 oldMat = Gizmos.matrix;
-        Gizmos.matrix = Matrix4x4.TRS(RoomCenter.currRoom.presenterHead.position, 
-                                        RoomCenter.currRoom.presenter.transform.rotation, 
+        Gizmos.matrix = Matrix4x4.TRS(SceneController.currRoom.presenterHead.position, 
+                                        SceneController.currRoom.presenter.transform.rotation, 
                                         Vector3.one);
         Gizmos.DrawFrustum
-        (RoomCenter.currRoom.presenterHead.position, verticalFOVDeg, 5f, 1f, aspect);
+        (SceneController.currRoom.presenterHead.position, verticalFOVDeg, 5f, 1f, aspect);
         Gizmos.matrix = oldMat;
         Gizmos.color = Color.white;
 

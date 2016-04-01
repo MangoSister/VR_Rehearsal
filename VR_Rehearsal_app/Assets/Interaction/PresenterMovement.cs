@@ -36,9 +36,9 @@ public class PresenterMovement : MonoBehaviour
         _agent.autoTraverseOffMeshLink = false;
         _destDict = new Dictionary<DestType, Transform>
         {
-            { DestType.PODIUM, RoomCenter.currRoom.presentDest},
-            { DestType.DOOR_IN, RoomCenter.currRoom.roomDoorIn},
-            { DestType.DOOR_OUT, RoomCenter.currRoom.roomDoorOut},
+            { DestType.PODIUM, SceneController.currRoom.presentDest},
+            { DestType.DOOR_IN, SceneController.currRoom.roomDoorIn},
+            { DestType.DOOR_OUT, SceneController.currRoom.roomDoorOut},
         };
 
         StartCoroutine(ProcessOffMeshLink_CR());
@@ -93,13 +93,13 @@ public class PresenterMovement : MonoBehaviour
         {
             case DestType.PODIUM:
                 {
-                    float time = Quaternion.Angle(transform.rotation, RoomCenter.currRoom.presentDest.rotation) / (_agent.angularSpeed * 0.1f);
+                    float time = Quaternion.Angle(transform.rotation, SceneController.currRoom.presentDest.rotation) / (_agent.angularSpeed * 0.1f);
                     float currTime = 0f;
                     Quaternion startRot = transform.rotation;
-                    while (transform.rotation != RoomCenter.currRoom.presentDest.rotation)
+                    while (transform.rotation != SceneController.currRoom.presentDest.rotation)
                     {
                         currTime += Time.deltaTime;
-                        transform.rotation = Quaternion.Slerp(startRot, RoomCenter.currRoom.presentDest.rotation,
+                        transform.rotation = Quaternion.Slerp(startRot, SceneController.currRoom.presentDest.rotation,
                         Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(currTime / time)));
                         yield return null;
                     }

@@ -35,7 +35,7 @@ public class SlidesPlayerCtrl : MonoBehaviour
             StartCoroutine(AutoAdvance_CR());
 
         _transitionRecord = new List<KeyValuePair<float, int>>();
-        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, 0));
+        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, 0));
         _player.Play();
     }
 
@@ -45,7 +45,7 @@ public class SlidesPlayerCtrl : MonoBehaviour
         {
             yield return new WaitForSeconds(autoAdvanceInterval);
             _player.NextSlide();
-            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, _player.CurrIdx));
+            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, _player.CurrIdx));
         }
     }
 
@@ -66,7 +66,7 @@ public class SlidesPlayerCtrl : MonoBehaviour
         else if (_clickCounter > 1)
             _player.PrevSlide();
 
-        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time, _player.CurrIdx));
+        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, _player.CurrIdx));
 
         _clickCounter = 0;
     }

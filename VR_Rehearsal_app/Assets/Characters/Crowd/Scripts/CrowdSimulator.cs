@@ -151,7 +151,7 @@ public class CrowdSimulator : MonoBehaviour
                 ad = CreateRandomMember(LOD.HalfSize_Diffuse_BasicAnim, Vector3.zero, Quaternion.identity);
             }
             ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
-            ad.followingTransform = RoomCenter.currRoom.presenterHead;
+            ad.followingTransform = SceneController.currRoom.presenterHead;
            
             //to Phan: fix the layout here
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;

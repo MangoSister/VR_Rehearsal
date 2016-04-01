@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 public class RecordingWrapper : MonoBehaviour
@@ -21,12 +22,58 @@ public class RecordingWrapper : MonoBehaviour
     //Debug purpose
     public TextMesh debugText;
 
+    public string recordingFilePath;
+
+    private List<KeyValuePair<bool, int>> fluencyRecord;
+    public List<KeyValuePair<bool, int>> outputFluencyRecord
+    {
+        get
+        {
+            var result = new List<KeyValuePair<bool, int>>();
+            if (fluencyRecord != null && fluencyRecord.Count > 0)
+            {
+                bool currState = fluencyRecord[0].Key;
+                int currLength = 0;
+                foreach (var pair in fluencyRecord)
+                {
+                    if (pair.Key != currState)
+                    {
+                        result.Add(new KeyValuePair<bool, int>(currState, currLength));
+                        currState = pair.Key;
+                        currLength = pair.Value;
+                    }
+                    else
+                        currLength += pair.Value;
+                }
+                result.Add(new KeyValuePair<bool, int>(currState, currLength));
+            }
+
+            int acc = 0;
+            for (int i = 0; i < result.Count; ++i)
+            {
+                int oldVal = result[i].Value;
+                result[i] = new KeyValuePair<bool, int>(result[i].Key, acc + result[i].Value);
+                acc += oldVal;
+            }
+                      
+            return result;
+        }
+    }
+
+    private void Awake()
+    {
+        recordingFilePath = Application.persistentDataPath + "/record.pcm";
+        fluencyRecord = new List<KeyValuePair<bool, int>>();
+    }
+
     public void StartRecording()
     {
+        if (File.Exists(recordingFilePath))
+            File.Delete(recordingFilePath);
 #if !UNITY_EDITOR && UNITY_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-		currentActivity.Call("initialize_recordNplayback", (Application.persistentDataPath + "/record.pcm"));
+		currentActivity.Call("initialize_recordNplayback", (recordingFilePath));
         currentActivity.Call("setReverbStrength", reverbStrength);
 #endif
     }
@@ -55,6 +102,7 @@ public class RecordingWrapper : MonoBehaviour
         return new Queue<KeyValuePair<bool, int>>();
 #endif
     }
+
 
     public void EndRecording()
     {
@@ -100,8 +148,10 @@ public class RecordingWrapper : MonoBehaviour
                 debugText.text += "\n" + fluencyFactor;
                 debugText.text += "\n" + "delta: " + fluencyDelta;
             }
+            
+            fluencyRecord.AddRange(statusQueue);
         }
-#else 
+#else
         float oldFactor = fluencyFactor;
         fluencyFactor = fakeFluencyFactor;
         if (debugText != null)

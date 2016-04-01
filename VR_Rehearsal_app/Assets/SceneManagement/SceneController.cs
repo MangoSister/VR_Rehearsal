@@ -3,15 +3,15 @@ using UnityEngine.Rendering;
 using System.Collections;
 using System.IO;
 
-public class RoomCenter : MonoBehaviour
+public class SceneController : MonoBehaviour
 {
-    private static RoomCenter _currRoom = null;
-    public static RoomCenter currRoom
+    private static SceneController _currRoom = null;
+    public static SceneController currRoom
     {
         get
         {
             if (_currRoom == null)
-                _currRoom = FindObjectOfType<RoomCenter>();
+                _currRoom = FindObjectOfType<SceneController>();
             return _currRoom;
         }
     }
@@ -109,7 +109,9 @@ public class RoomCenter : MonoBehaviour
                 heatmapTracker.aspect,
                 heatmapTracker.output,
                 heatmapTracker.scn,
-                slidesPlayerCtrl.outputTransitionRecord
+                slidesPlayerCtrl.outputTransitionRecord,
+                recordWrapper.recordingFilePath,
+                recordWrapper.outputFluencyRecord
             );
     }
 

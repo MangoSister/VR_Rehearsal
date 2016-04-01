@@ -134,11 +134,10 @@ public class ReplayController : MonoBehaviour {
             audioSource.clip = null;
 
         byte[] byteArray;
-        //HARDCODED =====================================================================
-        //if (PresentationData.out_FileName!=null)
-        //    byteArray = File.ReadAllBytes(PresentationData.out_FileName);
-        //else
-        byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
+        if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
+            byteArray = File.ReadAllBytes(PresentationData.out_RecordingFilePath);
+        else
+            byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
 
         //byte > unity float
         float[] floatArr = new float[byteArray.Length / 2 + 1];
@@ -186,18 +185,16 @@ public class ReplayController : MonoBehaviour {
         playbackSlider.value = 0;
         preventTrigger = false;
 
-        if (PresentationData.out_SlidesTransitionRecord!=null)
+        if (PresentationData.out_SlidesTransitionRecord != null)
             out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
-        //if (PresentationData.out_PauseRecord != null)
-        //    out_PauseRecord = PresentationData.out_PauseRecord;
 
         //for testing
-        out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
-        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
-        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
-        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
-        out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+        //out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+        //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
 
         //instantiate markers
         if (isTransitionDisplay == true)
@@ -214,13 +211,32 @@ public class ReplayController : MonoBehaviour {
             }
         }
 
+        if (PresentationData.out_FluencyRecord != null)
+        {
+            //long pause threshold is set to 3
+            int accumulatedTime = 0; //in ms!
+
+            for (int j = 0; j < PresentationData.out_FluencyRecord.Count; j++)
+            {
+                //check the length of current activity
+                int length = PresentationData.out_FluencyRecord[j].Value - accumulatedTime;
+                if (accumulatedTime!=0) //ignore the first pause
+                {
+                    if ((PresentationData.out_FluencyRecord[j].Key == false) && (length>3000))
+                        out_PauseRecord.Add(new KeyValuePair<float, int>((float)length/3000.0f, 1));//not speaking
+                }
+
+                accumulatedTime += PresentationData.out_FluencyRecord[j].Value;
+            }
+        }
+
         //for testing
-        out_PauseRecord = new List<KeyValuePair<float, int>>();
-        out_PauseRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
-        out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-        out_PauseRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
-        out_PauseRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
-        out_PauseRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
+        //out_PauseRecord = new List<KeyValuePair<float, int>>();
+        //out_PauseRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
+        //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+        //out_PauseRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
+        //out_PauseRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
+        //out_PauseRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
 
         //instantiate markers
         if (isPauseDisplay == true)
