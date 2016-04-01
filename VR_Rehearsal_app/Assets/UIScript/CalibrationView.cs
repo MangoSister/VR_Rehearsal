@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_ANDROID && !UNITY_EDITOR
+#define USE_ANDROID
+#endif
+using UnityEngine;
 using System;
 
 using System.Collections;
@@ -9,7 +12,6 @@ public class CalibrationView : MonoBehaviour
 	public static bool isCalibrationDone;
 
 	public GameObject popUpWindow;
-	public GameObject timerBar;
 	public GameObject button;
 	public GameObject contentText;
 	public GameObject descriptionPanel;
@@ -46,8 +48,10 @@ public class CalibrationView : MonoBehaviour
         UnityEngine.Debug.Log("setup unity activity");
         debugText.text = "Loading";
         //setup Unity Activity
+		#if USE_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+		#endif
         debugText.text = "Ready";
 	}
 	
@@ -90,8 +94,7 @@ public class CalibrationView : MonoBehaviour
 		}
 		isSilentCalibrationDone = true;
 	}
-
-
+		
 	public void PopUpOKButtonClick ()
 	{
 		popUpWindow.SetActive (false);
@@ -101,7 +104,6 @@ public class CalibrationView : MonoBehaviour
 
 	public void PopUpSkipButtonClick ()
 	{
-
 		popUpWindow.SetActive (false);
 		gameObject.SetActive (false);
 		isCalibrationDone = true;
@@ -114,59 +116,55 @@ public class CalibrationView : MonoBehaviour
 			if (silentFlag == false) {
 				silentFlag = true;
 			}
+			#if USE_ANDROID
             currentActivity.Call("startTestThreshold");
+			#endif
 		} 
 		//First Done Button
 		else if (isSilentCalibrationDone == true && isMicroCalibrationDone == false && button.GetComponentInChildren<Text> ().text == "Done !" ){
+			#if USE_ANDROID
             avgSilence = Convert.ToInt32(debugText.text);
-            
+			#endif
             Debug.Log("2");
 			button.GetComponentInChildren<Text> ().text = "Calibration Start";
 			contentText.GetComponent<Text>().text = "please test your microphone. Say something shit";
-
 		}
 		//Microbutton
 		else if(isSilentCalibrationDone == true && isMicroCalibrationDone == false && button.GetComponentInChildren<Text> ().text == "Calibration Start"){
 			curr_time = 0;
 			silentFlag = true;
 			isMicroCalibrationDone = true;
-            
+			#if USE_ANDROID
             currentActivity.Call("startTestThreshold");
+			#endif
 		}
 		//2nd Done Button
 		else if(isSilentCalibrationDone == true && isMicroCalibrationDone == true){
-<<<<<<< HEAD
+
 			Debug.Log("Rotation!!!!!");
 			popUpWindow.SetActive (false);
 			gameObject.SetActive (false);
 			isCalibrationDone = true;
-=======
 			//Debug.Log("Rotation!!!!!");
-
             //now test volume
+			#if USE_ANDROID
             avgSpeaking = Convert.ToInt32(debugText.text);
-
+			#endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
-
             Debug.Log("test");
             contentText.GetComponent<Text>().text = "see if it workes properly!";
-
+			#if USE_ANDROID
             currentActivity.Call("startTestThreshold");
+			#endif
             updateVolumeFlag = true;
->>>>>>> 522566bce3142eadeab6a22642d81f88ea12bb89
 		}
-
 	}
 
 	void ChangeTheText ()
 	{
 		button.GetComponentInChildren<Text> ().text = "Done !";
-<<<<<<< HEAD
-
-=======
+		#if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
->>>>>>> 522566bce3142eadeab6a22642d81f88ea12bb89
+		#endif
 	}
-
-	
 }
