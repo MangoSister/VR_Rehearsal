@@ -46,9 +46,12 @@ public class CalibrationView : MonoBehaviour
 		if (curr_time < 100) {
 			curr_time += (Time.deltaTime * rate);
 			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount = curr_time/max_time;
+			button.GetComponent<Button>().interactable = false;
+
 		} else {
 			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount =  0;
 			silentFlag = false;
+			button.GetComponent<Button>().interactable = true;
 			ChangeTheText ();
 		}
 		isSilentCalibrationDone = true;
@@ -94,6 +97,9 @@ public class CalibrationView : MonoBehaviour
 		//2nd Done Button
 		else if(isSilentCalibrationDone == true && isMicroCalibrationDone == true){
 			Debug.Log("Rotation!!!!!");
+			popUpWindow.SetActive (false);
+			gameObject.SetActive (false);
+			isCalibrationDone = true;
 		}
 
 	}
@@ -101,6 +107,7 @@ public class CalibrationView : MonoBehaviour
 	void ChangeTheText ()
 	{
 		button.GetComponentInChildren<Text> ().text = "Done !";
+
 	}
 
 	

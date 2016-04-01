@@ -22,6 +22,8 @@ public class LocalCaseView : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Visible;
+
         isLocalCaseDone = false;
         CheckLocalPPT();
         GetComponent<RectTransform>().SetAsLastSibling();

@@ -55,6 +55,7 @@ public class NavigationView : MonoBehaviour {
 
 
     void Start() {
+		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Visible;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
