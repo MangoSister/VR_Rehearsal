@@ -24,7 +24,7 @@ public class CanvasManager : MonoBehaviour {
         navigation.GetComponent<NavigationView>().SetSetupManager(_setupManager);
         customize.GetComponent<CustomizeView>().SetSetupManager(_setupManager);
         rotation.GetComponent<RotationView>().SetSetupManager(_setupManager);
-        calibration.SetActive(false);
+        calibration.SetActive(true);
         rotation.SetActive(false);
     }
     
