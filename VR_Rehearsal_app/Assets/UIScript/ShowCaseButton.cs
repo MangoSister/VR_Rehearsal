@@ -12,8 +12,10 @@ public class ShowCaseButton : MonoBehaviour {
     //UIManager uiManager;
     PrepHouseKeeper pHK;
     public GameObject optionCover;
+	public bool isShowcaseButtonClicked;
     string deletedShowcaseID;
     void Start () {
+		isShowcaseButtonClicked = false;
         optionCover.GetComponent<Image>().color = gameObject.GetComponent<Button>().colors.normalColor;
     }
 	
@@ -53,8 +55,12 @@ public class ShowCaseButton : MonoBehaviour {
     }
     public void OnShowCaseBUttonClicked()
     {
-       // GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().ShowRotationView();
+		Debug.Log("Showcase ZButton Clicked");
         PresentationData.in_SlidePath = _localPath;
+		isShowcaseButtonClicked = true;
+		GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
+	
+
 		// the unit of in_ExpectedTime is second
 		PresentationData.in_ExpectedTime = _expectedTime * 60;
         switch (_sizeOfRoom) {

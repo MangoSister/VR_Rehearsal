@@ -11,7 +11,9 @@ public class CanvasManager : MonoBehaviour {
     public GameObject customize;
     public GameObject calibration;
     public GameObject rotation;
-    private SetupManager _setupManager;
+	public GameObject showCaseButton;
+	private SetupManager _setupManager;
+
    
 	void Awake () {
 		
@@ -131,6 +133,7 @@ public class CanvasManager : MonoBehaviour {
     }
     public void ShowRotationView()
     {
+		
         if (CalibrationView.isCalibrationDone)
         {
             CalibrationView.isCalibrationDone = false;
@@ -138,6 +141,18 @@ public class CanvasManager : MonoBehaviour {
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
     }
+	public void DirectShowRotationView(){
+        foreach(GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
+        {
+            if(temp.GetComponent<ShowCaseButton>().isShowcaseButtonClicked == true)
+            {
+                localShowCase.SetActive(false);
+                rotation.SetActive(true);
+                rotation.GetComponent<RotationView>().SetRotation(true);
+            }
+
+        }
+	}
     void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
