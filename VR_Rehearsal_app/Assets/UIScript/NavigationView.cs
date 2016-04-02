@@ -118,9 +118,12 @@ public class NavigationView : MonoBehaviour {
 
         _userDrive.Setup(_googleDirve);
         _userDrive.Initialize(cloudType);
-        _userDrive.StartAuthentication(delegate ()
+        _userDrive.StartAuthentication(delegate (bool res)
         {
-            _userDrive.GetFileListFromPath("/", CreatePanels);
+            if (res)
+            {
+                _userDrive.GetFileListFromPath("/", CreatePanels);
+            }
         });
 
     }
