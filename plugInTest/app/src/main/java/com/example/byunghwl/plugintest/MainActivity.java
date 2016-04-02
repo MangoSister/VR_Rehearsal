@@ -226,11 +226,14 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         Log.i("MainActivity", "Stop volume testing");
 
         isRecording = false;
-        record.stop();
-        track.stop();
-        record.release();
-        track.release();
-
+        try {
+            record.stop();
+            track.stop();
+            record.release();
+            track.release();
+        }
+        catch (Exception e) {e.printStackTrace();}
+        
         if (volumeTestSampleCount == 0)
             return 0;
         else
