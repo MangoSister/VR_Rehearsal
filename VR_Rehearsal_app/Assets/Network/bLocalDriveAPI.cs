@@ -118,6 +118,6 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 	public override string GetRecentPath (){
 		return _recentPath;
 	}
-	public override void StartAuthentication (Authentication_Callback callback){callback ();}
+	public override void StartAuthentication (Authentication_Callback callback){callback (true);}
 	public override void Update (){} 
 }
