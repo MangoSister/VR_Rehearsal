@@ -56,7 +56,7 @@ public class NavigationView : MonoBehaviour {
 
 
     void Start() {
-		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Visible;
+		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -250,6 +250,7 @@ public class NavigationView : MonoBehaviour {
                 if (_button.GetComponent<ButtonType>().buttonType == "folder")
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+                    return;
                 }
 
 				_button.GetComponent<ButtonType> ().isSelected = false; 

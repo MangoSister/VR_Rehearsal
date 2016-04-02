@@ -33,6 +33,8 @@ public class ReplayController : MonoBehaviour {
     public GameObject prefabTransitionMarker;
     public GameObject groupPauseMarker;
     public GameObject prefabPauseMarker;
+    [Header("Marker Control")]
+    public Text testText;
 
     enum PLAY_STATUS
     {
@@ -133,13 +135,20 @@ public class ReplayController : MonoBehaviour {
         if (audioSource.clip != null)
             audioSource.clip = null;
 
-        byte[] byteArray;
+        byte[] byteArray = null;
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
-            byteArray = File.ReadAllBytes(PresentationData.out_RecordingFilePath);
+            try { byteArray = File.ReadAllBytes(PresentationData.out_RecordingFilePath); }
+            catch (FileNotFoundException e) { quarterTime.text=e.Message; }
         else
-            byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm");
+            byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm"); //for testing
 
         //byte > unity float
+        if (byteArray == null)
+        {
+            UnityEngine.Debug.Log("File not found");
+            return;
+        }
+
         float[] floatArr = new float[byteArray.Length / 2 + 1];
         int i;
         short max = 0;
@@ -211,6 +220,8 @@ public class ReplayController : MonoBehaviour {
             }
         }
 
+        out_PauseRecord = new List<KeyValuePair<float, int>>();
+
         if (PresentationData.out_FluencyRecord != null)
         {
             //long pause threshold is set to 3
@@ -220,23 +231,18 @@ public class ReplayController : MonoBehaviour {
             {
                 //check the length of current activity
                 int length = PresentationData.out_FluencyRecord[j].Value - accumulatedTime;
-                if (accumulatedTime!=0) //ignore the first pause
+
+                if (accumulatedTime != 0) //ignore the first pause
                 {
-                    if ((PresentationData.out_FluencyRecord[j].Key == false) && (length>3000))
-                        out_PauseRecord.Add(new KeyValuePair<float, int>((float)length/3000.0f, 1));//not speaking
+                    if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 2000))
+                    {
+                        out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, 1));//not speaking
+                    }
                 }
 
-                accumulatedTime += PresentationData.out_FluencyRecord[j].Value;
+                accumulatedTime = PresentationData.out_FluencyRecord[j].Value;
             }
         }
-
-        //for testing
-        //out_PauseRecord = new List<KeyValuePair<float, int>>();
-        //out_PauseRecord.Add(new KeyValuePair<float, int>(6.0f, 1));
-        //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-        //out_PauseRecord.Add(new KeyValuePair<float, int>(14.0f, 1));
-        //out_PauseRecord.Add(new KeyValuePair<float, int>(19.0f, 1));
-        //out_PauseRecord.Add(new KeyValuePair<float, int>(22.0f, 1));
 
         //instantiate markers
         if (isPauseDisplay == true)
@@ -250,6 +256,7 @@ public class ReplayController : MonoBehaviour {
                 float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
 
                 go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
+                go.GetComponent<RectTransform>().localScale = new Vector3(2.0f, 2.0f, 2.0f);
                 go.GetComponent<PauseController>().time = pauseRecord.Key;
             }
         }

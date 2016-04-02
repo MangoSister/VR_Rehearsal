@@ -16,9 +16,10 @@ using System.ComponentModel;
 public class bDropboxAPI : bhClowdDriveAPI{
 
 	private string _token;
-	private int _timeOut;
+	private float _timeOut;
 	private JobStatus _status = JobStatus.NotStarted;
 	private bool _isGetToken = false;
+
 
 	/*Authentication callback*/
 	Authentication_Callback _authen_callback;
@@ -99,6 +100,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		if (!_isGetToken) {
 
+			_timeOut += Time.deltaTime;
 			#if UNITY_EDITOR
 				
 			#elif UNITY_ANDROID
@@ -108,10 +110,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 			#endif
 
-			if(_token != "null"){
+			if (_token != "null") {
 				_isGetToken = true;
 				//SaveTokenOnLocal(_token);
-				_authen_callback();
+				_authen_callback (true);
+			} else if (_timeOut > 15.0) {
+				_authen_callback (false);
+				_timeOut = 0;
 			}
 
 		}

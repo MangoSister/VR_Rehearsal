@@ -21,26 +21,6 @@ public class ShowCaseButton : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        /*
-        RectTransform objectRectTransform = gameObject.GetComponent<RectTransform>();                // This section gets the RectTransform information from this object. Height and width are stored in variables. The borders of the object are also defined
-        float width = objectRectTransform.rect.width;
-        float height = objectRectTransform.rect.height;
-        float rightOuterBorder = (width * .5f);
-        float leftOuterBorder = (width * -.5f);
-        float topOuterBorder = (height * .5f);
-        float bottomOuterBorder = (height * -.5f);
-        if (Input.mousePosition.x <= (transform.position.x + rightOuterBorder) && Input.mousePosition.x >= (transform.position.x + leftOuterBorder) && Input.mousePosition.y <= (transform.position.y + topOuterBorder) && Input.mousePosition.y >= (transform.position.y + bottomOuterBorder))
-          {
-          optionCover.GetComponent<Image>().color = gameObject.GetComponent<Button>().colors.highlightedColor;
-         }
-           else
-          {
-    
-            
-  
-        }
-        */
-       
 
     }
 
@@ -67,7 +47,7 @@ public class ShowCaseButton : MonoBehaviour {
             case 0:
                 PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                     break;
-        }
+          }
 
         /*
          *  Send time, percentage of audience
