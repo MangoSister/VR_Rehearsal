@@ -61,19 +61,15 @@ public class CustomizeView : MonoBehaviour  {
     public void SetTimer()
     {
         customData._expetedTime_min = (ushort)(int.Parse(timer.text));
-         Debug.Log("TIMER : " + customData._expetedTime_min);
     }
 
     public void SetShowCaseName()
     {
         customData._showcaseName = showCaseTitle.text;
-        Debug.Log("ShowCase name : " + customData._showcaseName);
     }
     public void CustomCompleteClicked()
     {
-        Debug.Log("PHAN!!");
         _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min);
-        Debug.Log(_pptID);
         if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
         {
             foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)

@@ -24,35 +24,36 @@ public class ShowCaseButton : MonoBehaviour {
 
     }
 
-    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int _expectedTime)
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
     {
         _showCaseName = showCanseName;
         _sizeOfRoom = sizeOfRoom;
         _numberOfAudience = numberOfAudience;
         _localPath = localPath;
         _id = id;
-        _expectedTime = _expectedTime;
+        _expectedTime = time;
     }
     public void OnShowCaseBUttonClicked()
     {
-		Debug.Log("Showcase ZButton Clicked");
         PresentationData.in_SlidePath = _localPath;
-		isShowcaseButtonClicked = true;
-		GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
-	
-
+        PresentationData.in_ExpectedTime = _expectedTime;
 		// the unit of in_ExpectedTime is second
 		PresentationData.in_ExpectedTime = _expectedTime * 60;
         switch (_sizeOfRoom) {
             case 0:
                 PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                     break;
-          }
+            case 2:
+                PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                break;
 
-        /*
-         *  Send time, percentage of audience
-         * 
-         */
+            case 3:
+                PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                break;
+
+          }
+        isShowcaseButtonClicked = true;
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
 
     }
 

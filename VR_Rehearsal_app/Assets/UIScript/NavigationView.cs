@@ -112,7 +112,6 @@ public class NavigationView : MonoBehaviour {
     
     public void SetupCloud(int cloudType)
     {
-        Debug.Log("cloudType" + cloudType);
         if (_userDrive == null)
             _userDrive = new bUserCloudDrive();
 
@@ -202,9 +201,6 @@ public class NavigationView : MonoBehaviour {
                 string resFileName = parseResult["entries"][index]["name"].Value;
                 string[] elements = resFileName.Split('.');
                 extentionFormat = elements[elements.Length - 1];
-               //  Debug.Log("1 . File Name :" + resFileName + "L");
-               // Debug.Log("2 . ExtentionFormat :" + elements[elements.Length - 1] + "L");
-               // Debug.Log("3. Folder??:" + parseResult["entries"][index][".tag"].Value + "L");
                 if (extentionFormat.Split(' ').Length - 1 > 0) {
                     extentionFormat = extentionFormat.Substring(0, extentionFormat.Length - 1);
                 }

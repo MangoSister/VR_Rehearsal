@@ -32,7 +32,6 @@ public class CalibrationView : MonoBehaviour
 	bool isMicroCalibrationDone = false;
     bool isCalibrationSuccess = false;
     bool isSilentDone = false;
-	bool isBetwwen = false;
 
     //for calling unity android activity
     private AndroidJavaClass unity;
@@ -190,6 +189,13 @@ public class CalibrationView : MonoBehaviour
     }
     public void RestartButtonClick()
     {
-
+        isSilentCalibrationDone = false;
+        isMicroCalibrationDone = false;
+        isCalibrationSuccess = false;
+        isSilentDone = false;
+        button.GetComponentInChildren<Text>().text = "Calibration Start";
+#if USE_ANDROID
+        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
+#endif
     }
 }
