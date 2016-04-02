@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 769e7a150a83a35489ff03188ee0ae2e
-timeCreated: 1459551284
+guid: c6673b249ba94a248b47030d7619628e
+timeCreated: 1459569564
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
@@ -146,7 +146,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -3227,7 +3227,7 @@ ModelImporter:
     globalScale: 0.01
     meshCompression: 0
     addColliders: 0
-    importBlendShapes: 1
+    importBlendShapes: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1

@@ -64,7 +64,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 	void Update(){
 		if (_isAuthenticationDone == true) {
-			_authen_callback ();
+			_authen_callback (_isAuthenticationDone);
 			_isAuthenticationDone = false;
 		}
 

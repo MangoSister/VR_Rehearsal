@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using EnvType = PresentationData.EnvType;
 
 public class SceneController : MonoBehaviour
 {
@@ -16,6 +19,32 @@ public class SceneController : MonoBehaviour
         }
     }
 
+    //Lightmap & Lightprbes setting
+    public struct LightingInfo
+    {
+        public string near;
+        public string far;
+        public string probes;
+        public LightingInfo(string near, string far, string probes)
+        { this.near = near; this.far = far; this.probes = probes; }
+    }
+
+    public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
+    {
+        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_RPIS", "lightprobes_RPIS") },
+        { EnvType.ConferenceRoom, new LightingInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF") }
+    };
+
+    [Serializable]
+    public class EnvDict : SerializableDictionary<EnvType, GameObject>
+    {
+        public EnvDict() : base() { }
+        public EnvDict(IDictionary<EnvType, GameObject> dict) : base(dict) { }
+    }
+
+    [SerializeField]
+    public EnvDict envPrefabs = new EnvDict();
+
     public Transform presentDest;
     public Transform roomDoorIn;
     public Transform roomDoorOut;
@@ -23,10 +52,12 @@ public class SceneController : MonoBehaviour
     public GameObject presenter;
     public Transform presenterHead;
 
+    public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
     public SlidesPlayerCtrl slidesPlayerCtrl;
     public ExitTrigger exitTrigger;
+    public Tutorial_PptKaraoke tutManager;
 
     private AudioUnit _ambientUnit = null;
 
@@ -34,39 +65,56 @@ public class SceneController : MonoBehaviour
     {
 #if UNITY_ANDROID
      Screen.orientation = ScreenOrientation.LandscapeLeft;
-#endif 
-
-        LoadLights();
+#endif
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 
+        //PresentationData.in_EnvType = EnvType.ConferenceRoom;
+        LoadEnv();
+        LoadLights();
+
+        crowdSim.Init();
+
+        recordWrapper.Init();
         recordWrapper.StartRecording();
 
         OperateAmbient(true);
         StartCoroutine(SilenceAfterOpenning_CR());
     }
 
+    private void LoadEnv()
+    {
+        GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
+        slidesPlayerCtrl = env.transform.GetComponentInChildren<SlidesPlayerCtrl>();
+        exitTrigger = env.transform.GetComponentInChildren<ExitTrigger>();
+        exitTrigger.OnExit.AddListener(EndPresentation);
+        crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
+        recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
+        tutManager.slidePlayer = slidesPlayerCtrl.GetComponent<SlidesPlayer>();
+        tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
+    }
+
     private void LoadLights()
     {
         //load lightmap
-        PresentationData.LightingInfo info = PresentationData.lightingInfoDict[PresentationData.in_EnvType];
-        LightmapData data = new LightmapData();
-        if (info.far != null)
-        {
-            data.lightmapFar = Resources.Load<Texture2D>
-                (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.far));
-        }
+        LightingInfo info = lightingInfoDict[PresentationData.in_EnvType];
+        //LightmapData data = new LightmapData();
+        //if (info.far != null)
+        //{
+        //    data.lightmapFar = Resources.Load<Texture2D>
+        //        (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.far));
+        //}
 
-        if (info.near != null)
-        {
-            data.lightmapNear = Resources.Load<Texture2D>
-                (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.near));
-        }
+        //if (info.near != null)
+        //{
+        //    data.lightmapNear = Resources.Load<Texture2D>
+        //        (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.near));
+        //}
 
-        LightmapSettings.lightmaps = new LightmapData[] { data };
+        //LightmapSettings.lightmaps = new LightmapData[] { data };
 
         //load light probe
-        LoadLightProbes(Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.probes));
+        LoadLightProbes(Path.Combine("Lightmaps", info.probes));
         
     }
 
@@ -142,14 +190,15 @@ public class SceneController : MonoBehaviour
                                 bakedProbes[i][ch, coef] = input.ReadSingle();
                     }
 
-                    if (LightmapSettings.lightProbes == null)
-                    {
-                        LightProbes probes = new LightProbes();
-                        probes.name = "Imported probes";
-                        LightmapSettings.lightProbes = probes;
-                    }
-                    LightmapSettings.lightProbes.bakedProbes = bakedProbes;
-                    
+                    //if (LightmapSettings.lightProbes == null)
+                    //{
+                    LightProbes probes = Instantiate(LightmapSettings.lightProbes) as LightProbes;
+                    probes.name = "Imported probes";
+                    probes.bakedProbes = bakedProbes;
+                    LightmapSettings.lightProbes = probes;
+                    //}
+                    //LightmapSettings.lightProbes.bakedProbes = bakedProbes;
+                    //LightmapSettings.lightProbes = new LightProbes();
                     input.Close();
                 }
                 stream.Close();

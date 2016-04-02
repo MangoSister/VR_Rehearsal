@@ -10,7 +10,7 @@ public abstract class bhClowdDriveAPI{
 
 	public enum JobStatus { NotStarted, Started, Done};
 
-	public delegate void Authentication_Callback();
+	public delegate void Authentication_Callback(bool res);
 	public delegate void fileList_Callback(string filelists);
 	public delegate void fileDownload_Callback();
 	public delegate void fileDownload_Process_Callback (int total, int proceedNumber);

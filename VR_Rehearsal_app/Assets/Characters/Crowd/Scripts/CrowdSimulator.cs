@@ -208,7 +208,7 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public void Init()
     {
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
@@ -217,7 +217,6 @@ public class CrowdSimulator : MonoBehaviour
             CreateBehaviorTree();
 
         CreateCrowd();
-
     }
 
     private void Start()
