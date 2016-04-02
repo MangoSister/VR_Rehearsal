@@ -30,9 +30,12 @@ public class ShowCaseView : MonoBehaviour {
 
        
             _bDriveAPI = new bDropboxAPI();
-            _bDriveAPI.StartAuthentication(delegate ()
+            _bDriveAPI.StartAuthentication(delegate (bool res)
             {
-                _bDriveAPI.GetFileListFromPath("/", CreatePanels);
+                if (res)
+                {
+                    _bDriveAPI.GetFileListFromPath("/", CreatePanels);
+                }
             });
         _bShowcaseMgr = new bShowcaseManager();
         //_bShowcaseMgr.Start();
@@ -77,8 +80,11 @@ public class ShowCaseView : MonoBehaviour {
     {
 
         _bDriveAPI = new bDropboxAPI();
-        _bDriveAPI.StartAuthentication(delegate () {
-            _bDriveAPI.GetFileListFromPath("/", CreatePanels);
+        _bDriveAPI.StartAuthentication(delegate (bool res) {
+            if (res)
+            {
+                _bDriveAPI.GetFileListFromPath("/", CreatePanels);
+            }
         });
     }
     public void AddShowCaseClicked()

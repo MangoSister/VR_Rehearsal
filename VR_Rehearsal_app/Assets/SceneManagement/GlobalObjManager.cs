@@ -72,11 +72,13 @@ public static class GlobalManager
         (
             string slidePath,
             float expectedTime,
+            int voiceThreshold,
             PresentationData.EnvType envType = PresentationData.EnvType.RPIS
         )
     {
         PresentationData.in_SlidePath = slidePath;
         PresentationData.in_ExpectedTime = expectedTime;
+        PresentationData.in_VoiceThreshold = voiceThreshold;
         PresentationData.in_EnvType = envType;
         
         PresentationData.in_EnterTime = Time.time;
@@ -154,6 +156,7 @@ public static class PresentationData
     public static string in_SlidePath;
     public static float in_EnterTime;
     public static float in_ExpectedTime;
+    public static int in_VoiceThreshold;
 
     //Output
     public static float out_ExitTime;

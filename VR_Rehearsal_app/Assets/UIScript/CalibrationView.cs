@@ -13,6 +13,7 @@ public class CalibrationView : MonoBehaviour
 
 	public GameObject popUpWindow;
 	public GameObject button;
+    public GameObject calibrtaionData;
 	public GameObject contentText;
 	public GameObject descriptionPanel;
 	public GameObject circularProgress;
@@ -29,6 +30,7 @@ public class CalibrationView : MonoBehaviour
     bool updateVolumeFlag = false; //if true, then update volume every frame
 	bool isSilentCalibrationDone = false;
 	bool isMicroCalibrationDone = false;
+    bool isCalibrationSuccess = false;
     bool isSilentDone = false;
 	bool isBetwwen = false;
 
@@ -69,17 +71,17 @@ public class CalibrationView : MonoBehaviour
         {
             int volume = currentActivity.Call<int>("getNowAvg");
 
-            if (volume > (threshold * 1.2))
-                button.GetComponentInChildren<Text>().text = "<color=red>" + volume + "</color>";
+            if (volume > (threshold * 1.5))
+                calibrtaionData.GetComponentInChildren<Text>().text = "<color=red>" + volume + "</color>";
             else if (volume > (threshold * 0.9))
-                button.GetComponentInChildren<Text>().text = volume.ToString();
+                calibrtaionData.GetComponentInChildren<Text>().text = volume.ToString();
             else if (volume > (threshold * 0.7))
-                button.GetComponentInChildren<Text>().text = "<color=yellow>" + volume + "</color>";
+                calibrtaionData.GetComponentInChildren<Text>().text = "<color=yellow>" + volume + "</color>";
             else
-                button.GetComponentInChildren<Text>().text = "<color=grey>" + volume + "</color>";
+                calibrtaionData.GetComponentInChildren<Text>().text = "<color=grey>" + volume + "</color>";
         }
         else
-            button.GetComponentInChildren<Text>().text = "Calibration Start";
+            calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
 	}
 
 	void IncreaseTimer ()
@@ -104,8 +106,6 @@ public class CalibrationView : MonoBehaviour
 		descriptionPanel.SetActive(true);
 		circularProgress.SetActive(true);
         circularProgress.GetComponent<RectTransform>().SetAsLastSibling();
-
-
     }
 
 	public void PopUpSkipButtonClick ()
@@ -128,6 +128,7 @@ public class CalibrationView : MonoBehaviour
             currentActivity.Call("startTestThreshold");
 			#endif
 		} 
+
 		//First Done Button
 		else if (isSilentCalibrationDone == true && isMicroCalibrationDone == false && isSilentDone == false) {//&& button.GetComponentInChildren<Text> ().text == "Done !" ){
             Debug.Log("2");
@@ -138,26 +139,29 @@ public class CalibrationView : MonoBehaviour
 #if USE_ANDROID
             avgSilence = Convert.ToInt32(debugText.text);
 #endif
+#if USE_ANDROID
+        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
+#endif
         }
-		//Microbutton
-		else if(isSilentCalibrationDone == true && isMicroCalibrationDone == false && isSilentDone == true)
+
+        //Microbutton
+        else if(isSilentCalibrationDone == true && isMicroCalibrationDone == false && isSilentDone == true)
         {
             Debug.Log("3");
 #if USE_ANDROID
             currentActivity.Call("startTestThreshold");
 #endif
-            button.GetComponentInChildren<Text>().text = "Calibration Start";
-         
+            calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
             curr_time = 0;
 			silentFlag = true;
 			isMicroCalibrationDone = true;
 		}
 		//2nd Done Button
-		else if(isSilentCalibrationDone == true && isMicroCalibrationDone == true){
-
+		//else if(isSilentCalibrationDone == true && isMicroCalibrationDone == true){
+        else if (isSilentCalibrationDone == true && isMicroCalibrationDone == true) { 
 			popUpWindow.SetActive (false);
-			gameObject.SetActive (false);
-			isCalibrationDone = true;
+			gameObject.SetActive (true);
+			//isCalibrationDone = true;
             //now test volume
 			#if USE_ANDROID
             avgSpeaking = Convert.ToInt32(debugText.text);
@@ -173,9 +177,19 @@ public class CalibrationView : MonoBehaviour
 
 	void ChangeTheText ()
 	{
-		button.GetComponentInChildren<Text> ().text = "Done !";
+     button.GetComponentInChildren<Text> ().text = "Done !";
 		#if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 		#endif
 	}
+
+    public void DoneButtonClick()
+    {
+        gameObject.SetActive(false);
+        isCalibrationDone = true;
+    }
+    public void RestartButtonClick()
+    {
+
+    }
 }

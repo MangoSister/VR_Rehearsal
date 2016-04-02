@@ -45,18 +45,17 @@ public class NavigationView : MonoBehaviour {
     public GameObject loadingView;
     public GameObject downloadButton;
     public Sprite[] thumbnails;  // 0 folder, 1 files , 2 pics.
+    bool isOkToDown;
 
     //Customize Data
     string showCaseName;
     int audience;
     int roomSize;
     int timer;
-
-    
-
+    string extentionFormat;
 
     void Start() {
-		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+		
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -119,9 +118,12 @@ public class NavigationView : MonoBehaviour {
 
         _userDrive.Setup(_googleDirve);
         _userDrive.Initialize(cloudType);
-        _userDrive.StartAuthentication(delegate ()
+        _userDrive.StartAuthentication(delegate (bool res)
         {
-            _userDrive.GetFileListFromPath("/", CreatePanels);
+            if (res)
+            {
+                _userDrive.GetFileListFromPath("/", CreatePanels);
+            }
         });
 
     }
@@ -168,7 +170,7 @@ public class NavigationView : MonoBehaviour {
 
     public void CreatePanels(string fileList)
     {
-
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         JSONNode parseResult = JSON.Parse(fileList);
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;
@@ -199,11 +201,10 @@ public class NavigationView : MonoBehaviour {
             }else {
                 string resFileName = parseResult["entries"][index]["name"].Value;
                 string[] elements = resFileName.Split('.');
-                string extentionFormat = elements[elements.Length - 1];
-                Debug.Log("1 . File Name :" + resFileName + "L");
-                Debug.Log("2 . ExtentionFormat :" + elements[elements.Length - 1] + "L");
-
-                Debug.Log("3. Folder??:" + parseResult["entries"][index][".tag"].Value + "L");
+                extentionFormat = elements[elements.Length - 1];
+               //  Debug.Log("1 . File Name :" + resFileName + "L");
+               // Debug.Log("2 . ExtentionFormat :" + elements[elements.Length - 1] + "L");
+               // Debug.Log("3. Folder??:" + parseResult["entries"][index][".tag"].Value + "L");
                 if (extentionFormat.Split(' ').Length - 1 > 0) {
                     extentionFormat = extentionFormat.Substring(0, extentionFormat.Length - 1);
                 }
@@ -260,37 +261,50 @@ public class NavigationView : MonoBehaviour {
 
     public void DownloadButtonClicked()
     {
-      
-            try { 
-            if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
+          foreach(GameObject btn in storedButton)
+        {
+            if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
             {
-                ShowLoadingPanel();
-                string str = _userDrive.GetRecentPath();
-
-                _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
-                customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
-                _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
-                {
-                    Debug.Log("fileDownLoad Complete");
-                    StartCoroutine("CompleteDownloading");
-                    //  isNavigationDone = true;
-                    //  gameObject.SetActive(false);
-                    //   CustomizePanel();
-
-                }, delegate (int totalFileNum, int completedFileNum)
-                {
-                    progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
-                });
+                isOkToDown = true;
             }
             else
             {
-                Debug.Log("you can;t download");
+                isOkToDown = false;
+                Debug.Log("dfd");
             }
+            
+        }
+        if (isOkToDown == true)
+        {
+            try
+            {
+                if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
+                {
+
+                    ShowLoadingPanel();
+                    string str = _userDrive.GetRecentPath();
+
+                    _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
+                    customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
+                    _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
+                    {
+                        Debug.Log("fileDownLoad Complete");
+                        StartCoroutine("CompleteDownloading");
+                    }, delegate (int totalFileNum, int completedFileNum)
+                    {
+                        progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+                    });
+                }
+                else
+                {
+                    Debug.Log("you can;t download");
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.Log(e.ToString());
             }
+        }
         
     }
     public void ShowLoadingPanel()
