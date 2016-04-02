@@ -56,7 +56,7 @@ public class NavigationView : MonoBehaviour {
 
 
     void Start() {
-		ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+		
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -168,7 +168,7 @@ public class NavigationView : MonoBehaviour {
 
     public void CreatePanels(string fileList)
     {
-
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         JSONNode parseResult = JSON.Parse(fileList);
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;

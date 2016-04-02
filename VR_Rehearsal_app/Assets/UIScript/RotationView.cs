@@ -6,10 +6,13 @@ public class RotationView : MonoBehaviour {
     public GameObject prepHouse;
     private SetupManager _setManager;
     public bool _isRotate = false;
+    public GameObject verPanel;
+    public GameObject landPanel;
     // Use this for initialization
     void Start () {
         isRotationDone = false;
-        
+        verPanel.SetActive(true);
+        landPanel.SetActive(false);   
 	}
 	
 	// Update is called once per frame
@@ -44,7 +47,8 @@ public class RotationView : MonoBehaviour {
     void ChangeLandscapeImage()
     {
         if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight) {
-            
+            verPanel.SetActive(false);
+            landPanel.SetActive(true);
         }
     }
 }
