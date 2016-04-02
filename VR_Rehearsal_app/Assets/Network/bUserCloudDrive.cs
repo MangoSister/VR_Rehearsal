@@ -26,22 +26,16 @@ public class bUserCloudDrive  {
         }
 
         switch (type) {
-            case 1:
-                _type = eCloudType.bCloudDrive;
-                if (_bDriveAPI == null) {
-                    _bDriveAPI = new bDropboxAPI();
-                }
-               
+		case 1:
+			_type = eCloudType.bCloudDrive;
+				_bDriveAPI = new bDropboxAPI ();
                 break;
             case 2:
                 _type = eCloudType.GoogleDrive;
                 break;
             case 3:
                 _type = eCloudType.bCloudDrive;
-                if (_bDriveAPI == null) {
-                    _bDriveAPI = new bLocalDriveAPI();
-                }
-                
+				 _bDriveAPI = new bLocalDriveAPI();
                 break;
         }
     }
