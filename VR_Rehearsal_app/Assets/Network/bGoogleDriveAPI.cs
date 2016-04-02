@@ -101,7 +101,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		} else {
 			currPath.Clear ();
 		}
-
+	
     }
 
 	public void StartAuthentication(bhClowdDriveAPI.Authentication_Callback callback){
@@ -138,17 +138,18 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		
 		string id = "";
 		if (_selectedFolderName != "") {
+			/*
 			string removedLastWhiteSpace = "";
 
 			for (int i = 0; i < _selectedFolderName.Length - 1; i++) {
 				removedLastWhiteSpace += _selectedFolderName [i];
-			}
+			}*/
 
-			bool res = _filesDictionary.ContainsKey (removedLastWhiteSpace);
-			if (_filesDictionary != null &&_filesDictionary.ContainsKey(removedLastWhiteSpace)) {
-				id = _filesDictionary [removedLastWhiteSpace].ID;
+			bool res = _filesDictionary.ContainsKey (_selectedFolderName);
+			if (_filesDictionary != null &&_filesDictionary.ContainsKey(_selectedFolderName)) {
+				id = _filesDictionary [_selectedFolderName].ID;
 			}
-			recentFolderName = removedLastWhiteSpace;
+			recentFolderName = _selectedFolderName;
 
 			bool isDuplicated = false;
 			foreach(string Path in currPath){
@@ -156,6 +157,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					isDuplicated = true;
 				}
 			}
+
 			if (!isDuplicated) {
 				currPath.Add (id);
 			}
@@ -183,17 +185,20 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_updateList_callback = callback; 
 		_isUpdateListProcessing = true;
 
-		int parentIdx = currPath.Count - 2;
+		int parentIdx = currPath.Count - 1;
 		if (parentIdx < 0)
 			parentIdx = 0;
 		
-		string bbbRes = currPath[parentIdx];
-
 		if (parentIdx != 0) {
 			currPath.RemoveAt(currPath.Count - 1);
 		}
 
+		parentIdx -= 1;
+		if (parentIdx < 0)
+			parentIdx = 0;
 
+		string bbbRes = currPath[parentIdx];
+			
 		StartCoroutine (GetFileLists_internal (bbbRes, delegate() {
 			_isUpdateListDone = true;
 			_isUpdateListProcessing = false;
@@ -202,6 +207,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
     public string GetRecentPath()
     {
+		if (recentFolderID == "") 
+			return "";
+		else
         return recentFolderName;
     }
 
@@ -254,9 +262,9 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		foreach(KeyValuePair<string, GoogleDrive.File> file in Dict){
 			if (file.Value.MimeType == "application/vnd.google-apps.folder") {
-                jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\"" + file.Key + " \",\n },\n ";
+                jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\"" + file.Key + "\",\n },\n ";
 			} else {
-                jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\"" + file.Key + " \",\n },\n ";
+                jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\"" + file.Key + "\",\n },\n ";
             }
 		}
 
@@ -285,6 +293,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					#endif
 				} else {
 					_filesDictionary.Add (file.Title, file);
+
 					if (file.IsFolder == true) {
 						parentFolderID = file.Parents [0];
 					}
