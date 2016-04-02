@@ -250,6 +250,7 @@ public class NavigationView : MonoBehaviour {
                 if (_button.GetComponent<ButtonType>().buttonType == "folder")
                 {
                     CreateButtons(_button.GetComponent<ButtonType>().buttonName);
+					break;
                 }
 
 				_button.GetComponent<ButtonType> ().isSelected = false; 
