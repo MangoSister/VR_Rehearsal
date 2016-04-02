@@ -9,6 +9,7 @@ public class RotationView : MonoBehaviour {
     // Use this for initialization
     void Start () {
         isRotationDone = false;
+        
 	}
 	
 	// Update is called once per frame
@@ -16,6 +17,7 @@ public class RotationView : MonoBehaviour {
         if (_isRotate == true)
         {
             IsRotate();
+            ChangeLandscapeImage();
         }
     }
     void IsRotate()
@@ -38,5 +40,11 @@ public class RotationView : MonoBehaviour {
     public void SetRotation(bool rotation)
     {
         _isRotate = rotation;
+    }
+    void ChangeLandscapeImage()
+    {
+        if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight) {
+            
+        }
     }
 }
