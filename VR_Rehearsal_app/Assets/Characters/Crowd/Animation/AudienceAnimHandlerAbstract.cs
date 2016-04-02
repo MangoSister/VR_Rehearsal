@@ -11,7 +11,7 @@ public abstract class AudienceAnimHandlerAbstract : MonoBehaviour
 
     public static Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.1f;
     public static float eyeIconScale = 0.05f;
-    public static float eyeIconFreq = 6f;
+    public static float eyeIconFreq = 1f;
     public static GameObject eyeIconPrefab;
 
     public abstract void UpdateStateAnim();

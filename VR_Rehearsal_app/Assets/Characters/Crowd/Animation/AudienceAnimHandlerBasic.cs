@@ -10,20 +10,28 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
 
     public GameObject eyeIcon;
     private Coroutine _currEyeIconCR = null;
+    private bool _eyeIconToggle = false;
     public bool eyeIconToggle
     {
-        get { return eyeIcon != null && eyeIcon.activeSelf; }
+        get { return _eyeIconToggle; }
         set
         {
             if (eyeIcon != null)
             {
-                eyeIcon.SetActive(value);
                 if (value == true)
                 {
-                    _currEyeIconCR = StartCoroutine(IconAnimation_CR());
+                    if (!_eyeIconToggle)
+                    {
+                        _eyeIconToggle = value;
+                        eyeIcon.SetActive(value);
+                        if (_currEyeIconCR == null)
+                            _currEyeIconCR = StartCoroutine(IconAnimation_CR());
+                    }
                 }
                 else
                 {
+                    _eyeIconToggle = value;
+                    eyeIcon.SetActive(false);
                     if (_currEyeIconCR != null)
                     {
                         StopCoroutine(_currEyeIconCR);
@@ -38,12 +46,20 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
 
     private IEnumerator IconAnimation_CR()
     {
-        while (true)
+        float initScale = 0.8f;
+        float currTime = 0f, totalTime = 1f / eyeIconFreq;
+        while (currTime < totalTime)
         {
-            eyeIcon.transform.localScale = Vector3.one *
-                eyeIconScale * (0.1f * Mathf.Sin(Time.time * eyeIconFreq) + 1f);
+            float currScale = Mathf.Lerp(initScale, 1f, currTime * eyeIconFreq);
+            eyeIcon.transform.localScale = Vector3.one * eyeIconScale * currScale;
+            currTime += Time.deltaTime;
+            //eyeIcon.transform.localScale = Vector3.one *
+              //  eyeIconScale * (0.1f * Mathf.Sin(Time.time * eyeIconFreq) + 1f);
             yield return null;
         }
+
+        eyeIcon.SetActive(false);
+        _currEyeIconCR = null;
     }
 
     public override void UpdateStateAnim()
