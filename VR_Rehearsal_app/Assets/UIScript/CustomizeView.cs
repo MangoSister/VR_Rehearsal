@@ -27,6 +27,7 @@ public class CustomizeView : MonoBehaviour  {
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
      void Start () {
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         isCustomizeDone = false;
     }
 
