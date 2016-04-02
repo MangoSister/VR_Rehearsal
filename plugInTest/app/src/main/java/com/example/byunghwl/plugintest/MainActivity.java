@@ -233,7 +233,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             track.release();
         }
         catch (Exception e) {e.printStackTrace();}
-        
+
         if (volumeTestSampleCount == 0)
             return 0;
         else
@@ -350,6 +350,12 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         result += "]}";
         VADRecord.clear();
         return result;
+    }
+
+
+    public void initialize_recordNplayback(String filename, int newThreshold) {
+        vThreshold = newThreshold;
+        initialize_recordNplayback(filename);
     }
 
    // public void startRecording(String filename){
