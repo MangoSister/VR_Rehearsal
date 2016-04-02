@@ -69,7 +69,7 @@ public class SceneController : MonoBehaviour
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 
-        //PresentationData.in_EnvType = EnvType.ConferenceRoom;
+        PresentationData.in_EnvType = EnvType.ConferenceRoom;
         LoadEnv();
         LoadLights();
 
