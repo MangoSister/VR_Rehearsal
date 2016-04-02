@@ -12,6 +12,9 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 	public override bool GetFileListFromPath (string path, fileList_Callback callback){
 		_recentPath = path;
 
+		if (!Directory.Exists (_recentPath))
+			return false;
+
 		string jsonStr = "{\n   \"entries\":[\n   ";
 		string[] files = Directory.GetFiles (path);
 		string[] folders = Directory.GetDirectories (path);
@@ -19,12 +22,12 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 		foreach (string file in files) {
 			string[] stringSeparators = new string[] {"/", "\\"};
 			string[] result = file.Split(stringSeparators, StringSplitOptions.None);
-			jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\""+  result[result.Length - 1] + " \",\n },\n ";
+			jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\""+  result[result.Length - 1] + "\",\n },\n ";
 		}
 		foreach (string folder in folders) {
 			string[] stringSeparators = new string[] {"\\", "/"};
 			string[] result = folder.Split(stringSeparators, StringSplitOptions.None);
-			jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\""+  result[result.Length - 1] + " \",\n },\n ";
+			jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\""+  result[result.Length - 1] + "\",\n },\n ";
 		}
 
 		jsonStr += " ],\n }";
@@ -44,7 +47,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 		//example
 		//recentFolder = "aaa/bbb/ccc"
 		//cut it = "aaa/bbb/"
-		for (int i = 0; i < (result.Length -1 ); ++i) {
+		for (int i = 0; i < (result.Length -2 ); ++i) {
 
             if (i == 0)
             {
@@ -54,6 +57,10 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
                 _recentPath += "/" + result[i];
             } 
 
+		}
+
+		if (_recentPath == "") {
+			_recentPath = "/";
 		}
 
 		GetFileListFromPath (_recentPath, callback);
@@ -68,14 +75,15 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 			_recentPath += "/" + _selectedFolderName;
 		}
 
+		_recentPath += "/";
+
 		GetFileListFromPath (_recentPath, callback);
 		return true;
 	}
 
 	public override bool DownloadFile (string filename, string savePath,string saveName, fileDownload_Callback callback){
 
-
-		File.Move( (_recentPath + "/" + filename ), (savePath + "/" + saveName ));
+		File.Copy( (_recentPath + "/" + filename ), (savePath + "/" + saveName ));
 		callback ();
 		return true;
 	}
@@ -88,7 +96,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 				Directory.CreateDirectory(saveFolderPath);
 			}	
 
-			var parseResult = JSON.Parse (resJson);
+			JSONNode parseResult = JSON.Parse (resJson);
 			for (int index = 0; index < parseResult ["entries"].Count; index++) {
 				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
 					DownloadFile (parseResult ["entries"] [index] ["name"].Value, saveFolderPath, parseResult ["entries"] [index] ["name"].Value, delegate() {
