@@ -145,22 +145,9 @@ public static class PresentationData
     public enum EnvType
     {
         RPIS,
+        ConferenceRoom,
+        EmptySpace,
     }
-
-    //Lightmap & Lightprbes setting
-    public struct LightingInfo
-    {
-        public string near;
-        public string far;
-        public string probes;
-        public LightingInfo(string near, string far, string probes)
-        { this.near = near; this.far = far; this.probes = probes; }
-    }
-
-    public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
-    {
-        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_1", "lightprobes") }
-    };
 
     //Input
     public static EnvType in_EnvType;

@@ -25,6 +25,8 @@ public class RecordingWrapper : MonoBehaviour
     public string recordingFilePath;
 
     private List<KeyValuePair<bool, int>> fluencyRecord;
+
+    //Return cumulative time record of the speaker's fluency (from voice plugin)
     public List<KeyValuePair<bool, int>> outputFluencyRecord
     {
         get
@@ -60,7 +62,7 @@ public class RecordingWrapper : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public void Init()
     {
         recordingFilePath = Application.persistentDataPath + "/record.pcm";
         fluencyRecord = new List<KeyValuePair<bool, int>>();

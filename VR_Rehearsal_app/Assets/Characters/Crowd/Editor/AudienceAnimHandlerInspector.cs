@@ -98,9 +98,9 @@ public class AudienceAnimHandlerInspector : Editor
             if (AudienceAnimClipHolder.curr != null)
             {
                 EditorGUILayout.LabelField("Clip Shuffle", EditorStyles.boldLabel);
-                ShowArray(ref AudienceAnimClipHolder.curr.focusedClips, "Focused Clips");
-                ShowArray(ref AudienceAnimClipHolder.curr.boredClips, "Bored Clips");
-                ShowArray(ref AudienceAnimClipHolder.curr.chattingClips, "Chatting Clips");
+                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.focusedClips, "Focused Clips");
+                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.boredClips, "Bored Clips");
+                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.chattingClips, "Chatting Clips");
             }
             else
                 EditorGUILayout.LabelField("No Basic Clips Holder Found!", EditorStyles.boldLabel);
@@ -108,22 +108,6 @@ public class AudienceAnimHandlerInspector : Editor
         serializedObject.ApplyModifiedProperties();
     }
 
-    private void ShowArray<T>(ref T[] array, string title) where T : Object
-    {
-        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
-        int num = EditorGUILayout.IntField("Length", array == null ? 0 : array.Length);
-        if (num > 0 && array == null)
-            array = new T[num];
-        else if (num == 0 && array == null)
-            return;
-        else if(array != null && num != array.Length)
-            array = new T[num];
-
-        for (int i = 0; i < num; i++)
-        {
-            array[i] = EditorGUILayout.ObjectField(string.Format("Element {0}", i), array[i], typeof(T), false) as T;
-        }
-    }
 }
 
 #endif
