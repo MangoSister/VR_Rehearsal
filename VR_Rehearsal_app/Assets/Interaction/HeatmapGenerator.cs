@@ -100,11 +100,11 @@ public class HeatmapGenerator : MonoBehaviour
             outputCol[i] = heatmapGradient.Evaluate
 
 				(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
-            outputCol[i].a = 1.0f;
+            outputCol[i].a = 0.5f;
         }
         outofBoundCol = heatmapGradient.Evaluate
 			(Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxElementTime)));
-		outofBoundCol.a = 1.0f;
+		outofBoundCol.a = 0.5f;
 
         heatmap.SetPixels(outputCol);
         heatmap.Apply();
