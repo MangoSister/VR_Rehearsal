@@ -4,15 +4,19 @@ using System.Collections;
 public class RotationView : MonoBehaviour {
     static public bool isRotationDone;
     public GameObject prepHouse;
-    private SetupManager _setManager;
     public bool _isRotate = false;
     public GameObject verPanel;
     public GameObject landPanel;
+    private SetupManager _setManager;
+    public float width = 16;
+    public float height = 9f;
+    public GameObject camera;
     // Use this for initialization
     void Start () {
         isRotationDone = false;
+        landPanel.SetActive(false);
         verPanel.SetActive(true);
-        landPanel.SetActive(false);   
+      
 	}
 	
 	// Update is called once per frame
@@ -25,8 +29,10 @@ public class RotationView : MonoBehaviour {
     }
     void IsRotate()
     {
+        
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
+            ChangeLandscapeImage();
            // _setManager.BShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
@@ -46,9 +52,8 @@ public class RotationView : MonoBehaviour {
     }
     void ChangeLandscapeImage()
     {
-        if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight) {
-            verPanel.SetActive(false);
-            landPanel.SetActive(true);
-        }
+        camera.GetComponent<Camera>().aspect = width / height;
+        verPanel.SetActive(false);
+        landPanel.SetActive(true);
     }
 }
