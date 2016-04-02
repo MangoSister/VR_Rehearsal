@@ -400,8 +400,11 @@ public class UIManager : MonoBehaviour {
     public void DropboxClicked()
     {
         bDriveAPI = new bDropboxAPI();
-        bDriveAPI.StartAuthentication(delegate() {
-			bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+        bDriveAPI.StartAuthentication(delegate(bool res) {
+            if (res)
+            {
+                bDriveAPI.GetFileListFromPath("/", CreatePanels__);
+            }
        });
    
         ShowNavigationPanel();
