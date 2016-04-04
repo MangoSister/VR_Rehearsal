@@ -9,7 +9,6 @@
  * 
  */
 
-#if UNITY_EDITOR
 
 using UnityEngine;
 using UnityEditor;
@@ -25,10 +24,35 @@ using System.Linq;
 public class spaceInfoExpoter : MonoBehaviour {
 
 	public string mapName;
-	public Transform[] seatTransform;
+	public GameObject[] chairUnits;
+	public float intervalUnit_row;
+	public float intervalUnit_col;
 	public int seatRowNum;
 	public int seatColNum;
-	
+
+
+	public Transform[] seatTransform;
+
+
+	public void Dispose(){
+		seatTransform = new Transform[seatRowNum * seatColNum];
+
+		int idx = 0;
+		for (int r = 0; r <seatRowNum; r++) {
+			for(int c = 0; c <seatColNum; c++){
+				float rowPos = r * intervalUnit_row + this.transform.position.x ;
+				float colPos = c * intervalUnit_col + this.transform.position.z ;
+				
+				GameObject tempInstance = (GameObject)Instantiate(chairUnits[UnityEngine.Random.Range(0,chairUnits.Length)], new Vector3( rowPos, 0, colPos), Quaternion.identity);
+				tempInstance.transform.parent = this.transform;
+
+				seatTransform[idx] = tempInstance.transform;
+				idx++;
+			}
+		}
+	}
+
+
 	public void Export(){
 
 		if (mapName.Length == 0 && seatTransform.Length == 0 && seatRowNum == 0 && seatColNum ==0 ) {
@@ -37,7 +61,7 @@ public class spaceInfoExpoter : MonoBehaviour {
 		}
 
 		#if UNITY_EDITOR
-		string savePath = Application.dataPath + "/BH_EnvironmentOpt/EnvroInfo/" + mapName + ".bhm";
+		string savePath = Application.dataPath + "/BH_EnvironmentOpt/EnvroInfo/" + mapName + ".bytes";
 		#elif UNITY_ANDROID 
 		string savePath = Application.persistentDataPath + "MapInfo/" + mapName + ".bhm";
 		#endif
@@ -204,7 +228,14 @@ public class spaceInfoExpoter : MonoBehaviour {
 		}
 	}
 
+	public void DeleteAll(){
+		int childs = transform.childCount;
+		for (int i = childs - 1; i > 0; i--)
+		{
+			GameObject.DestroyImmediate(transform.GetChild(i).gameObject);
+		}
+	}
+
 
 }
 
-#endif
