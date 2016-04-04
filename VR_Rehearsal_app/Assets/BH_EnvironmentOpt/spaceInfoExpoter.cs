@@ -1,14 +1,5 @@
-﻿/*
- * Exporting all meshes from Unity 
- * updated : 2/4 2016
- * by Byunghwan Lee
- * 
- * - 대상 오브젝트에 대해 static 옵션을 모두 풀어줄 것 주의
- * - 이름과 Transform 데이타 필요 주의
- * 
- * 
- */
-
+﻿
+#if UNITY_EDITOR
 
 using UnityEngine;
 using UnityEditor;
@@ -241,3 +232,4 @@ public class spaceInfoExpoter : MonoBehaviour {
 
 }
 
+#endif
