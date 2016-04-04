@@ -77,9 +77,11 @@ public class spaceInfoExpoter : MonoBehaviour {
 				w.Write(seatTransform[i].localPosition.y );
 				w.Write(seatTransform[i].localPosition.z );
 
+				w.Write(seatTransform[i].localRotation.w );
 				w.Write(seatTransform[i].localRotation.x );
 				w.Write(seatTransform[i].localRotation.y );
 				w.Write(seatTransform[i].localRotation.z );
+
 			}
 
 			w.Close();
