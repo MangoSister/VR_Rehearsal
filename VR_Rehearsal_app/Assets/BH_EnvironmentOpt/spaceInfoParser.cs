@@ -34,7 +34,7 @@ public static class spaceInfoParser
 			numOfSeat = parsedData.seat_RowNum * parsedData.seat_ColNum;
 			
 			parsedData.seat_posVecs = new Vector3[numOfSeat];
-			parsedData.seat_rotVecs = new Vector3[numOfSeat];
+			parsedData.seat_rotQuans = new Quaternion[numOfSeat];
 			
 			for(int i =0; i < numOfSeat; ++i){
 				
