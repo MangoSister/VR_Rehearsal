@@ -73,13 +73,13 @@ public class spaceInfoExpoter : MonoBehaviour {
 			w.Write(System.Convert.ToInt32(seatColNum)); 
 			
 			for(int i =0; i < seatTransform.Length; ++i){
-				w.Write(seatTransform[i].position.x );
-				w.Write(seatTransform[i].position.y );
-				w.Write(seatTransform[i].position.z );
+				w.Write(seatTransform[i].localPosition.x );
+				w.Write(seatTransform[i].localPosition.y );
+				w.Write(seatTransform[i].localPosition.z );
 
-				w.Write(seatTransform[i].rotation.x );
-				w.Write(seatTransform[i].rotation.y );
-				w.Write(seatTransform[i].rotation.z );
+				w.Write(seatTransform[i].localRotation.x );
+				w.Write(seatTransform[i].localRotation.y );
+				w.Write(seatTransform[i].localRotation.z );
 			}
 
 			w.Close();
