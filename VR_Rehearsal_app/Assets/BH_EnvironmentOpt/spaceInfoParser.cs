@@ -15,7 +15,7 @@ public static class spaceInfoParser
 		public int seat_RowNum;
 		public int seat_ColNum;
 		public Vector3[] seat_posVecs;
-		public Vector3[] seat_rotVecs;
+		public Quaternion[] seat_rotQuans;
 
 	}
 
@@ -23,7 +23,7 @@ public static class spaceInfoParser
 
 		int numOfSeat;
 		parsedData_spaceInfo parsedData = new parsedData_spaceInfo ();
-		TextAsset obj = Resources.Load("MapInfo/" + mapName) as TextAsset;;
+		TextAsset obj = Resources.Load("MapInfo/" + mapName) as TextAsset;
 		Stream s = new MemoryStream(obj.bytes);
 
 		using(var r = new BinaryReader(s)){
@@ -34,17 +34,18 @@ public static class spaceInfoParser
 			numOfSeat = parsedData.seat_RowNum * parsedData.seat_ColNum;
 			
 			parsedData.seat_posVecs = new Vector3[numOfSeat];
-			parsedData.seat_rotVecs = new Vector3[numOfSeat];
+			parsedData.seat_rotQuans = new Quaternion[numOfSeat];
 			
 			for(int i =0; i < numOfSeat; ++i){
 				
 				parsedData.seat_posVecs[i].x = r.ReadSingle();
 				parsedData.seat_posVecs[i].y = r.ReadSingle();
 				parsedData.seat_posVecs[i].z = r.ReadSingle();
-				
-				parsedData.seat_rotVecs[i].x = r.ReadSingle();
-				parsedData.seat_rotVecs[i].y = r.ReadSingle();
-				parsedData.seat_rotVecs[i].z = r.ReadSingle();
+
+				parsedData.seat_rotQuans[i].w = r.ReadSingle();
+				parsedData.seat_rotQuans[i].x = r.ReadSingle();
+				parsedData.seat_rotQuans[i].y = r.ReadSingle();
+				parsedData.seat_rotQuans[i].z = r.ReadSingle();
 				
 			}
 			
@@ -52,11 +53,9 @@ public static class spaceInfoParser
 #if UNITY_EDITOR
         Debug.Log("Load complete");
 #endif
+        Resources.UnloadAsset(obj);
         return parsedData;
 
-
-
-		return parsedData;
 	}
 	
 }

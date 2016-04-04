@@ -20,19 +20,20 @@ public class SceneController : MonoBehaviour
     }
 
     //Lightmap & Lightprbes setting
-    public struct LightingInfo
+    public struct EnvInfo
     {
-        public string near;
-        public string far;
-        public string probes;
-        public LightingInfo(string near, string far, string probes)
-        { this.near = near; this.far = far; this.probes = probes; }
+        public string lightmapNearPath;
+        public string lightmapFarPath;
+        public string lightProbesPath;
+        public string crowdConfigPath;
+        public EnvInfo(string near, string far, string probes, string crowdConfig)
+        { this.lightmapNearPath = near; this.lightmapFarPath = far; this.lightProbesPath = probes; this.crowdConfigPath = crowdConfig; }
     }
 
-    public static Dictionary<EnvType, LightingInfo> lightingInfoDict = new Dictionary<EnvType, LightingInfo>
+    public static Dictionary<EnvType, EnvInfo> EnvInfoDict = new Dictionary<EnvType, EnvInfo>
     {
-        { EnvType.RPIS, new LightingInfo(null, "Lightmap-0_comp_light_RPIS", "lightprobes_RPIS") },
-        { EnvType.ConferenceRoom, new LightingInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF") }
+        { EnvType.RPIS, new EnvInfo(null, "Lightmap-0_comp_light_RPIS", "lightprobes_RPIS", "rpis_chair") },
+        { EnvType.ConferenceRoom, new EnvInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF", "conferenceRoom_chair") }
     };
 
     [Serializable]
@@ -44,6 +45,13 @@ public class SceneController : MonoBehaviour
 
     [SerializeField]
     public EnvDict envPrefabs = new EnvDict();
+
+#if UNITY_EDITOR
+    [HideInInspector]
+    public bool overrideEnv;
+    [HideInInspector]
+    public EnvType overrideEnvType;
+#endif
 
     public Transform presentDest;
     public Transform roomDoorIn;
@@ -69,10 +77,13 @@ public class SceneController : MonoBehaviour
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 
-        //PresentationData.in_EnvType = EnvType.ConferenceRoom;
-        LoadEnv();
-        LoadLights();
+#if UNITY_EDITOR
+        if (overrideEnv)
+            PresentationData.in_EnvType = overrideEnvType;
+#endif
 
+        LoadEnv();
+        LoadLightProbes(Path.Combine("Lightmaps", EnvInfoDict[PresentationData.in_EnvType].lightProbesPath));
         crowdSim.Init();
 
         recordWrapper.Init();
@@ -88,34 +99,11 @@ public class SceneController : MonoBehaviour
         slidesPlayerCtrl = env.transform.GetComponentInChildren<SlidesPlayerCtrl>();
         exitTrigger = env.transform.GetComponentInChildren<ExitTrigger>();
         exitTrigger.OnExit.AddListener(EndPresentation);
+        crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
         tutManager.slidePlayer = slidesPlayerCtrl.GetComponent<SlidesPlayer>();
         tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
-    }
-
-    private void LoadLights()
-    {
-        //load lightmap
-        LightingInfo info = lightingInfoDict[PresentationData.in_EnvType];
-        //LightmapData data = new LightmapData();
-        //if (info.far != null)
-        //{
-        //    data.lightmapFar = Resources.Load<Texture2D>
-        //        (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.far));
-        //}
-
-        //if (info.near != null)
-        //{
-        //    data.lightmapNear = Resources.Load<Texture2D>
-        //        (Path.Combine(GlobalManager._PRESENT_SCENE_NAME, info.near));
-        //}
-
-        //LightmapSettings.lightmaps = new LightmapData[] { data };
-
-        //load light probe
-        LoadLightProbes(Path.Combine("Lightmaps", info.probes));
-        
     }
 
     private void OperateAmbient(bool enable)

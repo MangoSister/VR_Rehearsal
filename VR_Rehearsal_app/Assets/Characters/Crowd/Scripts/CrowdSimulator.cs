@@ -157,6 +157,7 @@ public class CrowdSimulator : MonoBehaviour
             ad.normalizedPos = (float)(i % tx.seat_ColNum) / (float)tx.seat_ColNum;
             ad.transform.parent = crowdParent;
             ad.transform.localPosition = tx.seat_posVecs[i];
+            ad.transform.localRotation = tx.seat_rotQuans[i];
             audiences.Add(ad);
         }
 
