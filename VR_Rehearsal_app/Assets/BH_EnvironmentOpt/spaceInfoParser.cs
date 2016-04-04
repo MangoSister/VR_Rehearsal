@@ -15,7 +15,7 @@ public static class spaceInfoParser
 		public int seat_RowNum;
 		public int seat_ColNum;
 		public Vector3[] seat_posVecs;
-		public Vector3[] seat_rotVecs;
+		public Quaternion[] seat_rotQuans;
 
 	}
 
@@ -41,10 +41,11 @@ public static class spaceInfoParser
 				parsedData.seat_posVecs[i].x = r.ReadSingle();
 				parsedData.seat_posVecs[i].y = r.ReadSingle();
 				parsedData.seat_posVecs[i].z = r.ReadSingle();
-				
-				parsedData.seat_rotVecs[i].x = r.ReadSingle();
-				parsedData.seat_rotVecs[i].y = r.ReadSingle();
-				parsedData.seat_rotVecs[i].z = r.ReadSingle();
+
+				parsedData.seat_rotQuans[i].w = r.ReadSingle();
+				parsedData.seat_rotQuans[i].x = r.ReadSingle();
+				parsedData.seat_rotQuans[i].y = r.ReadSingle();
+				parsedData.seat_rotQuans[i].z = r.ReadSingle();
 				
 			}
 			
