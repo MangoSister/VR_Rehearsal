@@ -11,6 +11,23 @@ public class RotationView : MonoBehaviour {
     public float width = 16;
     public float height = 9f;
     public GameObject camera;
+    bShowcaseManager.showcase_Data customData;
+    private string _showCaseName;
+    private int _sizeOfRoom;
+    private int _numberOfAudience;
+    private string _localPath;
+    private string _id;
+    private int _expectedTime;
+
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
+    {
+        _showCaseName = showCanseName;
+        _sizeOfRoom = sizeOfRoom;
+        _numberOfAudience = numberOfAudience;
+        _localPath = localPath;
+        _id = id;
+        _expectedTime = time;
+    }
     // Use this for initialization
     void Start () {
         isRotationDone = false;
@@ -33,12 +50,53 @@ public class RotationView : MonoBehaviour {
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
         {
             ChangeLandscapeImage();
-           // _setManager.BShowcaseMgr.End();
+            PresentationData.in_SlidePath = _localPath;
+            PresentationData.in_ExpectedTime = _expectedTime;
+            Debug.Log("local Path = "+_localPath);
+            Debug.Log("expected Time = " + _expectedTime);
+            // the unit of in_ExpectedTime is second
+            PresentationData.in_ExpectedTime = _expectedTime * 60;
+            switch (_sizeOfRoom)
+            {
+                case 0:
+                    PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                    break;
+                case 2:
+                    PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                    break;
+
+                case 3:
+                    PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                    break;
+
+            }
+            // _setManager.BShowcaseMgr.End();
+
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
-          ///  _setManager.BShowcaseMgr.End();
+            PresentationData.in_SlidePath = _localPath;
+            PresentationData.in_ExpectedTime = _expectedTime;
+            Debug.Log("local Path = " + _localPath);
+            Debug.Log("expected Time = " + _expectedTime);
+            // the unit of in_ExpectedTime is second
+            PresentationData.in_ExpectedTime = _expectedTime * 60;
+            switch (_sizeOfRoom)
+            {
+                case 0:
+                    PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                    break;
+                case 2:
+                    PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                    break;
+
+                case 3:
+                    PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                    break;
+
+            }
+            ///  _setManager.BShowcaseMgr.End();
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
     }
