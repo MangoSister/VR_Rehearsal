@@ -195,7 +195,6 @@ public class CrowdSimulatorInspector : Editor
         sim.asseblingRot = Quaternion.Euler(EditorGUILayout.Vector3Field("Assembling Rot", sim.asseblingRot.eulerAngles));
 
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
-        sim.crowdConfigFileName = EditorGUILayout.TextField("Crowd Config File Name", sim.crowdConfigFileName);
         sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);
         sim.stepIntervalExt = EditorGUILayout.FloatField("Step Interval Ext", sim.stepIntervalExt);
         sim.stepIntervalInput = EditorGUILayout.FloatField("Step Interval Input", sim.stepIntervalInput);
