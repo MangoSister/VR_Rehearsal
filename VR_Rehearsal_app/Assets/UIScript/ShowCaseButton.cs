@@ -33,6 +33,7 @@ public class ShowCaseButton : MonoBehaviour {
         _id = id;
         _expectedTime = time;
     }
+
     public void OnShowCaseBUttonClicked()
     {
         PresentationData.in_SlidePath = _localPath;
@@ -50,7 +51,6 @@ public class ShowCaseButton : MonoBehaviour {
             case 3:
                 PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
                 break;
-
           }
         isShowcaseButtonClicked = true;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();

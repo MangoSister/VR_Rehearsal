@@ -198,6 +198,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.STREAM_MUSIC);
         am.setSpeakerphoneOn(false);
+        isKilled = false;
 
         Log.i("MainActivity", "Start volume testing");
         volumeTestSampleCount = 0;
@@ -205,7 +206,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        (new Thread()
+        (recordingThread = new Thread()
         {
             @Override
             public void run()
@@ -226,13 +227,18 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         Log.i("MainActivity", "Stop volume testing");
 
         isRecording = false;
+        isKilled = true;
         try {
             record.stop();
             track.stop();
             record.release();
             track.release();
+
+            recordingThread.join();
         }
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (volumeTestSampleCount == 0)
             return 0;
@@ -316,6 +322,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     private int sampleNumBits = 16;
     private int numChannels = 1;
     private int totalWriteCount = 0;
+    private int flagThread = -1; //thread lock
 
     private Thread recordingThread = null ;
 
@@ -406,6 +413,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private void recordAndPlay() //this is on second thread
     {
+        flagThread = 1;
+
         int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         byte byteData[] = new byte[bufferSizeInBytes];
@@ -494,6 +503,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 countSample = 0;
             }
         }
+
+        flagThread = 0;
     }
     private void startRecordAndPlay() {
         record.startRecording();
@@ -508,13 +519,25 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         bIsVRrecord = false;
     }
 
-    public String prepareReplay() {
+    //public String prepareReplay() {
+    public void prepareReplay() {
         Log.i("MainActivity", "Stopping Recording ~~");
 
         bIsVRrecord = false;
         isRecording = false;
         isKilled = true;
-        recordingThread.interrupt();
+        try {
+            recordingThread.join();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        while (flagThread!=0)
+        {
+            continue;
+        }
 
         record.stop();
         track.stop();
@@ -524,8 +547,9 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         try {outputStream.close();}
         catch (IOException e) {e.printStackTrace();}
 
-        filepath = Environment.getExternalStorageDirectory().getPath();
-        return filepath;
+        //filepath = Environment.getExternalStorageDirectory().getPath();
+
+        Log.i("MainActivity", "Stopped ~~");
     }
 
     private void initRecordAndTrack(){

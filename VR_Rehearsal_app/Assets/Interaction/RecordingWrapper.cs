@@ -107,10 +107,17 @@ public class RecordingWrapper : MonoBehaviour
     }
 
 
-    public void EndRecording()
+    public bool EndRecording()
     {
 #if !UNITY_EDITOR && UNITY_ANDROID
-        currentActivity.Call<string>("prepareReplay");
+        if(currentActivity != null)
+        {
+            currentActivity.Call<string>("prepareReplay");
+            return true;
+        }
+        else return false;
+#else
+        return true;
 #endif
     }
 
