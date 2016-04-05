@@ -110,9 +110,7 @@ public class RecordingWrapper : MonoBehaviour
     public void EndRecording()
     {
 #if !UNITY_EDITOR && UNITY_ANDROID
-        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-        currentActivity.Call<string>("prepareReplay");
+        currentActivity.Call("prepareReplay");
 #endif
     }
 

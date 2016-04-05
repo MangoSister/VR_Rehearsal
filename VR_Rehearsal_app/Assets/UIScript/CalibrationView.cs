@@ -187,10 +187,13 @@ public class CalibrationView : MonoBehaviour
         Debug.Log("threshold = " + threshold);
         calibrtaionData.GetComponent<Text>().text = threshold.ToString();
         gameObject.SetActive(false);
-        isCalibrationDone = true;
+
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
+
+        isCalibrationDone = true;
+
     }
     public void RestartButtonClick()
     {
