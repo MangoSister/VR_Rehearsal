@@ -23,7 +23,7 @@ public static class spaceInfoParser
 
 		int numOfSeat;
 		parsedData_spaceInfo parsedData = new parsedData_spaceInfo ();
-		TextAsset obj = Resources.Load("MapInfo/" + mapName) as TextAsset;;
+		TextAsset obj = Resources.Load("MapInfo/" + mapName) as TextAsset;
 		Stream s = new MemoryStream(obj.bytes);
 
 		using(var r = new BinaryReader(s)){
@@ -53,11 +53,9 @@ public static class spaceInfoParser
 #if UNITY_EDITOR
         Debug.Log("Load complete");
 #endif
+        Resources.UnloadAsset(obj);
         return parsedData;
 
-
-
-		return parsedData;
 	}
 	
 }

@@ -7,6 +7,7 @@ public class CustomizeView : MonoBehaviour  {
 
     public static bool isCustomizeDone;
     private SetupManager _setManager;
+    public GameObject rotationView;
     public GameObject navi;
 
     //Set Name of Showcase
@@ -81,6 +82,7 @@ public class CustomizeView : MonoBehaviour  {
             }
             navi.GetComponent<NavigationView>().storedButton.Clear();
         }
+        rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min);
         isCustomizeDone = true;
         gameObject.SetActive(false);
     }
@@ -93,6 +95,7 @@ public class CustomizeView : MonoBehaviour  {
     {
         _setManager = mg;
     }
+
 
   
   
