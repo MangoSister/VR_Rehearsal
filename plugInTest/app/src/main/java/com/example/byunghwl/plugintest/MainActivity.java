@@ -43,7 +43,7 @@ class VoiceActivityRecord {
     }
 
     public int getTime() { return this.time;}
-    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING
+    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING, 2 = SHOUTING
 }
 
 
@@ -228,17 +228,18 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         isRecording = false;
         isKilled = true;
-        try {
-            record.stop();
-            track.stop();
-            record.release();
-            track.release();
 
+        try {
             recordingThread.join();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        record.stop();
+        track.stop();
+        record.release();
+        track.release();
 
         if (volumeTestSampleCount == 0)
             return 0;
@@ -328,7 +329,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private int lastActivityType = -1;
     private int lastActivityDuration = 0;
-    public String getRecord(){ //in JSON
+    public String getRecord(){
+        //in JSON
         if (isRecording == false)
             return "";
 
