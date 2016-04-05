@@ -1,4 +1,4 @@
-﻿Shader "VR_Rehearsal_app/LightProbeUnlit" 
+﻿Shader "VR_Rehearsal_app/LightProbeDiffuse" 
 {
 	Properties 
 	{

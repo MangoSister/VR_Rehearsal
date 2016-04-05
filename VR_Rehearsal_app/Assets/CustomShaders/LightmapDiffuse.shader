@@ -1,4 +1,4 @@
-﻿Shader "VR_Rehearsal_app/LightmapUnlit"
+﻿Shader "VR_Rehearsal_app/LightmapDiffuse"
 {
 	Properties
 	{
