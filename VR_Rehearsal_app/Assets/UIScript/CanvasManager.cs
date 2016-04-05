@@ -94,10 +94,11 @@ public class CanvasManager : MonoBehaviour {
 
     public void ShowFileTransferView()
     {
-        if (LocalCaseView.isLocalCaseDone)
+        if (LocalCaseView.isLocalCaseDone && localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked==true)
         {
             fileTranser.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
+            localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked = false;
         }
     }
     public void ShowNavigationView()
@@ -113,14 +114,17 @@ public class CanvasManager : MonoBehaviour {
     }
     public void ShowCustomView()
     {
-        if (NavigationView.isNavigationDone)
+         if (NavigationView.isNavigationDone)
         {
             NavigationView.isNavigationDone = false;
             customize.SetActive(true);
             loading.SetActive(false);
         }
     }
-   
+   public void ShowCustomViewFromLocalCaseView()
+    {
+
+    }
     public void ShowCalibrationView()
     {
         if (CustomizeView.isCustomizeDone)
