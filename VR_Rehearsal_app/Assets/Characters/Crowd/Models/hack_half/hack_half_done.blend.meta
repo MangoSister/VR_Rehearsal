@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 4631cad03c68c4a4ead8816d24742df2
-timeCreated: 1456189876
+guid: 259aaa6047258564ba9a22a58c037587
+timeCreated: 1459983717
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
@@ -78,12 +78,37 @@ ModelImporter:
     4300000: Body
     4300002: Shoes
     7400000: Default Take
-    7400002: boring_0
-    7400004: boring_1
-    7400006: chat_L
-    7400008: chat_R
-    7400010: focus_0
-    7400012: focus_1
+    7400002: boring_0_1_L
+    7400004: boring_0_1_R
+    7400006: boring_0_2_L
+    7400008: boring_0_2_R
+    7400010: boring_0_2_rm
+    7400012: boring_1_1
+    7400014: boring_1_2
+    7400016: boring_2_001
+    7400018: boring_2_1_L
+    7400020: boring_2_1_R
+    7400022: boring_2_2_L
+    7400024: boring_2_2_R
+    7400026: boring_2_R_rm
+    7400028: boring_2_rm
+    7400030: boring_3_1
+    7400032: boring_3_2
+    7400034: boring_3_3
+    7400036: boring_3_transit
+    7400038: boring_4_1
+    7400040: chat_1_L
+    7400042: chat_1_R
+    7400044: chat_2_L
+    7400046: chat_2_R
+    7400048: chat_3_L
+    7400050: chat_3_R
+    7400052: chat_R_rm
+    7400054: focus_0
+    7400056: focus_1
+    7400058: focus_3
+    7400060: focus_4_L
+    7400062: focus_4_R
     9500000: //RootNode
     13700000: Body
     13700002: Shoes
@@ -101,7 +126,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    animationCompression: 3
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -114,7 +139,7 @@ ModelImporter:
     globalScale: 0.01
     meshCompression: 0
     addColliders: 0
-    importBlendShapes: 1
+    importBlendShapes: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -129,8 +154,8 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 4
-  importAnimation: 1
+    tangentImportMode: 3
+  importAnimation: 0
   copyAvatar: 0
   humanDescription:
     human: []

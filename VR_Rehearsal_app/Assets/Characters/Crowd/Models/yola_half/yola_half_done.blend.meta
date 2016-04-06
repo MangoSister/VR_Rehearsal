@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 1247955d3bb9c684ba8a8588c0ce32fa
-timeCreated: 1456191167
+guid: 52dbf4f4ff00bba4393981e1e2abeb7d
+timeCreated: 1459983289
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
@@ -75,8 +75,8 @@ ModelImporter:
     400064: mixamorig_Spine2
     400066: Shoes
     400068: //RootNode
-    4300000: Body
-    4300002: Shoes
+    4300000: Shoes
+    4300002: Body
     7400000: Default Take
     9500000: //RootNode
     13700000: Body
@@ -95,7 +95,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    animationCompression: 3
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -123,7 +123,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 4
+    tangentImportMode: 3
   importAnimation: 0
   copyAvatar: 0
   humanDescription:
