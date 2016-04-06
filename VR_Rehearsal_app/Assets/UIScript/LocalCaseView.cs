@@ -15,12 +15,14 @@ public class LocalCaseView : MonoBehaviour {
     public GameObject canvasScroll;
     public RectTransform showCaseContentRect;
     float originalRect;
+    float finalRect;
 
     public GameObject showCasePrefab;
     public GameObject contentRect;
 
     public bool isFileTransferClicked = false;
-    public bool isCustomizeButtonClicked;
+    public static bool isCustomizeButtonClicked;
+    public GameObject customView;
 
     int totalShowcase;
     
@@ -29,29 +31,25 @@ public class LocalCaseView : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        Debug.Log("delete Count " + deleteCount);
         isLocalCaseDone = false;
         isCustomizeButtonClicked = false;
         if (deleteCount == 0)
         {
-            originalRect = showCaseContentRect.offsetMin.y;
             CheckLocalPPT();
         }
         else
         {
            if(totalShowcase > 7)
             {
-                GridLayoutGroup gLayout_showCase = contentRect.GetComponent<GridLayoutGroup>();
-                float cellSize = gLayout_showCase.cellSize.y;
-                float span = gLayout_showCase.spacing.y;
-                float totalSizeofRect = (cellSize - (span / 2)) * totalShowcase;
-                originalRect = originalRect - (originalRect + (totalSizeofRect / 2));
                 CheckLocalPPT();
             }
             else
             {
+                GridLayoutGroup gLayout_showCase = contentRect.GetComponent<GridLayoutGroup>();
+                gLayout_showCase.padding.top = -580;
                 CheckLocalPPT();
             }
-        
         }
         GetComponent<RectTransform>().SetAsLastSibling();
     }
@@ -79,11 +77,13 @@ public class LocalCaseView : MonoBehaviour {
         float cellSize = gLayout_showCase.cellSize.y;
         float span = gLayout_showCase.spacing.y;
         float totalSizeofRect = (cellSize - (span/2)) * caseDatas.Length;
+        finalRect = -(originalRect + (totalSizeofRect / 2));
         totalShowcase = caseDatas.Length;
         if (caseDatas!=null)
         {
             if (caseDatas.Length < 7)
             {
+                gLayout_showCase.padding.top = -580;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
                 showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, originalRect);
             }
@@ -91,7 +91,7 @@ public class LocalCaseView : MonoBehaviour {
             {
                 gLayout_showCase.padding.top = -68;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
-                showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, -(originalRect + (totalSizeofRect/2)));
+                showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, finalRect);
             }
 
             for (int i = 0; i < caseDatas.Length; ++i)
@@ -139,17 +139,16 @@ public class LocalCaseView : MonoBehaviour {
     {
         _setManager.BShowcaseMgr.DeleteShowcase(deleteID);
         deleteCount++;
-        Debug.Log(deleteCount);
         Start();
-     
-
     }
+
      public void EditShowCase(string _title, int _sizeOfRoom, int _audience, string _localPath, string _id, int _time)
     {
         Debug.Log("call Edit Function");
+        customView.GetComponent<CustomizeView>().SetPPTID(_id);
+        customView.GetComponent<CustomizeView>().SetCustomValueFromLocalView(_title, _sizeOfRoom, _audience, _localPath, _time);
+        // _setManager.BShowcaseMgr.EditShowcase(_id,_title,_sizeOfRoom,_localPath,_audience,_time);
         isCustomizeButtonClicked = true;
-        _setManager.BShowcaseMgr.EditShowcase(_title, _sizeOfRoom.ToString(), _audience, _localPath, int.Parse(_id), _time);
     }
-
-   
+ 
 }

@@ -80,7 +80,10 @@ public class CanvasManager : MonoBehaviour {
         ShowCalibrationView();
         ShowRotationView();
         NavigationBetweenView();
-        
+        ShowCustomViewFromLocalCaseView();
+        ShowCustomViewToLocalView();
+
+
     }
     public void ShowLocasShowView()
     {
@@ -123,7 +126,24 @@ public class CanvasManager : MonoBehaviour {
     }
    public void ShowCustomViewFromLocalCaseView()
     {
-
+        if (LocalCaseView.isCustomizeButtonClicked)
+        {
+            LocalCaseView.isCustomizeButtonClicked = false;
+            localShowCase.SetActive(false);
+            customize.SetActive(true);
+        }
+    }
+    public void ShowCustomViewToLocalView()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            if (customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
+            {
+                customize.SetActive(false);
+                localShowCase.SetActive(true);
+                customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
+            }
+        }
     }
     public void ShowCalibrationView()
     {

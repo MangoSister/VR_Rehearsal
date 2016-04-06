@@ -68,6 +68,5 @@ public class ShowCaseButton : MonoBehaviour {
         Debug.Log("Customize Button Clicked");
         isCustomizeButtonClicked = true;
         GameObject.Find("LocalCaseCanvas").GetComponent<LocalCaseView>().EditShowCase(_showCaseName, _sizeOfRoom,_numberOfAudience,_localPath, _id,_expectedTime);
-
     }
 }
