@@ -63,8 +63,7 @@ public class SceneController : MonoBehaviour
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
-    public SlidesPlayerCtrl slidesPlayerCtrl;
-    public ExitTrigger exitTrigger;
+    public TriggerCtrl slidesPlayerCtrl;
     public Tutorial_PptKaraoke tutManager;
 
     private AudioUnit _ambientUnit = null;
@@ -96,9 +95,8 @@ public class SceneController : MonoBehaviour
     private void LoadEnv()
     {
         GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
-        slidesPlayerCtrl = env.transform.GetComponentInChildren<SlidesPlayerCtrl>();
-        exitTrigger = env.transform.GetComponentInChildren<ExitTrigger>();
-        exitTrigger.OnExit.AddListener(EndPresentation);
+        slidesPlayerCtrl = env.transform.GetComponentInChildren<TriggerCtrl>();
+        slidesPlayerCtrl.OnExit += EndPresentation;
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
@@ -135,7 +133,9 @@ public class SceneController : MonoBehaviour
 
     public void EndPresentation()
     {
+        slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
         recordWrapper.EndRecording();
+        slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
 #if UNITY_ANDROID
         Screen.orientation = ScreenOrientation.AutoRotation;
 #endif

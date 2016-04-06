@@ -29,6 +29,7 @@ public abstract class bhClowdDriveAPI{
 
 	public abstract void Update (); 
 	public abstract string GetRecentPath ();
+	public abstract void Revoke ();
 
 	public bool Validator(object sender,X509Certificate certificate,X509Chain chain,SslPolicyErrors policyErrors){
 		return true;

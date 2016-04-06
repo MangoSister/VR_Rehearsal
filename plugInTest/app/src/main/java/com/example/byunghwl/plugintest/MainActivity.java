@@ -43,7 +43,7 @@ class VoiceActivityRecord {
     }
 
     public int getTime() { return this.time;}
-    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING
+    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING, 2 = SHOUTING
 }
 
 
@@ -198,6 +198,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.STREAM_MUSIC);
         am.setSpeakerphoneOn(false);
+        isKilled = false;
 
         Log.i("MainActivity", "Start volume testing");
         volumeTestSampleCount = 0;
@@ -205,7 +206,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        (new Thread()
+        (recordingThread = new Thread()
         {
             @Override
             public void run()
@@ -226,13 +227,19 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         Log.i("MainActivity", "Stop volume testing");
 
         isRecording = false;
+        isKilled = true;
+
         try {
-            record.stop();
-            track.stop();
-            record.release();
-            track.release();
+            recordingThread.join();
         }
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        record.stop();
+        track.stop();
+        record.release();
+        track.release();
 
         if (volumeTestSampleCount == 0)
             return 0;
@@ -321,7 +328,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private int lastActivityType = -1;
     private int lastActivityDuration = 0;
-    public String getRecord(){ //in JSON
+    public String getRecord(){
+        //in JSON
         if (isRecording == false)
             return "";
 
@@ -372,8 +380,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         if (filepath.length()==0){
             filepath = Environment.getExternalStorageDirectory().getPath() +"/record.pcm";
         }
-
-
         Log.i("MainActivity", "Will write file to '"+filepath+"'");
 
         //create a file to record the voice
@@ -463,15 +469,19 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 int sNew = 0; //status of new sample, status = speak or not speak
                 int avgAmplifier = sumSample / countSample;
 
-                if (avgAmplifier >= vThreshold)
+                if (avgAmplifier >= 2*vThreshold)
                 {
-                    sNew = 1;
+                    sNew = 2;
                 }
+                else if (avgAmplifier >= vThreshold)
+                    sNew = 1;
                 else
                     sNew = 0;
 
-                if (sNew==sCurrent)
+                if (sNew == sCurrent)
                 {
+                    //if (tOpposite!=0)
+                    //    Log.i("MainActivity", "Ignored a "+tOpposite+" event that is not "+sNew);
                     tOpposite = 0;
                     tCurrent += elapsed;
                 }
@@ -495,6 +505,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             }
         }
     }
+
     private void startRecordAndPlay() {
         record.startRecording();
         track.play();
@@ -508,13 +519,20 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         bIsVRrecord = false;
     }
 
-    public String prepareReplay() {
+    //public String prepareReplay() {
+    public void prepareReplay() {
         Log.i("MainActivity", "Stopping Recording ~~");
 
         bIsVRrecord = false;
         isRecording = false;
         isKilled = true;
-        recordingThread.interrupt();
+        try {
+            recordingThread.join();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
 
         record.stop();
         track.stop();
@@ -524,8 +542,9 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         try {outputStream.close();}
         catch (IOException e) {e.printStackTrace();}
 
-        filepath = Environment.getExternalStorageDirectory().getPath();
-        return filepath;
+        //filepath = Environment.getExternalStorageDirectory().getPath();
+
+        Log.i("MainActivity", "Stopped ~~");
     }
 
     private void initRecordAndTrack(){

@@ -8,7 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-[RequireComponent(typeof(SlidesPlayerCtrl))]
+[RequireComponent(typeof(TriggerCtrl))]
 public class SlidesPlayer : MonoBehaviour
 {
     public List<MeshRenderer> displays;

@@ -226,5 +226,27 @@ public class bUserCloudDrive  {
         return res;
     }
 
+
+	public void Revoke(){
+		if (_type == eCloudType.NotSelected)
+			return ;
+
+		switch (_type)
+		{
+			case eCloudType.bCloudDrive:
+				{
+					_bDriveAPI.Revoke();
+				}
+				break;
+
+			case eCloudType.GoogleDrive:
+				{
+					_bGoogleAPI.Revoke ();
+				}
+				break;
+		}
+		return;
+	}
+
     
 }
