@@ -82,7 +82,7 @@ ModelImporter:
     13700000: default
     13700002: Shoes
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
@@ -91,13 +91,7 @@ ModelImporter:
     resampleRotations: 1
     optimizeGameObjects: 0
     motionNodeName: 
-    animationImportErrors: '
-
-      Imported file ''yoto_done_half'' conversion failed: Required human bone ''LeftUpperLeg''
-      not found
-
-
-'
+    animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0

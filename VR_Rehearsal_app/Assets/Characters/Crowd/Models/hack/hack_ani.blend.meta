@@ -108,7 +108,7 @@ ModelImporter:
     13700000: Body
     13700002: Shoes
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
@@ -118,12 +118,7 @@ ModelImporter:
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'boring_1' has import animation warnings that
-      might lower retargeting quality:\nNote: Activate translation DOF on avatar to
-      improve retargeting quality.\n\t'mixamorig_LeftHandThumb3' has translation animation
-      that will be discarded.\n\t'mixamorig_RightHandThumb1' has translation animation
-      that will be discarded.\n\t'mixamorig_RightHandIndex1' has translation animation
-      that will be discarded.\n"
+    animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     animationCompression: 3
