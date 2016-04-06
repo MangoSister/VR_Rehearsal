@@ -43,7 +43,7 @@ class VoiceActivityRecord {
     }
 
     public int getTime() { return this.time;}
-    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING
+    public int getType() { return this.type;} //0 = SILENCE, 1 = SPEAKING, 2 = SHOUTING
 }
 
 
@@ -228,17 +228,18 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         isRecording = false;
         isKilled = true;
-        try {
-            record.stop();
-            track.stop();
-            record.release();
-            track.release();
 
+        try {
             recordingThread.join();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        record.stop();
+        track.stop();
+        record.release();
+        track.release();
 
         if (volumeTestSampleCount == 0)
             return 0;
@@ -322,13 +323,13 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     private int sampleNumBits = 16;
     private int numChannels = 1;
     private int totalWriteCount = 0;
-    private int flagThread = -1; //thread lock
 
     private Thread recordingThread = null ;
 
     private int lastActivityType = -1;
     private int lastActivityDuration = 0;
-    public String getRecord(){ //in JSON
+    public String getRecord(){
+        //in JSON
         if (isRecording == false)
             return "";
 
@@ -379,8 +380,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         if (filepath.length()==0){
             filepath = Environment.getExternalStorageDirectory().getPath() +"/record.pcm";
         }
-
-
         Log.i("MainActivity", "Will write file to '"+filepath+"'");
 
         //create a file to record the voice
@@ -413,8 +412,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private void recordAndPlay() //this is on second thread
     {
-        flagThread = 1;
-
         int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         byte byteData[] = new byte[bufferSizeInBytes];
@@ -472,15 +469,19 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 int sNew = 0; //status of new sample, status = speak or not speak
                 int avgAmplifier = sumSample / countSample;
 
-                if (avgAmplifier >= vThreshold)
+                if (avgAmplifier >= 2*vThreshold)
                 {
-                    sNew = 1;
+                    sNew = 2;
                 }
+                else if (avgAmplifier >= vThreshold)
+                    sNew = 1;
                 else
                     sNew = 0;
 
-                if (sNew==sCurrent)
+                if (sNew == sCurrent)
                 {
+                    //if (tOpposite!=0)
+                    //    Log.i("MainActivity", "Ignored a "+tOpposite+" event that is not "+sNew);
                     tOpposite = 0;
                     tCurrent += elapsed;
                 }
@@ -503,9 +504,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 countSample = 0;
             }
         }
-
-        flagThread = 0;
     }
+
     private void startRecordAndPlay() {
         record.startRecording();
         track.play();
@@ -532,11 +532,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         catch (InterruptedException e)
         {
             e.printStackTrace();
-        }
-
-        while (flagThread!=0)
-        {
-            continue;
         }
 
         record.stop();

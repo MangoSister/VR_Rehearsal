@@ -42,14 +42,14 @@ public class CalibrationView : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-        UnityEngine.Debug.Log("initializing");
+        Debug.Log("initializing");
         mainIcon_say.SetActive(false);
         isCalibrationDone = false;
 		descriptionPanel.SetActive(true);
 		circularProgress.SetActive(true);
 		curr_time = 0;
 
-        UnityEngine.Debug.Log("setup unity activity");
+        Debug.Log("setup unity activity");
         debugText.text = "Loading";
         //setup Unity Activity
 		#if USE_ANDROID
@@ -68,6 +68,7 @@ public class CalibrationView : MonoBehaviour
 
         if (updateVolumeFlag == true)
         {
+#if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
 
             if (volume > (threshold * 1.5))
@@ -78,9 +79,11 @@ public class CalibrationView : MonoBehaviour
                 calibrtaionData.GetComponentInChildren<Text>().text = "<color=yellow>" + volume + "</color>";
             else
                 calibrtaionData.GetComponentInChildren<Text>().text = "<color=grey>" + volume + "</color>";
+#endif
         }
         else
             calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
+
 	}
 
 	void IncreaseTimer ()
@@ -123,9 +126,9 @@ public class CalibrationView : MonoBehaviour
 				silentFlag = true;
 			}
             Debug.Log("1");
-			#if USE_ANDROID
+#if USE_ANDROID
             currentActivity.Call("startTestThreshold");
-			#endif
+#endif
 		} 
 
 		//First Done Button
@@ -162,14 +165,14 @@ public class CalibrationView : MonoBehaviour
 			gameObject.SetActive (true);
 			//isCalibrationDone = true;
             //now test volume
-			#if USE_ANDROID
+#if USE_ANDROID
             avgSpeaking = Convert.ToInt32(debugText.text);
-			#endif
+#endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
             contentText.GetComponent<Text>().text = "see if it workes properly!";
-			#if USE_ANDROID
+#if USE_ANDROID
             currentActivity.Call("startTestThreshold");
-			#endif
+#endif
             updateVolumeFlag = true;
 		}
 	}
@@ -177,9 +180,9 @@ public class CalibrationView : MonoBehaviour
 	void ChangeTheText ()
 	{
      button.GetComponentInChildren<Text> ().text = "Done !";
-		#if USE_ANDROID
+#if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
-		#endif
+#endif
 	}
 
     public void DoneButtonClick()

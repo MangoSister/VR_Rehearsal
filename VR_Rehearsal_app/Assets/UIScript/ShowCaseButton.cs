@@ -14,6 +14,7 @@ public class ShowCaseButton : MonoBehaviour {
     public GameObject optionCover;
 	public bool isShowcaseButtonClicked;
     string deletedShowcaseID;
+    public bool isCustomizeButtonClicked;
     void Start () {
 		isShowcaseButtonClicked = false;
         optionCover.GetComponent<Image>().color = gameObject.GetComponent<Button>().colors.normalColor;
@@ -64,6 +65,8 @@ public class ShowCaseButton : MonoBehaviour {
     }
     public void CustomeButtonClicked()
     {
-
+        Debug.Log("Customize Button Clicked");
+        isCustomizeButtonClicked = true;
+        GameObject.Find("LocalCaseCanvas").GetComponent<LocalCaseView>().EditShowCase(_showCaseName, _sizeOfRoom,_numberOfAudience,_localPath, _id,_expectedTime);
     }
 }

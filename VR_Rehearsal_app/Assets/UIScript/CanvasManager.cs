@@ -80,7 +80,10 @@ public class CanvasManager : MonoBehaviour {
         ShowCalibrationView();
         ShowRotationView();
         NavigationBetweenView();
-        
+        ShowCustomViewFromLocalCaseView();
+        ShowCustomViewToLocalView();
+
+
     }
     public void ShowLocasShowView()
     {
@@ -94,10 +97,11 @@ public class CanvasManager : MonoBehaviour {
 
     public void ShowFileTransferView()
     {
-        if (LocalCaseView.isLocalCaseDone)
+        if (LocalCaseView.isLocalCaseDone && localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked==true)
         {
             fileTranser.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
+            localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked = false;
         }
     }
     public void ShowNavigationView()
@@ -113,14 +117,34 @@ public class CanvasManager : MonoBehaviour {
     }
     public void ShowCustomView()
     {
-        if (NavigationView.isNavigationDone)
+         if (NavigationView.isNavigationDone)
         {
             NavigationView.isNavigationDone = false;
             customize.SetActive(true);
             loading.SetActive(false);
         }
     }
-   
+   public void ShowCustomViewFromLocalCaseView()
+    {
+        if (LocalCaseView.isCustomizeButtonClicked)
+        {
+            LocalCaseView.isCustomizeButtonClicked = false;
+            localShowCase.SetActive(false);
+            customize.SetActive(true);
+        }
+    }
+    public void ShowCustomViewToLocalView()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            if (customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
+            {
+                customize.SetActive(false);
+                localShowCase.SetActive(true);
+                customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
+            }
+        }
+    }
     public void ShowCalibrationView()
     {
         if (CustomizeView.isCustomizeDone)
