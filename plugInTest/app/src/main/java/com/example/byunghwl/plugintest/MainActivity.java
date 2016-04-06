@@ -323,7 +323,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     private int sampleNumBits = 16;
     private int numChannels = 1;
     private int totalWriteCount = 0;
-    private int flagThread = -1; //thread lock
 
     private Thread recordingThread = null ;
 
@@ -415,8 +414,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private void recordAndPlay() //this is on second thread
     {
-        flagThread = 1;
-
         int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         byte byteData[] = new byte[bufferSizeInBytes];
@@ -474,15 +471,18 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 int sNew = 0; //status of new sample, status = speak or not speak
                 int avgAmplifier = sumSample / countSample;
 
-                if (avgAmplifier >= vThreshold)
+                if (avgAmplifier >= 2*vThreshold)
                 {
-                    sNew = 1;
+                    sNew = 2;
                 }
+                else if (avgAmplifier >= vThreshold)
+                    sNew = 1;
                 else
                     sNew = 0;
 
-                if (sNew==sCurrent)
+                if (sNew == sCurrent)
                 {
+                    Log.i("MainActivity", "Ignored a "+tOpposite+" event that is not "+sNew);
                     tOpposite = 0;
                     tCurrent += elapsed;
                 }
@@ -505,9 +505,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 countSample = 0;
             }
         }
-
-        flagThread = 0;
     }
+
     private void startRecordAndPlay() {
         record.startRecording();
         track.play();
@@ -534,11 +533,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         catch (InterruptedException e)
         {
             e.printStackTrace();
-        }
-
-        while (flagThread!=0)
-        {
-            continue;
         }
 
         record.stop();
