@@ -60,18 +60,35 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 
 
+
+
 	public override void StartAuthentication (Authentication_Callback callback){
 
-		#if UNITY_EDITOR
-			_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
-		#elif UNITY_ANDROID
-			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
-			AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
-			currentActivity.Call("start_Dropbox_Authentication" );
-		#endif
+		string tmpToken = PlayerPrefs.GetString ("Unity_dropbox_token"); 
+		if (tmpToken.Length > 0) {
+			_token = tmpToken;
+		
+		} else {
+			#if UNITY_EDITOR
+				_token = "3sfXSVeeyKwAAAAAAAAJO-BSICNhdYrmbhziIdRx7I2WWY72qbYRdtAzi6ZQji4x";
+			
+			#elif UNITY_ANDROID
+
+				AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+				AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+				currentActivity.Call("start_Dropbox_Authentication" );
+
+			#endif
+		}
+
 		_authen_callback = callback;
 		Initalize ();
 	}
+
+	public override void Revoke(){
+		PlayerPrefs.SetString ("Unity_dropbox_token", "");
+	}
+
 	/*
 	bool SaveTokenOnLocal (string token){
 		string savePath = Application.persistentDataPath + "/bDropboxToken.bytes";
@@ -112,7 +129,9 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 			if (_token != "null") {
 				_isGetToken = true;
-				//SaveTokenOnLocal(_token);
+
+				PlayerPrefs.SetString ("Unity_dropbox_token", _token);
+
 				_authen_callback (true);
 			} else if (_timeOut > 15.0) {
 				_authen_callback (false);

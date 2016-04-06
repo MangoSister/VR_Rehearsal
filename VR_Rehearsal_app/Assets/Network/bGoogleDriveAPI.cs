@@ -224,7 +224,20 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath) );
 	} 
 
-		
+	public void Revoke(){
+		if (_revokeInProgress == true)
+			return;
+
+		StartCoroutine (Revock_internal ());
+	}
+
+
+	IEnumerator Revock_internal(){
+		_revokeInProgress = true;
+		yield return StartCoroutine(_drive.Unauthorize());
+		_revokeInProgress = false;
+	}
+
 	IEnumerator StartAuthentication_internal(boolFuncResult callback){
 		_initInProgress = true;
 
@@ -251,11 +264,6 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_initInProgress = false;
 	}
 
-	IEnumerator Revock_internal(){
-		_revokeInProgress = true;
-		yield return StartCoroutine(_drive.Unauthorize());
-		_revokeInProgress = false;
-	}
 
 	private string GenerateBClowdFormatJson(Dictionary<string, GoogleDrive.File> Dict){
 		string jsonStr = "{\n   \"entries\":[\n   ";
