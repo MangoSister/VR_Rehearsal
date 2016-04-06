@@ -380,8 +380,6 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         if (filepath.length()==0){
             filepath = Environment.getExternalStorageDirectory().getPath() +"/record.pcm";
         }
-
-
         Log.i("MainActivity", "Will write file to '"+filepath+"'");
 
         //create a file to record the voice
@@ -482,7 +480,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
                 if (sNew == sCurrent)
                 {
-                    Log.i("MainActivity", "Ignored a "+tOpposite+" event that is not "+sNew);
+                    //if (tOpposite!=0)
+                    //    Log.i("MainActivity", "Ignored a "+tOpposite+" event that is not "+sNew);
                     tOpposite = 0;
                     tCurrent += elapsed;
                 }
