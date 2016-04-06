@@ -190,17 +190,11 @@ public class CalibrationView : MonoBehaviour
         Debug.Log("threshold = " + threshold);
         calibrtaionData.GetComponent<Text>().text = threshold.ToString();
         gameObject.SetActive(false);
-<<<<<<< HEAD
-#if USE_ANDROID
-        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
-#endif
-=======
 
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
 
->>>>>>> 55d2e481de94a566ac8a6b9744192db0e4ffef3d
         isCalibrationDone = true;
 
     }
