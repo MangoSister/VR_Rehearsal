@@ -155,7 +155,7 @@ public class bUserCloudDrive  {
         return res;
     }
     //public  bool DownloadFile(string filename, string savePath, string saveName, bhClowdDriveAPI.fileDownload_Callback callback);
-    public bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback, bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback) {
+	public bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback, bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback, bhClowdDriveAPI.fileDownload_Cancel_Callback cancel_callback) {
         if (_type == eCloudType.NotSelected)
             return false;
 
@@ -164,7 +164,7 @@ public class bUserCloudDrive  {
         {
             case eCloudType.bCloudDrive:
                 {
-                    res = _bDriveAPI.DonwloadAllFilesInFolder(loadFolderPath, saveFolderPath, callback, proceed_callback);
+				res = _bDriveAPI.DonwloadAllFilesInFolder(loadFolderPath, saveFolderPath, callback, proceed_callback, cancel_callback);
                 }
                 break;
 
@@ -176,7 +176,7 @@ public class bUserCloudDrive  {
                     {
                         resPath = "";
                     }
-                    _bGoogleAPI.FileDownloadAll(loadFolderPath, saveFolderPath, callback, proceed_callback);
+				_bGoogleAPI.FileDownloadAll(loadFolderPath, saveFolderPath, callback, proceed_callback, cancel_callback);
                 }
                 break;
         }
@@ -244,6 +244,27 @@ public class bUserCloudDrive  {
 					_bGoogleAPI.Revoke ();
 				}
 				break;
+		}
+		return;
+	}
+
+	public void CancelDownload(){
+		if (_type == eCloudType.NotSelected)
+			return ;
+
+		switch (_type)
+		{
+		case eCloudType.bCloudDrive:
+			{
+				_bDriveAPI.CancelDownload();
+			}
+			break;
+
+		case eCloudType.GoogleDrive:
+			{
+				_bGoogleAPI.CancelDownload ();
+			}
+			break;
 		}
 		return;
 	}

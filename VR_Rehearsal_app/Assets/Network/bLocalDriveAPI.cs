@@ -9,6 +9,7 @@ using SimpleJSON;
 public class bLocalDriveAPI : bhClowdDriveAPI {
 	private string _recentPath;
 
+
 	public override bool GetFileListFromPath (string path, fileList_Callback callback){
 		_recentPath = path;
 
@@ -88,7 +89,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 		return true;
 	}
 
-	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback,  fileDownload_Process_Callback proceed_callback){
+	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath,fileDownload_Callback callback,  fileDownload_Process_Callback proceed_callback, fileDownload_Cancel_Callback cancel_callback){
 
 		GetFileListFromPath (loadFolderPath, delegate(string resJson) {
 
@@ -104,9 +105,16 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 					});
 				}
 			}
+
 			callback ();
+
+
 		});
 		return true;
+	}
+
+	public override void CancelDownload (){
+
 	}
 
 	public override void JobDone (){

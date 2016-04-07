@@ -135,6 +135,7 @@ public class UIManager : MonoBehaviour {
 
     }
     string pptID;
+	/*
     public void SelectedDownload()
     {
         if (selectedButton.GetComponent<ButtonType>().buttonType =="folder")
@@ -161,7 +162,7 @@ public class UIManager : MonoBehaviour {
             Debug.Log("you can;t download");
         }
     }
-
+*/
     void ButtonListener()
     {
         foreach (GameObject _button in storedButton)
