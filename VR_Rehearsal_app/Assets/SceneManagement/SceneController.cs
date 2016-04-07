@@ -59,11 +59,13 @@ public class SceneController : MonoBehaviour
 
     public GameObject presenter;
     public Transform presenterHead;
+    public MeshRenderer exitRenderer;
 
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
     public TriggerCtrl slidesPlayerCtrl;
+    public clockTimer timer;
     public Tutorial_PptKaraoke tutManager;
 
     private AudioUnit _ambientUnit = null;
@@ -96,7 +98,10 @@ public class SceneController : MonoBehaviour
     {
         GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
         slidesPlayerCtrl = env.transform.GetComponentInChildren<TriggerCtrl>();
+        slidesPlayerCtrl.exitRenderer = exitRenderer;
         slidesPlayerCtrl.OnExit += EndPresentation;
+        timer = env.transform.GetComponentInChildren<clockTimer>();
+        timer.SetTimer(PresentationData.in_ExpectedTime);
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
@@ -115,16 +120,6 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    //private void OperateAmbient(DestType dest)
-    //{
-    //    StopAllCoroutines();
-    //    if (dest == DestType.PODIUM)
-    //        StartCoroutine(SilenceAfterOpenning_CR());
-    //    else if (dest == DestType.DOOR_OUT)
-    //        OperateAmbient(true);
-    //}
-
-
     private IEnumerator SilenceAfterOpenning_CR()
     {
         yield return new WaitForSeconds(5f);
@@ -133,9 +128,9 @@ public class SceneController : MonoBehaviour
 
     public void EndPresentation()
     {
-        slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
+        //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
         recordWrapper.EndRecording();
-        slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
+        //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
 #if UNITY_ANDROID
         Screen.orientation = ScreenOrientation.AutoRotation;
 #endif

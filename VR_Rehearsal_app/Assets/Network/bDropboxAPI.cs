@@ -51,12 +51,14 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	string _recentSaveFolderPath;
 	bool _isDownloadMultipleFilesDone = false;
 	fileDownload_Callback _downloadMultipleFile_callback;
-	int processIdx = 0;
+	fileDownload_Cancel_Callback _downaload_cancel_callback;
+	int _processIdx = 0;
 	struct dropboxFile{
 		public string _id;
 		public string _name;
 	}
 	List<dropboxFile> _filteredFiles;
+	bool _isCanceled= false;
 
 
 
@@ -152,7 +154,14 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		}
 
 		if (_isDownloadMultipleFilesDone) {
-			_downloadMultipleFile_callback ();
+			//cancel 
+			if (_isCanceled) {
+				_downaload_cancel_callback ();
+				//_status = JobStatus.Done;
+				_isCanceled = false;
+			} else {
+				_downloadMultipleFile_callback ();
+			}
 			_isDownloadMultipleFilesDone = false;
 		}
 	}
@@ -193,6 +202,17 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		else
 			return false;
 	}
+
+
+
+	public override void CancelDownload (){
+		if (_status != JobStatus.Started || _isDownloadMultipleFilesDone != false)
+			return;
+
+		_isCanceled = true;
+	}
+
+
 
 	public override bool GetSelectedFolderFileList(string _selectedFolderName, fileList_Callback callback){
 		if (_status == JobStatus.Started)
@@ -239,13 +259,13 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			return false;
 	}
 		
-	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback, fileDownload_Process_Callback proceed_callback){
+	public override bool DonwloadAllFilesInFolder(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback, fileDownload_Process_Callback proceed_callback, fileDownload_Cancel_Callback cancel_callback){
 		if (_status == JobStatus.Started)
 			return false;
 		else
 			_status = JobStatus.Started;
 
-		bool res = DonwloadAllFilesInFolder_internal (loadFolderPath, saveFolderPath, callback, proceed_callback);
+		bool res = DonwloadAllFilesInFolder_internal (loadFolderPath, saveFolderPath, callback, proceed_callback, cancel_callback);
 		if (res)
 			return true;
 		else
@@ -285,7 +305,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 
 
-	private bool DonwloadAllFilesInFolder_internal(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback,fileDownload_Process_Callback proceed_callback){
+	private bool DonwloadAllFilesInFolder_internal(string loadFolderPath, string saveFolderPath, fileDownload_Callback callback,fileDownload_Process_Callback proceed_callback, fileDownload_Cancel_Callback cancel_callback){
 
 		if (_downloadFile_bw.IsBusy == true || _updateList_bw.IsBusy == true) {
 			return false;
@@ -295,11 +315,12 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		_recentSaveFolderPath = saveFolderPath;
 		_downloadMultipleFile_callback = callback;
+		_downaload_cancel_callback = cancel_callback;
 
 		if (_recentPath != loadFolderPath) {
 			GetFileListFromPath_internal (loadFolderPath, delegate(string resJson) {
 				_updateList_result = resJson;
-				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback, cancel_callback);
 			});
 			return true;
 		}
@@ -313,7 +334,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			 * downloadable Files filtering
 			 * 
 			 */
-			if (processIdx == 0) {
+			if (_processIdx == 0) {
 
 				JSONNode parseResult = JSON.Parse(_updateList_result);
 
@@ -333,8 +354,28 @@ public class bDropboxAPI : bhClowdDriveAPI{
 					}
 				}
 			}
+
+
+			//****Cancel 0--------------------
+			if (_isCanceled) {
+				/*Recet*/
+
+				//background Worker Kill
+				if (!_downloadFile_bw.IsBusy) {
+					_downloadFile_bw.CancelAsync ();
+					Initalize ();
+				}
+
+				_isDownloadMultipleFilesDone = true;
+				_filteredFiles.Clear ();
+				_processIdx = 0;
+
+				return false;
+			}
+			//****Cancel 0--------------------
+
 			//Filtered file count
-			proceed_callback (_filteredFiles.Count, processIdx);
+			proceed_callback (_filteredFiles.Count, _processIdx);
 		} else {
 			return false;
 		}
@@ -343,24 +384,24 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		Debug.Log (_updateList_result);
 		#endif
 
-		if (processIdx < _filteredFiles.Count) {
+		if (_processIdx < _filteredFiles.Count) {
 			
-			DownloadFile_internal (_filteredFiles[processIdx]._id, saveFolderPath, _filteredFiles[processIdx]._name, delegate() {
-				processIdx++;
-				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
+			DownloadFile_internal (_filteredFiles[_processIdx]._id, saveFolderPath, _filteredFiles[_processIdx]._name, delegate() {
+				_processIdx++;
+				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback, cancel_callback);
 			});
 
 			/*
 			//Ignore the folder
-			if (parseResult ["entries"] [processIdx] [".tag"].Value == "file") {
+			if (parseResult ["entries"] [_processIdx] [".tag"].Value == "file") {
 
 				//JpG, Png Blocking Needed
-				DownloadFile_internal (parseResult ["entries"] [processIdx] ["id"].Value, saveFolderPath, parseResult ["entries"] [processIdx] ["name"].Value, delegate() {
-					processIdx++;
+				DownloadFile_internal (parseResult ["entries"] [_processIdx] ["id"].Value, saveFolderPath, parseResult ["entries"] [_processIdx] ["name"].Value, delegate() {
+					_processIdx++;
 					DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 				});
 			} else {
-				processIdx++;
+				_processIdx++;
 				DonwloadAllFilesInFolder_internal(_recentPath, _recentSaveFolderPath, _downloadMultipleFile_callback, proceed_callback);
 			}
 			*/
@@ -368,7 +409,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			/*Done*/
 			_isDownloadMultipleFilesDone = true;
 			_filteredFiles.Clear ();
-			processIdx = 0;
+			_processIdx = 0;
 		}
 
 		return true;
@@ -451,6 +492,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			
 		FileStream fs = new FileStream (arg._savePath + "/" + arg._saveName, FileMode.Create);
 		fs.Write(result, 0, result.Length);
+		fs.Dispose ();
 	}
 
 	private void bw_DownlaodFilesFromPath_done(object sender, RunWorkerCompletedEventArgs e){

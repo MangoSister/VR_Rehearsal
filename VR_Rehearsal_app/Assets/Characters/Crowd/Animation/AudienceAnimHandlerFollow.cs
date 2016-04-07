@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
 {
@@ -137,8 +138,95 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
     {
         _audience = GetComponent<Audience>();
         controller = GetComponentInChildren<Animator>();
-        controller.runtimeAnimatorController = AudienceAnimClipHolder.curr.followController;
+        controller.runtimeAnimatorController = AudienceAnimWarehouse.curr.followController;
         controller.SetLayerWeight(defaultLayerIdx, 1f);
-        RandomizeBasicClips();
+
+        RandomizeFollowClips();
+    }
+
+    private void RandomizeFollowClips()
+    {
+        var holder = AudienceAnimWarehouse.curr;
+        if (holder == null)
+            return;
+        AnimatorOverrideController overCtrl = new AnimatorOverrideController();
+        overCtrl.name = "Audience Override Anim Ctrl";
+        overCtrl.runtimeAnimatorController = controller.runtimeAnimatorController;
+        var clipPairs = overCtrl.clips;
+
+        AnimationClipPair leftChatPair = null;
+        AnimationClipPair rightChatPair = null;
+
+        foreach (var pair in clipPairs)
+        {
+            if (holder.followFocusedClips != null && holder.followFocusedClips.Length > 0)
+            {
+                bool found = false;
+                foreach (var clip in holder.followFocusedClips)
+                {
+                    if (pair.originalClip == clip)
+                    {
+                        pair.overrideClip = holder.followFocusedClips[Random.Range(0, holder.followFocusedClips.Length)];
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    continue;
+            }
+
+            if (holder.followBoredClips != null && holder.followBoredClips.Length > 0)
+            {
+                bool found = false;
+                foreach (var clip in holder.followBoredClips)
+                {
+                    if (pair.originalClip == clip)
+                    {
+                        pair.overrideClip = holder.followBoredClips[Random.Range(0, holder.followBoredClips.Length)];
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    continue;
+            }
+
+            if (holder.followLeftChattingClips != null && holder.followLeftChattingClips.Length > 0)
+            {
+                bool found = false;
+                foreach (var clip in holder.followLeftChattingClips)
+                {
+                    if (pair.originalClip == clip)
+                    {
+                        leftChatPair = pair;
+                        break;
+                    }
+                }
+                if (found)
+                    continue;
+            }
+
+            if (holder.followRightChattingClips != null && holder.followRightChattingClips.Length > 0)
+            {
+                bool found = false;
+                foreach (var clip in holder.followRightChattingClips)
+                {
+                    if (pair.originalClip == clip)
+                    {
+                        rightChatPair = pair;
+                        break;
+                    }
+                }
+                if (found)
+                    continue;
+            }
+        }
+
+        int chatClipIdx = Random.Range(0, holder.followLeftChattingClips.Length);
+        leftChatPair.overrideClip = holder.followLeftChattingClips[chatClipIdx];
+        rightChatPair.overrideClip = holder.followRightChattingClips[chatClipIdx];
+
+        overCtrl.clips = clipPairs;
+        controller.runtimeAnimatorController = overCtrl;
     }
 }

@@ -135,14 +135,13 @@ public class CanvasManager : MonoBehaviour {
     }
     public void ShowCustomViewToLocalView()
     {
-        if (Input.GetKey(KeyCode.Escape))
+
+        if (Input.GetKey(KeyCode.Escape) && customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
         {
-            if (customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
-            {
                 customize.SetActive(false);
                 localShowCase.SetActive(true);
                 customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
-            }
+          
         }
     }
     public void ShowCalibrationView()
@@ -152,6 +151,7 @@ public class CanvasManager : MonoBehaviour {
             CustomizeView.isCustomizeDone = false;
             calibration.SetActive(true);
         }
+       
     }
     public void ShowRotationView()
     {

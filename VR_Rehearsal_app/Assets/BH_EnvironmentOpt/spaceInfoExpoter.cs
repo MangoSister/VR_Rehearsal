@@ -29,8 +29,8 @@ public class spaceInfoExpoter : MonoBehaviour {
 		seatTransform = new Transform[seatRowNum * seatColNum];
 
 		int idx = 0;
-		for (int r = 0; r <seatRowNum; r++) {
-			for(int c = 0; c <seatColNum; c++){
+		for (int r = 0; r <seatColNum; r++) {
+			for(int c = 0; c <seatRowNum; c++){
 				float rowPos = r * intervalUnit_row + this.transform.position.x ;
 				float colPos = c * intervalUnit_col + this.transform.position.z ;
 				

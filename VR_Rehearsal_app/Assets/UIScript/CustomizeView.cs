@@ -110,13 +110,13 @@ public class CustomizeView : MonoBehaviour  {
         showCaseTitle.GetComponent<InputField>().text = oldTitle;
         switch (oldSizeOfRoom)
         {
-            case 0:
+            case 3:
                 tgroup.GetComponent<RectTransform>().FindChild("SmallRoom").GetComponent<Toggle>().isOn = true;
                 break;
-            case 1:
+            case 2:
                 tgroup.GetComponent<RectTransform>().FindChild("Medium ").GetComponent<Toggle>().isOn = true;
                 break;
-            case 2:
+            case 1:
                 tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = true;
                 break;
             default:
