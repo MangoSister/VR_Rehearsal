@@ -50,9 +50,10 @@ public class AudienceAnimHandlerInspector : Editor
             var anim_full = anim as AudienceAnimHandlerFull;
             anim_full.repeatPeriodBound.x = EditorGUILayout.FloatField("Repeat Period Low", anim_full.repeatPeriodBound.x);
             anim_full.repeatPeriodBound.y = EditorGUILayout.FloatField("Repeat Period High", anim_full.repeatPeriodBound.y);
+
+            EditorGUILayout.ObjectField("Laptop", anim_full.laptop, typeof(Object), true);
+            EditorGUILayout.ObjectField("Smarphone", anim_full.smartPhone, typeof(Object), true);
         }
-
-
 
         EditorGUILayout.Separator();
 
@@ -80,7 +81,8 @@ public class AudienceAnimHandlerInspector : Editor
                 mirror = EditorGUILayout.Toggle("Mirror", mirror);
                 anim.controller.SetBool(AudienceAnimHandlerBasic._paramIdMirror, mirror);
             }
-            
+
+
             EditorGUILayout.EndToggleGroup();
             EditorGUILayout.Separator();
         }
@@ -91,20 +93,12 @@ public class AudienceAnimHandlerInspector : Editor
         AudienceAnimHandlerBasic.eyeIconOffset = EditorGUILayout.Vector3Field("Eye Icon Offset", AudienceAnimHandlerBasic.eyeIconOffset);
         AudienceAnimHandlerBasic.eyeIconScale = EditorGUILayout.FloatField("Eye Icon Scale", AudienceAnimHandlerBasic.eyeIconScale);
         AudienceAnimHandlerBasic.eyeIconFreq = EditorGUILayout.FloatField("Eye Icon Freq", AudienceAnimHandlerBasic.eyeIconFreq);
+
+        if (lv == Level.Full)
+            EditorGUILayout.FloatField("Laptop Anim Length", AudienceAnimHandlerFull.laptopAnimLength);
+
         GUI.enabled = true;
 
-        if (lv != Level.Full)
-        {
-            if (AudienceAnimClipHolder.curr != null)
-            {
-                EditorGUILayout.LabelField("Clip Shuffle", EditorStyles.boldLabel);
-                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.focusedClips, "Focused Clips");
-                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.boredClips, "Bored Clips");
-                EditorHelper.ShowArray(ref AudienceAnimClipHolder.curr.chattingClips, "Chatting Clips");
-            }
-            else
-                EditorGUILayout.LabelField("No Basic Clips Holder Found!", EditorStyles.boldLabel);
-        }
         serializedObject.ApplyModifiedProperties();
     }
 

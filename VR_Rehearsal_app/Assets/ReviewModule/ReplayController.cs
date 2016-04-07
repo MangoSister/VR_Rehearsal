@@ -216,7 +216,7 @@ public class ReplayController : MonoBehaviour {
                 //calculate x coord
                 float xPos = -54f + (379f - (-54f)) * (transitionRecord.Key / totaltime);
 
-                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, -110.2937f);
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, 0f);
             }
         }
 
@@ -255,8 +255,8 @@ public class ReplayController : MonoBehaviour {
                 //calculate x coord
                 float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
 
-                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, -110f);
-                go.GetComponent<RectTransform>().localScale = new Vector3(2.0f, 2.0f, 2.0f);
+                go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, 0f);
+                //go.GetComponent<RectTransform>().localScale = new Vector3(2.0f, 2.0f, 2.0f);
                 go.GetComponent<PauseController>().time = pauseRecord.Key;
             }
         }

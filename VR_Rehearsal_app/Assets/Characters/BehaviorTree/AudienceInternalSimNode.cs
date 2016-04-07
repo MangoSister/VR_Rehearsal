@@ -68,7 +68,9 @@ public class AudienceInternalSimNode : BaseNode<Audience>
             return;
 
         float global = sim.globalAttentionAmp * GaussianRandom(sim.globalAttentionMean, sim.globalAttentionStDev) +
-                        sim.globalAttentionConstOffset;
+                        sim.globalAttentionConstOffset + 
+                        sim.globalTimeCurve.Evaluate(Mathf.Clamp01((Time.time - PresentationData.in_EnterTime) / PresentationData.in_ExpectedTime));
+
         global = Mathf.Clamp(global, -1f, 1f);
         target.stateMassFunctionInternal[(int)State.Focused] += global;
         target.stateMassFunctionInternal[(int)State.Bored] -= global;

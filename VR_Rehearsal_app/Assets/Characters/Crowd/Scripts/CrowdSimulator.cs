@@ -65,6 +65,7 @@ public class CrowdSimulator : MonoBehaviour
     public float globalAttentionStDev;
     public float globalAttentionAmp;
     public float globalAttentionConstOffset;
+    public AnimationCurve globalTimeCurve;
 
     public AnimationCurve seatPosAttentionCurve;
     public float seatPosAttentionUpper
@@ -142,14 +143,14 @@ public class CrowdSimulator : MonoBehaviour
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
             Audience ad;
-            if (i % tx.seat_ColNum < 2)
-            {
+            int row = i % tx.seat_RowNum;
+            if (row < 2)
                 ad = CreateRandomMember(LOD.FullSize_Diffuse_FullAnim, Vector3.zero, Quaternion.identity);
-            }
+            else if (row < 3)
+                ad = CreateRandomMember(LOD.FullSize_Diffuse_FollowAnim, Vector3.zero, Quaternion.identity);
             else
-            {
                 ad = CreateRandomMember(LOD.HalfSize_Diffuse_BasicAnim, Vector3.zero, Quaternion.identity);
-            }
+
             ad.simInternalOffset = URandom.Range(0, stepIntervalInt);
             ad.followingTransform = SceneController.currRoom.presenterHead;
            

@@ -95,6 +95,24 @@ public class bShowcaseManager  {
 		return tempId;
 	}
 
+	public bool EditShowcase_path(string caseID, string pptFolderPath){
+		bool res = LoadShowcaseBinaryFromLocal();
+		if (!res) return false;
+
+		if (!_showcaseTable.ContainsKey(caseID))
+			return false;
+		
+		showcase_Data tempShowcase = (showcase_Data)_showcaseTable [caseID];
+		tempShowcase._pptFolderPath = pptFolderPath;
+		tempShowcase._updatedDate = System.DateTime.Now;
+
+		_showcaseTable [caseID] = tempShowcase;
+
+		SaveShowcasesBinaryInLocal ();
+		return true;
+
+	}
+
 	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
 
         bool res = LoadShowcaseBinaryFromLocal();
@@ -129,6 +147,7 @@ public class bShowcaseManager  {
         {
 			string targetFolderPath = _showcaseTable[caseID]._pptFolderPath;
 			if(Directory.Exists (targetFolderPath)){
+
 				Directory.Delete(targetFolderPath,true);
 			}
 

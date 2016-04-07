@@ -280,16 +280,30 @@ public class NavigationView : MonoBehaviour {
                     ShowLoadingPanel();
                     string str = _userDrive.GetRecentPath();
 
-                    _pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty", 30, 5);
+					_pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty" , 30, 5);
+					_setManager.BShowcaseMgr.EditShowcase_path(_pptID,  (Application.persistentDataPath + "/" + _pptID));
                     customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
-                    _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, delegate ()
-                    {
-                        Debug.Log("fileDownLoad Complete");
-                        StartCoroutine("CompleteDownloading");
-                    }, delegate (int totalFileNum, int completedFileNum)
-                    {
-                        progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
-                    });
+                    _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, 
+						delegate ()
+						{ 	/* completed Callback */
+							#if UNITY_EDITOR
+	                        	Debug.Log("fileDownLoad Complete");
+							#endif
+							_userDrive.JobDone();
+	                        StartCoroutine("CompleteDownloading");
+						}, delegate (int totalFileNum, int completedFileNum) /* process Callback */
+	                    {
+	                        progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+						}, delegate() {/* Cancel Callback */
+								#if UNITY_EDITOR
+									Debug.Log("fileDownLoad Canceled");						
+								#endif
+								_setManager.BShowcaseMgr.DeleteShowcase(_pptID);
+								
+								_userDrive.JobDone();
+
+								loadingView.SetActive(false);
+	                    });
                 }
                 else
                 {
@@ -303,6 +317,11 @@ public class NavigationView : MonoBehaviour {
         }
         
     }
+
+	public void CancelDownload(){
+		_userDrive.CancelDownload ();
+	}
+
     public void ShowLoadingPanel()
     {
         loadingView.GetComponent<RectTransform>().SetAsFirstSibling();

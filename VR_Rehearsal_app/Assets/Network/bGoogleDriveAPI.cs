@@ -47,10 +47,12 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	//3. FileDownload
 	bhClowdDriveAPI.fileDownload_Callback _fileDownload_callback; 
 	bhClowdDriveAPI.fileDownload_Process_Callback _fileDownload_proceed_callback;
+	bhClowdDriveAPI.fileDownload_Cancel_Callback _fileDownload_cancel_callback;
 
 	bool _isFileDownloadDone = false;
 	bool _isSingleFileDownloadDone = false;
 	bool _isFileDownloadProcessing = false;
+	bool _isFileDownloadCancel = false;
 	int _NumberOfTotalDownloadFile = 0;
 	int _NumberOfProcessedFile = 0;
 
@@ -76,7 +78,13 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		if (_isFileDownloadProcessing == true) {
 			if (_isFileDownloadDone == true) {
-				_fileDownload_callback ();
+
+				if (_isFileDownloadCancel) {
+					_fileDownload_cancel_callback ();
+					_isFileDownloadCancel = false;
+				} else {
+					_fileDownload_callback ();
+				}
 
 				_NumberOfTotalDownloadFile = 0;
 				_NumberOfProcessedFile = 0;
@@ -213,13 +221,21 @@ public class bGoogleDriveAPI : MonoBehaviour {
         return recentFolderName;
     }
 
-    public void FileDownloadAll(string loadFolderName, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback,  bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback ){
+	public  void CancelDownload (){
+		if (_isFileDownloadProcessing != true)
+			return;
+
+		_isFileDownloadCancel = true;
+	}
+
+	public void FileDownloadAll(string loadFolderName, string saveFolderPath, bhClowdDriveAPI.fileDownload_Callback callback,  bhClowdDriveAPI.fileDownload_Process_Callback proceed_callback, bhClowdDriveAPI.fileDownload_Cancel_Callback cancel_callback ){
 
 		if (_isFileDownloadProcessing == true)
 			return;
 
 		_fileDownload_callback = callback;
 		_fileDownload_proceed_callback= proceed_callback;
+		_fileDownload_cancel_callback = cancel_callback;
 
 		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath) );
 	} 
@@ -230,6 +246,8 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		StartCoroutine (Revock_internal ());
 	}
+
+	public
 
 
 	IEnumerator Revock_internal(){
@@ -363,6 +381,11 @@ public class bGoogleDriveAPI : MonoBehaviour {
 				#if UNITY_EDITOR
 				Debug.Log(file);
 				#endif
+
+				if (_isFileDownloadCancel)
+					break;
+
+
 				if (file.Title.EndsWith(".jpg") || file.Title.EndsWith(".png") || file.Title.EndsWith(".JPG") || file.Title.EndsWith(".PNG") ){
 					var download = _drive.DownloadFile(file);
 					yield return StartCoroutine(download);
@@ -386,6 +409,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 					FileStream fs = new FileStream (saveFolderPath + "/" + finalFileTitle, FileMode.Create);
 					fs.Write(data, 0, data.Length);
+					fs.Dispose ();
 
 					fileNameList.Add (file.Title);
 					/*
