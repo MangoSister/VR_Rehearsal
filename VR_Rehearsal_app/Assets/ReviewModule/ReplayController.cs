@@ -234,6 +234,7 @@ public class ReplayController : MonoBehaviour {
 
                 if (accumulatedTime != 0) //ignore the first pause
                 {
+                    testText.text += PresentationData.out_FluencyRecord[j].Key.ToString() + " " + length + "\n";
                     if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 2000))
                     {
                         out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, 1));//not speaking
