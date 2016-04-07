@@ -264,7 +264,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 int bufferReadByte = record.read(byteData, 0, bufferSizeInBytes);
 
                 //write to playback track
-                track.write(byteData, 0, bufferReadByte);
+//                track.write(byteData, 0, bufferReadByte);
 
                 //byte > short array for VAD
                 int bufferReadShort = bufferReadByte / 2;
@@ -371,6 +371,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
    // public void startRecording(String filename){
    public void initialize_recordNplayback(String filename){
         bIsVRrecord = true;
+        isKilled = false;
 
         lastnanosec = System.nanoTime();
         //replayData = new ArrayList();
@@ -418,6 +419,9 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         byte byteData[] = new byte[bufferSizeInBytes];
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
+        Log.i("MainActivity", "Recording thread start");
+
         while (true)
         {
             if (isKilled)
@@ -471,11 +475,12 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 int sNew = 0; //status of new sample, status = speak or not speak
                 int avgAmplifier = sumSample / countSample;
 
-                if (avgAmplifier >= 2*vThreshold)
+                /*if (avgAmplifier >= 2*vThreshold)
                 {
                     sNew = 2;
                 }
-                else if (avgAmplifier >= vThreshold)
+                else */
+                if (avgAmplifier >= vThreshold)
                     sNew = 1;
                 else
                     sNew = 0;

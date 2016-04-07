@@ -58,7 +58,13 @@ public class ReplayController : MonoBehaviour {
 
     public void exitRehearsal()
     {
+        if (audioSource != null)
+        {
+            if (audioSource.isPlaying == true)
+                audioSource.Stop();
+        }
 
+        
     }
 
     private String getTimeString(float time)
@@ -138,15 +144,18 @@ public class ReplayController : MonoBehaviour {
         byte[] byteArray = null;
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
             try { byteArray = File.ReadAllBytes(PresentationData.out_RecordingFilePath); }
-            catch (FileNotFoundException e) { quarterTime.text=e.Message; }
+            catch (FileNotFoundException e) { quarterTime.text = e.Message; }
         else
+        {
+            testText.text = PresentationData.out_RecordingFilePath + "\n";
             byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm"); //for testing
+        }
 
         //byte > unity float
         if (byteArray == null)
         {
             //UnityEngine.Debug.Log("File not found");
-            testText.text += "File not found\n" + PresentationData.out_RecordingFilePath+"\n";
+            testText.text += "File not found\n";
             return;
         }
 
@@ -236,7 +245,7 @@ public class ReplayController : MonoBehaviour {
                 if (accumulatedTime != 0) //ignore the first pause
                 {
                     testText.text += PresentationData.out_FluencyRecord[j].Key.ToString() + " " + length + "\n";
-                    if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 2000))
+                    if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 1500))
                     {
                         out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, 1));//not speaking
                     }
