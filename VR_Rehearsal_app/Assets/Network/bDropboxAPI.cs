@@ -66,7 +66,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 	public override void StartAuthentication (Authentication_Callback callback){
 
-		string tmpToken = PlayerPrefs.GetString ("Unity_dropbox_token"); 
+		string tmpToken = "";//PlayerPrefs.GetString ("Unity_dropbox_token"); 
 		if (tmpToken.Length > 0) {
 			_token = tmpToken;
 		
