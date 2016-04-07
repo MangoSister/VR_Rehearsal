@@ -145,7 +145,8 @@ public class ReplayController : MonoBehaviour {
         //byte > unity float
         if (byteArray == null)
         {
-            UnityEngine.Debug.Log("File not found");
+            //UnityEngine.Debug.Log("File not found");
+            testText.text += "File not found\n" + PresentationData.out_RecordingFilePath+"\n";
             return;
         }
 
