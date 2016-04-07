@@ -255,6 +255,7 @@ public class CrowdSimulatorInspector : Editor
         sim.globalAttentionStDev = EditorGUILayout.FloatField("Std Deviation (Gaussian)", sim.globalAttentionStDev);
         sim.globalAttentionAmp = EditorGUILayout.FloatField("Amplitude (Gaussian)", sim.globalAttentionAmp);
         sim.globalAttentionConstOffset = EditorGUILayout.FloatField("Constant offset", sim.globalAttentionConstOffset);
+        sim.globalTimeCurve = EditorGUILayout.CurveField("Time Curve", sim.globalTimeCurve);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 
