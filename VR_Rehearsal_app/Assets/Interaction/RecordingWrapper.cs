@@ -94,7 +94,7 @@ public class RecordingWrapper : MonoBehaviour
             var time = parseResult["status"][idx]["time"].Value; //int (ms)
 
             KeyValuePair<bool, int> pair = new KeyValuePair<bool, int>
-            (Convert.ToInt32(status) == 1 ? true : false,
+            (Convert.ToInt32(status) != 0 ? true : false,
             Convert.ToInt32(time));
 
             statusQueue.Enqueue(pair);
@@ -112,7 +112,7 @@ public class RecordingWrapper : MonoBehaviour
 #if !UNITY_EDITOR && UNITY_ANDROID
         if(currentActivity != null)
         {
-            currentActivity.Call<string>("prepareReplay");
+            currentActivity.Call("prepareReplay");
             return true;
         }
         else return false;
