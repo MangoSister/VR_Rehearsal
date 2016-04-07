@@ -77,29 +77,33 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
     {
         _audience = GetComponent<Audience>();
         controller = GetComponentInChildren<Animator>();
-        controller.runtimeAnimatorController = AudienceAnimClipHolder.curr.basicController;
+        controller.runtimeAnimatorController = AudienceAnimWarehouse.curr.basicController;
         RandomizeBasicClips();
     }
 
-    protected void RandomizeBasicClips()
+    private void RandomizeBasicClips()
     {
-        var holder = AudienceAnimClipHolder.curr;
+        var holder = AudienceAnimWarehouse.curr;
         if (holder == null)
             return;
         AnimatorOverrideController overCtrl = new AnimatorOverrideController();
         overCtrl.name = "Audience Override Anim Ctrl";
         overCtrl.runtimeAnimatorController = controller.runtimeAnimatorController;
         var clipPairs = overCtrl.clips;
+
+        AnimationClipPair leftChatPair = null;
+        AnimationClipPair rightChatPair = null;
+
         foreach (var pair in clipPairs)
         {
-            if (holder.focusedClips != null && holder.focusedClips.Length > 0)
+            if (holder.basicFocusedClips != null && holder.basicFocusedClips.Length > 0)
             {
                 bool found = false;
-                foreach (var clip in holder.focusedClips)
+                foreach (var clip in holder.basicFocusedClips)
                 {
                     if (pair.originalClip == clip)
                     {
-                        pair.overrideClip = holder.focusedClips[Random.Range(0, holder.focusedClips.Length)];
+                        pair.overrideClip = holder.basicFocusedClips[Random.Range(0, holder.basicFocusedClips.Length)];
                         found = true;
                         break;
                     }
@@ -108,14 +112,14 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
                     continue;
             }
 
-            if (holder.boredClips != null && holder.boredClips.Length > 0)
+            if (holder.basicBoredClips != null && holder.basicBoredClips.Length > 0)
             {
                 bool found = false;
-                foreach (var clip in holder.boredClips)
+                foreach (var clip in holder.basicBoredClips)
                 {
                     if (pair.originalClip == clip)
                     {
-                        pair.overrideClip = holder.boredClips[Random.Range(0, holder.boredClips.Length)];
+                        pair.overrideClip = holder.basicBoredClips[Random.Range(0, holder.basicBoredClips.Length)];
                         found = true;
                         break;
                     }
@@ -124,15 +128,29 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
                     continue;
             }
 
-            if (holder.chattingClips != null && holder.chattingClips.Length > 0)
+            if (holder.basicLeftChattingClips != null && holder.basicLeftChattingClips.Length > 0)
             {
                 bool found = false;
-                foreach (var clip in holder.chattingClips)
+                foreach (var clip in holder.basicLeftChattingClips)
                 {
                     if (pair.originalClip == clip)
                     {
-                        pair.overrideClip = holder.chattingClips[Random.Range(0, holder.chattingClips.Length)];
-                        found = true;
+                        leftChatPair = pair;
+                        break;
+                    }
+                }
+                if (found)
+                    continue;
+            }
+
+            if (holder.basicRightChattingClips != null && holder.basicRightChattingClips.Length > 0)
+            {
+                bool found = false;
+                foreach (var clip in holder.basicRightChattingClips)
+                {
+                    if (pair.originalClip == clip)
+                    {
+                        rightChatPair = pair;
                         break;
                     }
                 }
@@ -140,6 +158,10 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
                     continue;
             }
         }
+
+        int chatClipIdx = Random.Range(0, holder.basicLeftChattingClips.Length);
+        leftChatPair.overrideClip = holder.basicLeftChattingClips[chatClipIdx];
+        rightChatPair.overrideClip = holder.basicRightChattingClips[chatClipIdx];
 
         overCtrl.clips = clipPairs;
         controller.runtimeAnimatorController = overCtrl;
