@@ -152,10 +152,10 @@ public static class PresentationData
     }
 
     //Input
-    public static EnvType in_EnvType;
+    public static EnvType in_EnvType = EnvType.RPIS;
     public static string in_SlidePath;
-    public static float in_EnterTime;
-    public static float in_ExpectedTime;
+    public static float in_EnterTime = 0f;
+    public static float in_ExpectedTime = 600f;
     public static int in_VoiceThreshold;
 
     //Output
