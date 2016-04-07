@@ -177,13 +177,13 @@ public class ReplayController : MonoBehaviour {
         floatArr[i / 2] = '\0';
 
         //time stamp update
-        float totaltime = (floatArr.Length) / 8000.0f;
+        float totaltime = (floatArr.Length) / (float)FREQUENCY;
         quarterTime.text = getTimeString(totaltime / 4.0f);
         halfTime.text = getTimeString(totaltime / 2.0f);
         softTime.text = getTimeString(totaltime * 0.75f);
         endTime.text = getTimeString(totaltime);
 
-        AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, 8000, false, false);
+        AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, FREQUENCY, false, false);
         myClip.SetData(floatArr, 0);
         audioSource.clip = myClip;
         //UnityEngine.Debug.Log("reset slider"); 

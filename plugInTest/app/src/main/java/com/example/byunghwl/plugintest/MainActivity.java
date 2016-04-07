@@ -49,6 +49,8 @@ class VoiceActivityRecord {
 
 public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
+    private int FREQUENCY = 44100;
+
     //Google Drive Activity Added 3/24/2016
     //-------------------------------------------------------------------------
     public static void launchGoogleDriveActivity() {
@@ -249,7 +251,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private void volumeTest() //this is on second thread
     {
-        int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        int bufferSizeInBytes = AudioRecord.getMinBufferSize(FREQUENCY, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         byte byteData[] = new byte[bufferSizeInBytes];
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
@@ -316,7 +318,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     AudioRecord record = null;
     AudioTrack track = null;
     private int audioSource = MediaRecorder.AudioSource.MIC;
-    private int samplingRate = 8000; /* in Hz*/
+    private int samplingRate = FREQUENCY; /* in Hz*/
     private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private int bufferSize = AudioRecord.getMinBufferSize(samplingRate, channelConfig, audioFormat);
@@ -412,7 +414,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private void recordAndPlay() //this is on second thread
     {
-        int bufferSizeInBytes = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        int bufferSizeInBytes = AudioRecord.getMinBufferSize(FREQUENCY, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         byte byteData[] = new byte[bufferSizeInBytes];
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
@@ -550,12 +552,12 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     private void initRecordAndTrack(){
 
         //Log.i("MainActivity", "initRecordAndTrack");
-        int min = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        // record = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, min);
+        int min = AudioRecord.getMinBufferSize(FREQUENCY, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        // record = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, FREQUENCY, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, min);
         record = new AudioRecord(audioSource, samplingRate, channelConfig, audioFormat, bufferSize);
 
-        int maxJitter = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        track = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, maxJitter,
+        int maxJitter = AudioTrack.getMinBufferSize(FREQUENCY, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        track = new AudioTrack(AudioManager.STREAM_MUSIC, FREQUENCY, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, maxJitter,
                 AudioTrack.MODE_STREAM);
     }
 
