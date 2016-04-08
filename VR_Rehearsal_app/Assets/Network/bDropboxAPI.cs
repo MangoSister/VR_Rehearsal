@@ -59,13 +59,17 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	}
 	List<dropboxFile> _filteredFiles;
 	bool _isCanceled= false;
-
+	Mutex _cancelMutex = new Mutex ();
 
 	public override void StartAuthentication (Authentication_Callback callback){
 
-		string tmpToken = PlayerPrefs.GetString ("Unity_dropbox_token"); 
-		if (tmpToken.Length > 0) {
-			_token = tmpToken;
+		bool res =LoadTokenBinaryFromLocal();
+		if (!res) {
+			_token = "";
+		}
+
+		if (_token.Length > 0 && _token != "" ) {
+
 		
 		} else {
 			#if UNITY_EDITOR
@@ -84,10 +88,77 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		Initalize ();
 	}
 
-	public override void Revoke(){
-		PlayerPrefs.SetString ("Unity_dropbox_token", "");
-		PlayerPrefs.Save ();
+	public override void Revoke(revoke_Callback callback){
+		_token = "";
+		SaveTokenBinaryInLocal ();
+		callback ();
 	}
+
+	private string _fileHeaderValidChecker = "#!@#@$#@!$@#@#%#@%&^*4";
+	private bool LoadTokenBinaryFromLocal(){
+		#if UNITY_EDITOR
+		string loadPath = Application.dataPath + "/dropboxTokenBinary.bytes";
+		#elif UNITY_ANDROID 
+		string loadPath = Application.persistentDataPath + "/dropboxTokenBinary.bytes";
+		#endif
+		
+		if (File.Exists (loadPath)) {
+			try{
+				using (BinaryReader r = new BinaryReader (File.Open (loadPath, FileMode.Open))) {
+					//1. Header checking in order to check file corruption
+					string tempHeader = r.ReadString ();
+					if (tempHeader != _fileHeaderValidChecker)
+						return false;
+					//2. numOfshowcase
+					_token = r.ReadString ();
+			
+					//4. End
+					string tempfooter = r.ReadString ();
+					if (tempHeader != _fileHeaderValidChecker) {
+						_token = "";
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}catch{
+				return false;
+			}
+			
+		} else {
+			return false;
+		}
+	}
+	
+	private bool SaveTokenBinaryInLocal(){
+		#if UNITY_EDITOR
+		string savePath = Application.dataPath + "/dropboxTokenBinary.bytes";
+		#elif UNITY_ANDROID 
+		string savePath = Application.persistentDataPath + "/dropboxTokenBinary.bytes";
+		#endif
+		
+		try{
+			using(var w = new BinaryWriter(File.OpenWrite(savePath))){
+				//1. Header checking in order to check file corruption
+				w.Write(_fileHeaderValidChecker);
+				
+				//2.save token
+				if(_token.Length > 0 && _token != ""){
+					w.Write(_token);
+				}else{
+					w.Write("");
+				}
+
+				//4. End
+				w.Write(_fileHeaderValidChecker);
+				w.Close();
+			}
+		}catch{
+			return false;
+		}
+		return true;
+	}
+
 
 	/*
 	bool SaveTokenOnLocal (string token){
@@ -130,8 +201,12 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			if (_token != "null") {
 				_isGetToken = true;
 
-				PlayerPrefs.SetString ("Unity_dropbox_token", _token);
-				PlayerPrefs.Save ();
+				bool res = SaveTokenBinaryInLocal();
+				#if UNITY_EDITOR
+				if(!res)
+				Debug.LogError("Error: Token Binary saving failed");
+				#endif
+
 
 				_authen_callback (true);
 			} else if (_timeOut > 15.0) {
@@ -208,7 +283,9 @@ public class bDropboxAPI : bhClowdDriveAPI{
 		if (_status != JobStatus.Started || _isDownloadMultipleFilesDone != false)
 			return;
 
+		_cancelMutex.WaitOne ();
 		_isCanceled = true;
+		_cancelMutex.ReleaseMutex ();
 	}
 
 
@@ -355,7 +432,8 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			}
 
 
-			//****Cancel 0--------------------
+			//****Cancel 0---Syncro_mutex-------------
+			_cancelMutex.WaitOne ();
 			if (_isCanceled) {
 				/*Recet*/
 
@@ -372,6 +450,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 				return false;
 			}
 			//****Cancel 0--------------------
+			_cancelMutex.ReleaseMutex();
 
 			//Filtered file count
 			proceed_callback (_filteredFiles.Count, _processIdx);
@@ -497,6 +576,8 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	private void bw_DownlaodFilesFromPath_done(object sender, RunWorkerCompletedEventArgs e){
 		if (e.Cancelled == true){
 			//resultLabel.Text = "Canceled!";
+			_isCanceled = true;
+			_isDownloadFileDone = true;
 		}else if (e.Error != null){
 			//resultLabel.Text = "Error: " + e.Error.Message;
 		}else{

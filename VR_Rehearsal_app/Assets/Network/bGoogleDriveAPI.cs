@@ -64,6 +64,11 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	delegate void funcResult();
 	delegate void boolFuncResult(bool res);
 
+	//4. Revoke
+	bhClowdDriveAPI.revoke_Callback _revoke_callback;
+	bool isRevoked = false;
+
+
 	void Update(){
 		if (_isAuthenticationDone == true) {
 			_authen_callback (_isAuthenticationDone);
@@ -96,6 +101,11 @@ public class bGoogleDriveAPI : MonoBehaviour {
 				_isSingleFileDownloadDone = false;
 			}
 		
+		}
+
+		if (isRevoked) {
+			_revoke_callback ();
+			isRevoked = false;
 		}
 			
 	}
@@ -240,28 +250,27 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		StartCoroutine(DonwloadAllFilesInFolder_internal (loadFolderName, saveFolderPath) );
 	} 
 
-	public void Revoke(){
+	public void Revoke(bhClowdDriveAPI.revoke_Callback callback){
 		if (_revokeInProgress == true)
 			return;
 
+		_revoke_callback = callback;
 		StartCoroutine (Revock_internal ());
 	}
-
-	public
-
 
 	IEnumerator Revock_internal(){
 		_revokeInProgress = true;
 		yield return StartCoroutine(_drive.Unauthorize());
 		_revokeInProgress = false;
+		isRevoked = true;
 	}
 
 	IEnumerator StartAuthentication_internal(boolFuncResult callback){
 		_initInProgress = true;
 
 		_drive = new GoogleDrive();
-		_drive.ClientID = "251952116687-bl6cbb0n9veq5ovirpk5n99pjlgtf16g.apps.googleusercontent.com";
-		_drive.ClientSecret = "z65O11Za6aB74a7r21_TbtFL";
+		_drive.ClientID = "251952116687-o29juik9i0qbl6ktpa0n97cavk8cvip4.apps.googleusercontent.com";
+		_drive.ClientSecret = "0ZptNq9TwzL7enTtlRUOoZ3_";
 
 		var authorization = _drive.Authorize();
 		yield return StartCoroutine(authorization);
@@ -407,22 +416,22 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					if(bIsDuplicatedFileName)
 					finalFileTitle += duplicatedNumber.ToString();
 
-					FileStream fs = new FileStream (saveFolderPath + "/" + finalFileTitle, FileMode.Create);
-					fs.Write(data, 0, data.Length);
-					fs.Dispose ();
+					try{
+						FileStream fs = new FileStream (saveFolderPath + "/" + finalFileTitle, FileMode.Create);
+						fs.Write(data, 0, data.Length);
+						fs.Dispose ();
 
-					fileNameList.Add (file.Title);
-					/*
-					catch(IOException e){
-						#if UNITY_EDITOR
-						Debug.Log (e);
-						#endif
-						break;
+						fileNameList.Add (file.Title);
+
+						//-----
+						++_NumberOfProcessedFile;
+						_isSingleFileDownloadDone = true;
+					}catch{
+						_isFileDownloadCancel = true;
 					}
-					*/
-					//-----
-					++_NumberOfProcessedFile;
-					_isSingleFileDownloadDone = true;
+
+
+
 				}
 			}
 

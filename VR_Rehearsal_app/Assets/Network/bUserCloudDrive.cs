@@ -27,7 +27,7 @@ public class bUserCloudDrive  {
 
         switch (type) {
 		case 1:
-			_type = eCloudType.bCloudDrive;
+				_type = eCloudType.bCloudDrive;
 				_bDriveAPI = new bDropboxAPI ();
                 break;
             case 2:
@@ -227,7 +227,7 @@ public class bUserCloudDrive  {
     }
 
 
-	public void Revoke(){
+	public void Revoke(bhClowdDriveAPI.revoke_Callback callback){
 		if (_type == eCloudType.NotSelected)
 			return ;
 
@@ -235,13 +235,13 @@ public class bUserCloudDrive  {
 		{
 			case eCloudType.bCloudDrive:
 				{
-					_bDriveAPI.Revoke();
+				_bDriveAPI.Revoke(callback);
 				}
 				break;
 
 			case eCloudType.GoogleDrive:
 				{
-					_bGoogleAPI.Revoke ();
+				_bGoogleAPI.Revoke (callback);
 				}
 				break;
 		}

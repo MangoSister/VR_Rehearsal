@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System;
 
 public class NavigationView : MonoBehaviour {
+
+	enum AuthCheck { Succeed, failed }
+
     // Dropbox API
     bUserCloudDrive _userDrive;
     public bGoogleDriveAPI _googleDirve;
@@ -53,6 +56,10 @@ public class NavigationView : MonoBehaviour {
     int roomSize;
     int timer;
     string extentionFormat;
+
+	//Authentication Check
+	AuthCheck _authCheck = AuthCheck.failed;
+	int _currCloudType = 0;
 
     void Start() {
 		
@@ -115,14 +122,18 @@ public class NavigationView : MonoBehaviour {
         if (_userDrive == null)
             _userDrive = new bUserCloudDrive();
 
+		_currCloudType = cloudType;
         _userDrive.Setup(_googleDirve);
         _userDrive.Initialize(cloudType);
         _userDrive.StartAuthentication(delegate (bool res)
         {
             if (res)
             {
+				_authCheck = AuthCheck.Succeed;
                 _userDrive.GetFileListFromPath("/", CreatePanels);
-            }
+			}else{
+				_authCheck = AuthCheck.failed;
+			}
         });
 
     }
@@ -140,6 +151,8 @@ public class NavigationView : MonoBehaviour {
             isReseting = false;
         });
     }
+
+
 
     public void UpdateButtons(string _folderName)
     {
@@ -166,6 +179,18 @@ public class NavigationView : MonoBehaviour {
         storedButton.Clear();
         isCopy = false;
     }
+
+	public void ClearPanels(){
+		foreach (RectTransform child in contentRect)
+		{
+			if (child.name == "PPT_Practice(Clone)")
+			{
+				GameObject.Destroy(child.gameObject);
+			}
+		}
+		storedButton.Clear();
+	}
+
 
     public void CreatePanels(string fileList)
     {
@@ -318,8 +343,20 @@ public class NavigationView : MonoBehaviour {
         
     }
 
-	public void CancelDownload(){
+	public void CancelDownloadButton(){
 		_userDrive.CancelDownload ();
+	}
+
+	public void ClickLogoutButton(){
+		if (_authCheck == AuthCheck.Succeed) {
+			_userDrive.Revoke (delegate(){
+				if(_currCloudType != 0){
+					ClearPanels();
+					SetupCloud(_currCloudType);
+				}
+			});
+		}
+
 	}
 
     public void ShowLoadingPanel()
