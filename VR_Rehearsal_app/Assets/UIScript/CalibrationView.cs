@@ -169,6 +169,7 @@ public class CalibrationView : MonoBehaviour
             avgSpeaking = Convert.ToInt32(debugText.text);
 #endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
+            PresentationData.in_VoiceThreshold = threshold;
             contentText.GetComponent<Text>().text = "see if it workes properly!";
 #if USE_ANDROID
             currentActivity.Call("startTestThreshold");

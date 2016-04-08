@@ -76,7 +76,7 @@ public class EvaluationUI_Manager : MonoBehaviour {
 			floatArr[i / 2] = '\0';
 			//UnityEngine.Debug.Log("max "+max);
 
-			AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, 8000, false, false); //8000 and 1 coming from Byunghwan's setting in native Android side
+			AudioClip myClip = AudioClip.Create("record", floatArr.Length, 1, 44100, false, false); //8000 and 1 coming from Byunghwan's setting in native Android side
 			myClip.SetData(floatArr, 0);
 			audioSource.clip = myClip;
 			// UnityEngine.Debug.Log("reset slider"); 

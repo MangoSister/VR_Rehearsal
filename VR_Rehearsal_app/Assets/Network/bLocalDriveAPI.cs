@@ -128,5 +128,7 @@ public class bLocalDriveAPI : bhClowdDriveAPI {
 	}
 	public override void StartAuthentication (Authentication_Callback callback){callback (true);}
 	public override void Update (){} 
-	public override void Revoke(){}
+	public override void Revoke(revoke_Callback callback){
+		callback ();
+	}
 }
