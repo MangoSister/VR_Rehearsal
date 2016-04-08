@@ -61,12 +61,9 @@ public class bDropboxAPI : bhClowdDriveAPI{
 	bool _isCanceled= false;
 
 
-
-
-
 	public override void StartAuthentication (Authentication_Callback callback){
 
-		string tmpToken = "";//PlayerPrefs.GetString ("Unity_dropbox_token"); 
+		string tmpToken = PlayerPrefs.GetString ("Unity_dropbox_token"); 
 		if (tmpToken.Length > 0) {
 			_token = tmpToken;
 		
@@ -89,6 +86,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 	public override void Revoke(){
 		PlayerPrefs.SetString ("Unity_dropbox_token", "");
+		PlayerPrefs.Save ();
 	}
 
 	/*
@@ -133,6 +131,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 				_isGetToken = true;
 
 				PlayerPrefs.SetString ("Unity_dropbox_token", _token);
+				PlayerPrefs.Save ();
 
 				_authen_callback (true);
 			} else if (_timeOut > 15.0) {
