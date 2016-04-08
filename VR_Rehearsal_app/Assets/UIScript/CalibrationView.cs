@@ -11,6 +11,9 @@ public class CalibrationView : MonoBehaviour
 {
 	public static bool isCalibrationDone;
 
+    enum Status {Begin =0, Silence = 1, Talking =2, Done =3 };
+    int currentStatus;
+
 	public GameObject popUpWindow;
 	public GameObject button;
     public GameObject calibrtaionData;
@@ -26,49 +29,59 @@ public class CalibrationView : MonoBehaviour
 	float curr_time = 0f;
 	float calc_timer;
 
-	bool silentFlag = false;
     bool updateVolumeFlag = false; //if true, then update volume every frame
-	bool isSilentCalibrationDone = false;
-	bool isMicroCalibrationDone = false;
-    bool isCalibrationSuccess = false;
-    bool isSilentDone = false;
 
     //for calling unity android activity
     private AndroidJavaClass unity;
     private AndroidJavaObject currentActivity;
 
     private int avgSilence, avgSpeaking, threshold=0;
-
+    bool isButtonClicked;
 	// Use this for initialization
 	void Start ()
 	{
-        Debug.Log("initializing");
         mainIcon_say.SetActive(false);
         isCalibrationDone = false;
 		descriptionPanel.SetActive(true);
 		circularProgress.SetActive(true);
 		curr_time = 0;
-
-        Debug.Log("setup unity activity");
+        currentStatus = 0;
+        isButtonClicked = false;
         debugText.text = "Loading";
         //setup Unity Activity
-		#if USE_ANDROID
+#if USE_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-		#endif
+#endif
         debugText.text = "Ready";
 	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		if (silentFlag == true) {
-			IncreaseTimer ();
-		}
 
+    // Update is called once per frame
+    void Update()
+    {
+        Debug.Log("status = " + currentStatus);
+        if (currentStatus == (int)Status.Done)
+        {
+            updateVolumeFlag = true;
+            button.GetComponent<Button>().interactable = false;
+        }
+        if (isButtonClicked == true)
+        {
+            IncreaseTimer();
+        }
+
+        if(currentStatus == (int)Status.Silence && isButtonClicked == false)
+        {
+            contentText.GetComponent<Text>().text = "Please say something...";
+            mainIcon_silence.SetActive(false);
+            mainIcon_say.SetActive(true);
+            currentStatus++;
+        }
         if (updateVolumeFlag == true)
         {
+
 #if USE_ANDROID
+
             int volume = currentActivity.Call<int>("getNowAvg");
 
             if (volume > (threshold * 1.5))
@@ -81,9 +94,9 @@ public class CalibrationView : MonoBehaviour
                 calibrtaionData.GetComponentInChildren<Text>().text = "<color=grey>" + volume + "</color>";
 #endif
         }
-        else
+        else {
             calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
-
+        }
 	}
 
 	void IncreaseTimer ()
@@ -92,14 +105,23 @@ public class CalibrationView : MonoBehaviour
 			curr_time += (Time.deltaTime * rate);
 			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount = curr_time/max_time;
 			button.GetComponent<Button>().interactable = false;
-
-		} else {
-			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount =  0;
-			silentFlag = false;
-			button.GetComponent<Button>().interactable = true;
-			ChangeTheText ();
 		}
-		isSilentCalibrationDone = true;
+        else
+        {
+            curr_time = 0;
+			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount =  0;
+            if(currentStatus != (int)Status.Done)
+            {
+#if USE_ANDROID
+        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
+#endif
+            }
+#if USE_ANDROID
+            avgSilence = Convert.ToInt32(debugText.text);
+#endif
+            button.GetComponent<Button>().interactable = true;
+            isButtonClicked = false;
+        }
 	}
 		
 	public void PopUpOKButtonClick ()
@@ -116,73 +138,33 @@ public class CalibrationView : MonoBehaviour
 		gameObject.SetActive (false);
 		isCalibrationDone = true;
 	}
-
-   
-	public void CalirbartionStartButtonClick ()
-	{
-		//First Silence button
-		if (isSilentCalibrationDone == false && isMicroCalibrationDone == false && button.GetComponentInChildren<Text> ().text == "Calibration Start") {
-			if (silentFlag == false) {
-				silentFlag = true;
-			}
-            Debug.Log("1");
+    
+    public void CalirbartionStartButtonClick()
+    {
+        //First Button Click
+        if (currentStatus == (int)Status.Begin) {
+            Debug.Log("first Silent button Clicked...");
 #if USE_ANDROID
             currentActivity.Call("startTestThreshold");
 #endif
-		} 
-
-		//First Done Button
-		else if (isSilentCalibrationDone == true && isMicroCalibrationDone == false && isSilentDone == false) {//&& button.GetComponentInChildren<Text> ().text == "Done !" ){
-            Debug.Log("2");
-            contentText.GetComponent<Text>().text = "Please say something...";
-            mainIcon_silence.SetActive(false);
-            mainIcon_say.SetActive(true);
-            isSilentDone = true;
+            currentStatus++;
+            isButtonClicked = true;
+        }
+    
+		//Second Button Click
+	if(currentStatus == (int)Status.Talking) { 
+            Debug.Log("2nd Talking button Clicked");
+#if USE_ANDROID
+            currentActivity.Call("startTestThreshold");
+#endif
+            isButtonClicked = true;
 #if USE_ANDROID
             avgSilence = Convert.ToInt32(debugText.text);
 #endif
-#if USE_ANDROID
-        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
-#endif
-        }
-
-        //Microbutton
-        else if(isSilentCalibrationDone == true && isMicroCalibrationDone == false && isSilentDone == true)
-        {
-            Debug.Log("3");
-#if USE_ANDROID
-            currentActivity.Call("startTestThreshold");
-#endif
-            calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
-            curr_time = 0;
-			silentFlag = true;
-			isMicroCalibrationDone = true;
-		}
-		//2nd Done Button
-		//else if(isSilentCalibrationDone == true && isMicroCalibrationDone == true){
-        else if (isSilentCalibrationDone == true && isMicroCalibrationDone == true) { 
-			popUpWindow.SetActive (false);
-			gameObject.SetActive (true);
-			//isCalibrationDone = true;
-            //now test volume
-#if USE_ANDROID
-            avgSpeaking = Convert.ToInt32(debugText.text);
-#endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
-            contentText.GetComponent<Text>().text = "see if it workes properly!";
-#if USE_ANDROID
-            currentActivity.Call("startTestThreshold");
-#endif
             updateVolumeFlag = true;
-		}
-	}
-
-	void ChangeTheText ()
-	{
-     button.GetComponentInChildren<Text> ().text = "Done !";
-#if USE_ANDROID
-        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
-#endif
+            currentStatus++;
+        }
 	}
 
     public void DoneButtonClick()
@@ -194,19 +176,7 @@ public class CalibrationView : MonoBehaviour
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
-
         isCalibrationDone = true;
 
     }
-    public void RestartButtonClick()
-    {
-        isSilentCalibrationDone = false;
-        isMicroCalibrationDone = false;
-        isCalibrationSuccess = false;
-        isSilentDone = false;
-        button.GetComponentInChildren<Text>().text = "Calibration Start";
-#if USE_ANDROID
-        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
-#endif
-    }
-}
+ }

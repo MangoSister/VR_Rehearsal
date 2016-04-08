@@ -97,7 +97,8 @@ public class RotationView : MonoBehaviour {
 
             }
             ///  _setManager.BShowcaseMgr.End();
-            prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
+            // prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
+            GlobalManager.EnterPresentation();
         }
     }
     public void SetSetupManager(SetupManager mg)

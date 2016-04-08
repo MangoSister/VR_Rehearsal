@@ -29,9 +29,7 @@ public class LocalCaseView : MonoBehaviour {
 
     int deleteCount = 0;
 
-    // Use this for initialization
     void Start () {
-        Debug.Log("delete Count " + deleteCount);
         isLocalCaseDone = false;
         isCustomizeButtonClicked = false;
         if (deleteCount == 0)
@@ -54,7 +52,6 @@ public class LocalCaseView : MonoBehaviour {
         GetComponent<RectTransform>().SetAsLastSibling();
     }
 	
-	// Update is called once per frame
 	void Update () {
 	
 	}
