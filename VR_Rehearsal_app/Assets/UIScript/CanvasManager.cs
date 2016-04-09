@@ -16,9 +16,6 @@ public class CanvasManager : MonoBehaviour {
 
    
 	void Awake () {
-
-        // Makes the status bar and navigation bar visible over the content (different content resize method) 
-        //ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         localShowCase.SetActive(false);
         fileTranser.SetActive(false);
         navigation.SetActive(false);
@@ -31,10 +28,8 @@ public class CanvasManager : MonoBehaviour {
         rotation.GetComponent<RotationView>().SetSetupManager(_setupManager);
         calibration.SetActive(false);
         rotation.SetActive(false);
-
     }
-
-
+    
     void Update () {
         /*
         if (LogoView.isLogoSceneDone)

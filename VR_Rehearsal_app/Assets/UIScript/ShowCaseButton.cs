@@ -9,12 +9,13 @@ public class ShowCaseButton : MonoBehaviour {
     private string _localPath;
     private string _id;
 	private int _expectedTime;
-    //UIManager uiManager;
+
     PrepHouseKeeper pHK;
     public GameObject optionCover;
 	public bool isShowcaseButtonClicked;
     string deletedShowcaseID;
     public bool isCustomizeButtonClicked;
+
     void Start () {
 		isShowcaseButtonClicked = false;
         optionCover.GetComponent<Image>().color = gameObject.GetComponent<Button>().colors.normalColor;
