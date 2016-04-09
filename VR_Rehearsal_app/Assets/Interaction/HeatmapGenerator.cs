@@ -42,17 +42,18 @@ public class HeatmapGenerator : MonoBehaviour
     //to: query end time
     //heatmap: generated heatmap
     //maxTime: the max staring time (of one direction) among all directions
-    public void GenerateMap(List<GazeSnapshot> gazeData, float from, float to, out Texture2D heatmap, out float maxElementTime)
+    public void GenerateMap(List<GazeSnapshot> gazeData, float from, float to, out Texture2D heatmap, out float maxElementTime, out float outOfBoundRatio)
     {
         if (gazeData == null || gazeData.Count == 0)
         {
             heatmap = null;
             maxElementTime = 0f;
+            outOfBoundRatio = 0f;
             return;
         }
 
         from = Mathf.Clamp(from, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
-         to = Mathf.Clamp(to, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
+        to = Mathf.Clamp(to, PresentationData.in_EnterTime, PresentationData.out_ExitTime);
         float halfProjHeight = Mathf.Tan(verticalFOVDeg * 0.5f * Mathf.Deg2Rad);
         float halfProjWidth = halfProjHeight * aspect;
         float length = to - from;
@@ -62,8 +63,8 @@ public class HeatmapGenerator : MonoBehaviour
                                  TextureFormat.ARGB32, false);
         float[] outputTime = new float[heatmap.width * heatmap.height];
         float outOfBoundTime = 0f;
+        float totalTime = 0f;
         Color[] outputCol = new Color[heatmap.width * heatmap.height];
-        Color outofBoundCol;
 
         float lastTime = gazeData[0].timeStamp;
         foreach (GazeSnapshot snapshot in gazeData)
@@ -78,23 +79,25 @@ public class HeatmapGenerator : MonoBehaviour
             float projX = 0.5f * (dir.x / dir.z + halfProjWidth) / halfProjWidth;
             float projY = 0.5f * (dir.y / dir.z + halfProjHeight) / halfProjHeight;
 
+            float deltaTime = (snapshot.timeStamp - lastTime);
+            totalTime += deltaTime;
+
             if (dir.z < 0f || projX < 0f || projX > 1f || projY < 0f || projY > 1f)
             {
-                outOfBoundTime += (snapshot.timeStamp - lastTime);
+                outOfBoundTime += deltaTime;
             }
             else
             {
                 int mapX = Mathf.FloorToInt(projX * (float)(heatmap.width));
                 int mapY = Mathf.FloorToInt(projY * (float)(heatmap.height));
 
-                outputTime[mapX + mapY * heatmap.width] += (snapshot.timeStamp - lastTime);
+                outputTime[mapX + mapY * heatmap.width] += deltaTime;
             }
 
             lastTime = snapshot.timeStamp;
         }
 
         maxElementTime = outputTime.Max();
-        maxElementTime = Mathf.Max(maxElementTime, outOfBoundTime);
         for (int i = 0; i < heatmap.width * heatmap.height; ++i)
         {
             outputCol[i] = heatmapGradient.Evaluate
@@ -102,18 +105,17 @@ public class HeatmapGenerator : MonoBehaviour
 				(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
             outputCol[i].a = 0.5f;
         }
-        outofBoundCol = heatmapGradient.Evaluate
-			(Mathf.Clamp01(heatmapColorCurve.Evaluate(outOfBoundTime / maxElementTime)));
-		outofBoundCol.a = 0.5f;
 
+
+        outOfBoundRatio = Mathf.Clamp01(outOfBoundTime / totalTime);
         heatmap.SetPixels(outputCol);
         heatmap.Apply();
     }
 
-    public void GenerateMapToFile(List<GazeSnapshot> gazeData, float from, float to, string path, out float maxTime)
+    public void GenerateMapToFile(List<GazeSnapshot> gazeData, float from, float to, string path, out float maxTime, out float outOfBoundRatio)
     {
         Texture2D heatmap;
-        GenerateMap(gazeData, from, to, out heatmap, out maxTime);
+        GenerateMap(gazeData, from, to, out heatmap, out maxTime, out outOfBoundRatio);
         File.WriteAllBytes(path, heatmap.EncodeToPNG());
     }
 
