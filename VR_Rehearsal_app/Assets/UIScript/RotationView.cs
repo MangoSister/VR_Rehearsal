@@ -73,6 +73,7 @@ public class RotationView : MonoBehaviour {
             // _setManager.BShowcaseMgr.End();
             //prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
             GlobalManager.EnterPresentation();
+
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
@@ -96,8 +97,6 @@ public class RotationView : MonoBehaviour {
                     break;
 
             }
-            ///  _setManager.BShowcaseMgr.End();
-            // prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
             GlobalManager.EnterPresentation();
         }
     }
