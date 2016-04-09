@@ -171,10 +171,28 @@ public class CalibrationView : MonoBehaviour
             avgSilence = Convert.ToInt32(debugText.text);
 #endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
+<<<<<<< HEAD
             //updateVolumeFlag = true;
             isFlag = true;
             currentStatus+=1;
         }
+=======
+            PresentationData.in_VoiceThreshold = threshold;
+            contentText.GetComponent<Text>().text = "see if it workes properly!";
+#if USE_ANDROID
+            currentActivity.Call("startTestThreshold");
+#endif
+            updateVolumeFlag = true;
+		}
+	}
+
+	void ChangeTheText ()
+	{
+     button.GetComponentInChildren<Text> ().text = "Done !";
+#if USE_ANDROID
+        debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
+#endif
+>>>>>>> 0f72b78493c9f2fa457259f2114d61030cf4ee08
 	}
 
     public void DoneButtonClick()

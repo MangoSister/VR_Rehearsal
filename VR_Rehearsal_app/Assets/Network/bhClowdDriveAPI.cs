@@ -17,6 +17,7 @@ public abstract class bhClowdDriveAPI{
 	public delegate void fileDownload_Cancel_Callback();
 
 	public delegate void fileDownload_Process_Callback (int total, int proceedNumber);
+	public delegate void revoke_Callback();
 
 	public abstract void StartAuthentication (Authentication_Callback callback);
 	public abstract bool GetFileListFromPath (string path, fileList_Callback callback);
@@ -32,7 +33,7 @@ public abstract class bhClowdDriveAPI{
 
 	public abstract void Update (); 
 	public abstract string GetRecentPath ();
-	public abstract void Revoke ();
+	public abstract void Revoke (revoke_Callback callback);
 
 
 	public abstract void CancelDownload ();
