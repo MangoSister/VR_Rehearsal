@@ -68,9 +68,6 @@ public class SceneController : MonoBehaviour
 
     void Start ()
     {
-#if UNITY_ANDROID
-     Screen.orientation = ScreenOrientation.LandscapeLeft;
-#endif
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 

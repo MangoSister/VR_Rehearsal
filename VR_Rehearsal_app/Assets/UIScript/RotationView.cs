@@ -47,7 +47,7 @@ public class RotationView : MonoBehaviour {
     void IsRotate()
     {
         
-        if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft || Input.deviceOrientation == DeviceOrientation.LandscapeRight)
+        if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
             ChangeLandscapeImage();
             PresentationData.in_SlidePath = _localPath;
