@@ -11,7 +11,7 @@ public class CalibrationView : MonoBehaviour
 {
 	public static bool isCalibrationDone;
 
-    enum Status {Begin =0, Silence = 1, Talking =2, Done =3 };
+    enum Status {Begin =0, Silence = 1, Talking =2, Done =3, showText = 4 };
     int currentStatus;
 
 	public GameObject popUpWindow;
@@ -28,6 +28,7 @@ public class CalibrationView : MonoBehaviour
 	float max_time = 100f;
 	float curr_time = 0f;
 	float calc_timer;
+    int stage = 0;
 
     bool updateVolumeFlag = false; //if true, then update volume every frame
 
@@ -37,6 +38,7 @@ public class CalibrationView : MonoBehaviour
 
     private int avgSilence, avgSpeaking, threshold=0;
     bool isButtonClicked;
+    bool isFlag;
 	// Use this for initialization
 	void Start ()
 	{
@@ -47,6 +49,7 @@ public class CalibrationView : MonoBehaviour
 		curr_time = 0;
         currentStatus = 0;
         isButtonClicked = false;
+        isFlag = false;
         debugText.text = "Loading";
         //setup Unity Activity
 #if USE_ANDROID
@@ -60,6 +63,7 @@ public class CalibrationView : MonoBehaviour
     void Update()
     {
         Debug.Log("status = " + currentStatus);
+        Debug.Log("Stage = " + stage);
         if (currentStatus == (int)Status.Done)
         {
             updateVolumeFlag = true;
@@ -69,7 +73,6 @@ public class CalibrationView : MonoBehaviour
         {
             IncreaseTimer();
         }
-
         if(currentStatus == (int)Status.Silence && isButtonClicked == false)
         {
             contentText.GetComponent<Text>().text = "Please say something...";
@@ -77,11 +80,10 @@ public class CalibrationView : MonoBehaviour
             mainIcon_say.SetActive(true);
             currentStatus++;
         }
-        if (updateVolumeFlag == true)
+
+        if (updateVolumeFlag == true && currentStatus == (int)Status.showText)
         {
-
 #if USE_ANDROID
-
             int volume = currentActivity.Call<int>("getNowAvg");
 
             if (volume > (threshold * 1.5))
@@ -94,12 +96,14 @@ public class CalibrationView : MonoBehaviour
                 calibrtaionData.GetComponentInChildren<Text>().text = "<color=grey>" + volume + "</color>";
 #endif
         }
+        
         else {
             calibrtaionData.GetComponentInChildren<Text>().text = "Calibration Start";
         }
-	}
+        
+    }
 
-	void IncreaseTimer ()
+    void IncreaseTimer ()
 	{
 		if (curr_time < 100) {
 			curr_time += (Time.deltaTime * rate);
@@ -108,6 +112,7 @@ public class CalibrationView : MonoBehaviour
 		}
         else
         {
+            stage += 1;
             curr_time = 0;
 			circularProgress.GetComponent<RectTransform>().FindChild("loading").GetComponent<Image>().fillAmount =  0;
             if(currentStatus != (int)Status.Done)
@@ -121,6 +126,10 @@ public class CalibrationView : MonoBehaviour
 #endif
             button.GetComponent<Button>().interactable = true;
             isButtonClicked = false;
+            if(currentStatus == (int)Status.Done)
+            {
+                currentStatus += 1;
+            }
         }
 	}
 		
@@ -147,7 +156,7 @@ public class CalibrationView : MonoBehaviour
 #if USE_ANDROID
             currentActivity.Call("startTestThreshold");
 #endif
-            currentStatus++;
+            currentStatus+=1;
             isButtonClicked = true;
         }
     
@@ -162,8 +171,9 @@ public class CalibrationView : MonoBehaviour
             avgSilence = Convert.ToInt32(debugText.text);
 #endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
-            updateVolumeFlag = true;
-            currentStatus++;
+            //updateVolumeFlag = true;
+            isFlag = true;
+            currentStatus+=1;
         }
 	}
 

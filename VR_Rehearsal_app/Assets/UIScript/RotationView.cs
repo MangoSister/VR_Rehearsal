@@ -71,7 +71,6 @@ public class RotationView : MonoBehaviour {
 
             }
             // _setManager.BShowcaseMgr.End();
-
             prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
         }
         else if (Input.GetKeyDown(KeyCode.R))
