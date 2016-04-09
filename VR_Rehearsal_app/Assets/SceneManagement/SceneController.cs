@@ -53,10 +53,6 @@ public class SceneController : MonoBehaviour
     public EnvType overrideEnvType;
 #endif
 
-    public Transform presentDest;
-    public Transform roomDoorIn;
-    public Transform roomDoorOut;
-
     public GameObject presenter;
     public Transform presenterHead;
     public MeshRenderer exitRenderer;
@@ -64,8 +60,8 @@ public class SceneController : MonoBehaviour
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
-    public TriggerCtrl slidesPlayerCtrl;
-    public clockTimer timer;
+    public InputManager inputManager;
+    public ClockTimer timer;
     public Tutorial_PptKaraoke tutManager;
 
     private AudioUnit _ambientUnit = null;
@@ -88,25 +84,30 @@ public class SceneController : MonoBehaviour
         crowdSim.Init();
 
         recordWrapper.Init();
-        recordWrapper.StartRecording();
 
         OperateAmbient(true);
         StartCoroutine(SilenceAfterOpenning_CR());
+
+        inputManager.OnPracticeBegin += BeginPractice;
     }
 
     private void LoadEnv()
     {
         GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
-        slidesPlayerCtrl = env.transform.GetComponentInChildren<TriggerCtrl>();
-        slidesPlayerCtrl.exitRenderer = exitRenderer;
-        slidesPlayerCtrl.OnExit += EndPresentation;
-        timer = env.transform.GetComponentInChildren<clockTimer>();
-        timer.SetTimer(PresentationData.in_ExpectedTime);
+
+        inputManager.player = env.transform.GetComponentInChildren<SlidesPlayer>();
+        inputManager.OnExit += EndPresentation;
+
+        timer = env.transform.GetComponentInChildren<ClockTimer>();
+        timer.SetMaxTime(10);
+        timer.enabled = false;
+
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
-        tutManager.slidePlayer = slidesPlayerCtrl.GetComponent<SlidesPlayer>();
-        tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
+
+        //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
+        //tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
     }
 
     private void OperateAmbient(bool enable)
@@ -126,6 +127,13 @@ public class SceneController : MonoBehaviour
         OperateAmbient(false);
     }
 
+    private void BeginPractice()
+    {
+        crowdSim.StartSimulation();
+        recordWrapper.StartRecording();
+        timer.enabled = true;
+    }
+
     public void EndPresentation()
     {
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
@@ -140,7 +148,7 @@ public class SceneController : MonoBehaviour
                 heatmapTracker.aspect,
                 heatmapTracker.output,
                 heatmapTracker.scn,
-                slidesPlayerCtrl.outputTransitionRecord,
+                inputManager.outputTransitionRecord,
                 recordWrapper.recordingFilePath,
                 recordWrapper.outputFluencyRecord
             );
