@@ -99,8 +99,7 @@ public class SceneController : MonoBehaviour
         inputManager.OnExit += EndPresentation;
 
         timer = env.transform.GetComponentInChildren<ClockTimer>();
-        timer.SetMaxTime(10);
-        timer.enabled = false;
+        timer.SetMaxTime((int)PresentationData.in_ExpectedTime);
 
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
@@ -131,7 +130,7 @@ public class SceneController : MonoBehaviour
     {
         crowdSim.StartSimulation();
         recordWrapper.StartRecording();
-        timer.enabled = true;
+        timer.StartCounting();
     }
 
     public void EndPresentation()
