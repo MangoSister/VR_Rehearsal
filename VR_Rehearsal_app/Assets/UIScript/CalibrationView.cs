@@ -175,18 +175,19 @@ public class CalibrationView : MonoBehaviour
             isFlag = true;
             currentStatus+=1;
         }
-    /*
-            PresentationData.in_VoiceThreshold = threshold;
-            contentText.GetComponent<Text>().text = "see if it workes properly!";
-#if USE_ANDROID
-            currentActivity.Call("startTestThreshold");
-#endif
-            updateVolumeFlag = true;
-		}
-        */
-	}
 
-	void ChangeTheText ()
+            
+        /*
+        contentText.GetComponent<Text>().text = "see if it workes properly!";
+#if USE_ANDROID
+        currentActivity.Call("startTestThreshold");
+#endif
+        updateVolumeFlag = true;
+    }
+    */
+    }
+
+    void ChangeTheText ()
 	{
      button.GetComponentInChildren<Text> ().text = "Done !";
 #if USE_ANDROID
@@ -203,7 +204,25 @@ public class CalibrationView : MonoBehaviour
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
+        PresentationData.in_VoiceThreshold = threshold;
         isCalibrationDone = true;
-
     }
- }
+
+    public void ResetButtonClicked()
+    {
+
+#if USE_ANDROID
+        currentActivity.Call<int>("stopTestThreshold");
+        currentActivity.Call("startTestThreshold");
+#endif
+        currentStatus = 0;
+        isFlag = false;
+        isButtonClicked = false;
+        stage = 0;
+        curr_time = 0;
+        if(currentStatus != (int)Status.Begin)
+        {
+            currentStatus = (int)Status.Begin;
+        }
+    }
+}

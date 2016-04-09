@@ -39,6 +39,7 @@ public class FileTransferView : MonoBehaviour {
 	// Update is called once per frame
 	public void DropboxButtonClicked()
     {
+        
 		bool res = CheckForInternetConnection ();
 		if (!res) {
 			#if UNITY_EDITOR
@@ -46,7 +47,7 @@ public class FileTransferView : MonoBehaviour {
 			#endif
 			return;
 		}
-
+       
         transferNumber = 1;
         gameObject.SetActive(false);
         isFileTransferViewDone = true;
