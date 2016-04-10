@@ -49,30 +49,33 @@ public class RotationView : MonoBehaviour {
         
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
-            ChangeLandscapeImage();
-            PresentationData.in_SlidePath = _localPath;
-            PresentationData.in_ExpectedTime = _expectedTime;
-            Debug.Log("local Path = "+_localPath);
-            Debug.Log("expected Time = " + _expectedTime);
-            // the unit of in_ExpectedTime is second
-            PresentationData.in_ExpectedTime = _expectedTime * 60;
-            switch (_sizeOfRoom)
+            if (Input.acceleration.y < 1.0f)
             {
-                case 0:
-                    PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
-                    break;
-                case 2:
-                    PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
-                    break;
+                ChangeLandscapeImage();
+                PresentationData.in_SlidePath = _localPath;
+                PresentationData.in_ExpectedTime = _expectedTime;
+                Debug.Log("local Path = " + _localPath);
+                Debug.Log("expected Time = " + _expectedTime);
+                // the unit of in_ExpectedTime is second
+                PresentationData.in_ExpectedTime = _expectedTime * 60;
+                switch (_sizeOfRoom)
+                {
+                    case 0:
+                        PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                        break;
+                    case 2:
+                        PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                        break;
 
-                case 3:
-                    PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
-                    break;
+                    case 3:
+                        PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                        break;
 
+                }
+                // _setManager.BShowcaseMgr.End();
+                //prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
+                GlobalManager.EnterPresentation();
             }
-            // _setManager.BShowcaseMgr.End();
-            //prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
-            GlobalManager.EnterPresentation();
 
         }
         else if (Input.GetKeyDown(KeyCode.R))
