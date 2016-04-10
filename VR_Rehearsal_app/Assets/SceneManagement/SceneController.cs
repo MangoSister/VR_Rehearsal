@@ -33,7 +33,8 @@ public class SceneController : MonoBehaviour
     public static Dictionary<EnvType, EnvInfo> EnvInfoDict = new Dictionary<EnvType, EnvInfo>
     {
         { EnvType.RPIS, new EnvInfo(null, "Lightmap-0_comp_light_RPIS", "lightprobes_RPIS", "rpis_chair") },
-        { EnvType.ConferenceRoom, new EnvInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF", "conferenceRoom_chair") }
+        { EnvType.ConferenceRoom, new EnvInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF", "conferenceRoom_chair") },
+        { EnvType.EmptySpace, new EnvInfo(null, "Lightmap-0_comp_light_EMPTY", "lightprobes_EMPTY", "rpis_chair") }
     };
 
     [Serializable]
