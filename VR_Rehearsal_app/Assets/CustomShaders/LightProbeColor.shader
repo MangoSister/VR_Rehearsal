@@ -22,8 +22,8 @@
 			{
 				"LightMode" = "ForwardBase"
 			}
-			Fog
-			{ Mode Global }
+			//Fog
+			//{ Mode Global }
 			CGPROGRAM
 
 			#pragma vertex vert
@@ -42,7 +42,8 @@
 			struct v2f
 			{
 				half4 pos : SV_POSITION;
-				fixed4 vLightingFog : TEXCOORD1; //xyz: vertex light color; w: vertex fog data
+				//fixed4 vLightingFog : TEXCOORD1; //xyz: vertex light color; (w: vertex fog data)
+				fixed3 vLightingFog : TEXCOORD1; //xyz: vertex light color; (w: vertex fog data)
 			};
 
 			uniform fixed3 _Color;
@@ -60,14 +61,15 @@
 				//light probe	
 				output.vLightingFog.xyz = ShadeSH9 (float4(worldN,1.0));
 
-				output.vLightingFog.w = exp(-length(_WorldSpaceCameraPos - worldPos) * unity_FogParams.x);
+				//output.vLightingFog.w = exp(-length(_WorldSpaceCameraPos - worldPos) * unity_FogParams.x);
 				return output;
 			}
 
 			fixed4 frag(v2f input) : SV_TARGET
 			{
 				fixed4 col =  fixed4(_Color, 1.0) * fixed4(input.vLightingFog.xyz, 1.0);
-				return lerp(unity_FogColor, col, input.vLightingFog.w);
+				return col;
+				//return lerp(unity_FogColor, col, input.vLightingFog.w);
 			}
 			ENDCG
 

@@ -39,11 +39,7 @@ public class FileTransferView : MonoBehaviour {
 	// Update is called once per frame
 	public void DropboxButtonClicked()
     {
-<<<<<<< HEAD
-        /*
-=======
-		/*
->>>>>>> 0f72b78493c9f2fa457259f2114d61030cf4ee08
+        
 		bool res = CheckForInternetConnection ();
 		if (!res) {
 			#if UNITY_EDITOR
@@ -51,22 +47,14 @@ public class FileTransferView : MonoBehaviour {
 			#endif
 			return;
 		}
-<<<<<<< HEAD
-        */
-=======
-		*/
->>>>>>> 0f72b78493c9f2fa457259f2114d61030cf4ee08
+       
         transferNumber = 1;
         gameObject.SetActive(false);
         isFileTransferViewDone = true;
      }
     public void GoogleButtonClicked()
     {
-<<<<<<< HEAD
-        /*
-=======
-		/*
->>>>>>> 0f72b78493c9f2fa457259f2114d61030cf4ee08
+
 		bool res = CheckForInternetConnection ();
 		if (!res) {
 			#if UNITY_EDITOR
@@ -74,9 +62,6 @@ public class FileTransferView : MonoBehaviour {
 			#endif
 			return;
 		}
-        */
-			
-		*/
         transferNumber = 2;
         gameObject.SetActive(false);
         isFileTransferViewDone = true;

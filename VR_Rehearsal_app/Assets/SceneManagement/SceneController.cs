@@ -33,7 +33,8 @@ public class SceneController : MonoBehaviour
     public static Dictionary<EnvType, EnvInfo> EnvInfoDict = new Dictionary<EnvType, EnvInfo>
     {
         { EnvType.RPIS, new EnvInfo(null, "Lightmap-0_comp_light_RPIS", "lightprobes_RPIS", "rpis_chair") },
-        { EnvType.ConferenceRoom, new EnvInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF", "conferenceRoom_chair") }
+        { EnvType.ConferenceRoom, new EnvInfo(null, "Lightmap-0_comp_light_CONF", "lightprobes_CONF", "conferenceRoom_chair") },
+        { EnvType.EmptySpace, new EnvInfo(null, "Lightmap-0_comp_light_EMPTY", "lightprobes_EMPTY", "rpis_chair") }
     };
 
     [Serializable]
@@ -53,10 +54,6 @@ public class SceneController : MonoBehaviour
     public EnvType overrideEnvType;
 #endif
 
-    public Transform presentDest;
-    public Transform roomDoorIn;
-    public Transform roomDoorOut;
-
     public GameObject presenter;
     public Transform presenterHead;
     public MeshRenderer exitRenderer;
@@ -64,17 +61,14 @@ public class SceneController : MonoBehaviour
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
-    public TriggerCtrl slidesPlayerCtrl;
-    public clockTimer timer;
+    public InputManager inputManager;
+    public ClockTimer timer;
     public Tutorial_PptKaraoke tutManager;
 
     private AudioUnit _ambientUnit = null;
 
     void Start ()
     {
-#if UNITY_ANDROID
-     Screen.orientation = ScreenOrientation.LandscapeLeft;
-#endif
         if (GlobalManager.screenTransition != null)
             GlobalManager.screenTransition.Fade(true, 1.0f);
 
@@ -88,25 +82,29 @@ public class SceneController : MonoBehaviour
         crowdSim.Init();
 
         recordWrapper.Init();
-        recordWrapper.StartRecording();
 
         OperateAmbient(true);
         StartCoroutine(SilenceAfterOpenning_CR());
+
+        inputManager.OnPracticeBegin += BeginPractice;
     }
 
     private void LoadEnv()
     {
         GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
-        slidesPlayerCtrl = env.transform.GetComponentInChildren<TriggerCtrl>();
-        slidesPlayerCtrl.exitRenderer = exitRenderer;
-        slidesPlayerCtrl.OnExit += EndPresentation;
-        timer = env.transform.GetComponentInChildren<clockTimer>();
-        timer.SetTimer(PresentationData.in_ExpectedTime);
+
+        inputManager.player = env.transform.GetComponentInChildren<SlidesPlayer>();
+        inputManager.OnExit += EndPresentation;
+
+        timer = env.transform.GetComponentInChildren<ClockTimer>();
+        timer.SetMaxTime((int)PresentationData.in_ExpectedTime);
+
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
-        tutManager.slidePlayer = slidesPlayerCtrl.GetComponent<SlidesPlayer>();
-        tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
+
+        //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
+        //tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
     }
 
     private void OperateAmbient(bool enable)
@@ -126,6 +124,13 @@ public class SceneController : MonoBehaviour
         OperateAmbient(false);
     }
 
+    private void BeginPractice()
+    {
+        crowdSim.StartSimulation();
+        recordWrapper.StartRecording();
+        timer.StartCounting();
+    }
+
     public void EndPresentation()
     {
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
@@ -140,7 +145,7 @@ public class SceneController : MonoBehaviour
                 heatmapTracker.aspect,
                 heatmapTracker.output,
                 heatmapTracker.scn,
-                slidesPlayerCtrl.outputTransitionRecord,
+                inputManager.outputTransitionRecord,
                 recordWrapper.recordingFilePath,
                 recordWrapper.outputFluencyRecord
             );

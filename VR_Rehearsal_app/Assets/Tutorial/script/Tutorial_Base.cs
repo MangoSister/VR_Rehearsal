@@ -11,7 +11,7 @@ using System.Collections;
 public class Tutorial_Base : MonoBehaviour {
 
     public SlidesPlayer slidePlayer;
-    public clockTimer timerPlayer;
+    public ClockTimer timerPlayer;
 
 	protected SpriteRenderer spriteRend;
 	public string tutorialName;

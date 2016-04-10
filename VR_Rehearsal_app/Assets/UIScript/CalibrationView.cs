@@ -81,7 +81,7 @@ public class CalibrationView : MonoBehaviour
             currentStatus++;
         }
 
-        if (updateVolumeFlag == true && currentStatus == (int)Status.showText)
+        if (updateVolumeFlag == true && stage == 2)
         {
 #if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
@@ -171,28 +171,28 @@ public class CalibrationView : MonoBehaviour
             avgSilence = Convert.ToInt32(debugText.text);
 #endif
             threshold = avgSilence + (avgSpeaking - avgSilence) / 2;
-<<<<<<< HEAD
             //updateVolumeFlag = true;
             isFlag = true;
             currentStatus+=1;
         }
-=======
-            PresentationData.in_VoiceThreshold = threshold;
-            contentText.GetComponent<Text>().text = "see if it workes properly!";
-#if USE_ANDROID
-            currentActivity.Call("startTestThreshold");
-#endif
-            updateVolumeFlag = true;
-		}
-	}
 
-	void ChangeTheText ()
+            
+        /*
+        contentText.GetComponent<Text>().text = "see if it workes properly!";
+#if USE_ANDROID
+        currentActivity.Call("startTestThreshold");
+#endif
+        updateVolumeFlag = true;
+    }
+    */
+    }
+
+    void ChangeTheText ()
 	{
      button.GetComponentInChildren<Text> ().text = "Done !";
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
->>>>>>> 0f72b78493c9f2fa457259f2114d61030cf4ee08
 	}
 
     public void DoneButtonClick()
@@ -204,7 +204,24 @@ public class CalibrationView : MonoBehaviour
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
+        PresentationData.in_VoiceThreshold = threshold;
         isCalibrationDone = true;
-
     }
- }
+
+    public void ResetButtonClicked()
+    {
+
+#if USE_ANDROID
+        currentActivity.Call<int>("stopTestThreshold");
+#endif
+        currentStatus = 0;
+        isFlag = false;
+        isButtonClicked = false;
+        stage = 0;
+        curr_time = 0;
+        if(currentStatus != (int)Status.Begin)
+        {
+            currentStatus = (int)Status.Begin;
+        }
+    }
+}

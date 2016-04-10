@@ -221,7 +221,7 @@ public class CrowdSimulator : MonoBehaviour
         CreateCrowd();
     }
 
-    private void Start()
+    public void StartSimulation()
     {
         if (_behaviorTree != null)
         {
@@ -231,6 +231,7 @@ public class CrowdSimulator : MonoBehaviour
             StartCoroutine(UpdateVoice_CR());
         }
     }
+
 
     private IEnumerator UpdateGazeEffect_CR()
     {
@@ -326,6 +327,7 @@ public class CrowdSimulator : MonoBehaviour
                     handler.repeatPeriodBound = new Vector2(30f, 60f);
 
                     var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.SetActive(false);
                     icon.transform.parent = ad.headTransform;
                     icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
                     ad.GetComponent<AudienceAnimHandlerFull>().eyeIcon = icon;
@@ -362,6 +364,7 @@ public class CrowdSimulator : MonoBehaviour
 
                     var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
                     icon.transform.parent = ad.headTransform;
+                    icon.SetActive(false);
                     icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
                     ad.GetComponent<AudienceAnimHandlerFollow>().eyeIcon = icon;
 
@@ -397,6 +400,7 @@ public class CrowdSimulator : MonoBehaviour
 
                     var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
                     icon.transform.parent = ad.headTransform;
+                    icon.SetActive(false);
                     icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
                     ad.GetComponent<AudienceAnimHandlerBasic>().eyeIcon = icon;
 
@@ -431,6 +435,7 @@ public class CrowdSimulator : MonoBehaviour
                     handler.controller = body;
 
                     var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
+                    icon.SetActive(false);
                     icon.transform.parent = ad.headTransform;
                     icon.transform.localPosition = AudienceAnimHandlerBasic.eyeIconOffset;
                     ad.GetComponent<AudienceAnimHandlerBasic>().eyeIcon = icon;
