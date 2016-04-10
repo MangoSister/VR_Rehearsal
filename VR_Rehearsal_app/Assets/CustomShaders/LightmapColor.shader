@@ -1,8 +1,8 @@
-﻿Shader "VR_Rehearsal_app/LightmapDiffuse"
+﻿Shader "VR_Rehearsal_app/LightmapColor"
 {
 	Properties
 	{
-		_MainTex ("Texture", 2D) = "white" {}
+		_Color("Color (rgb)", Color) = (1,1,1)
 	}
 	SubShader
 	{
@@ -32,27 +32,24 @@
 			struct appdata
 			{
 				half4 vertex : POSITION;
-				half2 uv : TEXCOORD0;
 				half2 uv_lm : TEXCOORD1;
 			};
 
 			struct v2f
 			{
 				half4 vertex : SV_POSITION;
-				half4 uv : TEXCOORD0; //xy: texture uv; zw: lightmap uv
+				half2 uv : TEXCOORD0; //xy: lightmap uv
 				//UNITY_FOG_COORDS(1)
 			};
 
-			uniform sampler2D _MainTex;
-			uniform half4 _MainTex_ST;
+			uniform fixed3 _Color;
 
 			v2f vert (appdata v)
 			{
 				v2f o;
 				UNITY_INITIALIZE_OUTPUT(v2f, o);
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
-				o.uv.zw = v.uv_lm *unity_LightmapST.xy + unity_LightmapST.zw;
+				o.uv.xy = v.uv_lm *unity_LightmapST.xy + unity_LightmapST.zw;
 				//UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
@@ -60,9 +57,9 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// sample the texture
-				fixed4 col = tex2D(_MainTex, i.uv);
+				fixed4 col = fixed4(_Color, 1.0);
 				// apply fog
-				col.rgb *= DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.uv.zw));
+				col.rgb *= DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.uv));
 				//UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
 			}
