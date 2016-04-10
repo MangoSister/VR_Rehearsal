@@ -213,7 +213,6 @@ public class CalibrationView : MonoBehaviour
 
 #if USE_ANDROID
         currentActivity.Call<int>("stopTestThreshold");
-        currentActivity.Call("startTestThreshold");
 #endif
         currentStatus = 0;
         isFlag = false;

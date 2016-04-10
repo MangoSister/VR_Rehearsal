@@ -23,13 +23,16 @@ public class LocalCaseView : MonoBehaviour {
     public bool isFileTransferClicked = false;
     public static bool isCustomizeButtonClicked;
     public GameObject customView;
-
+    public GameObject accTextX;
+    public GameObject accTexty;
+    public GameObject accTextz;
     int totalShowcase;
     
 
     int deleteCount = 0;
 
     void Start () {
+      
         isLocalCaseDone = false;
         isCustomizeButtonClicked = false;
         if (deleteCount == 0)
@@ -53,14 +56,24 @@ public class LocalCaseView : MonoBehaviour {
     }
 	
 	void Update () {
-	
-	}
+#if UNITY_ANDROID
+        CheckAccelometer();
+#endif
+
+    }
 
     public void SetSetupManager(SetupManager mg)
     {
         _setManager = mg;
     }
+    void CheckAccelometer()
+    {
 
+        accTextX.GetComponent<Text>().text = Input.acceleration.x.ToString();
+        accTexty.GetComponent<Text>().text = Input.acceleration.y.ToString();
+        accTextz.GetComponent<Text>().text = Input.acceleration.z.ToString();
+
+    }
     void CheckLocalPPT()
     {
         DeleteShowCase();
