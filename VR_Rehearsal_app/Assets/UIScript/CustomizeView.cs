@@ -29,8 +29,10 @@ public class CustomizeView : MonoBehaviour  {
     private string _pptID;
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
+    public bool isFromCustom;
      void Start () {
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
         isCustomizeDoneFromLocal = false;
     }
@@ -87,6 +89,7 @@ public class CustomizeView : MonoBehaviour  {
         }
         rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min);
         isCustomizeDone = true;
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
         gameObject.SetActive(false);
     }
     public void SetPPTID(string id)
@@ -129,8 +132,4 @@ public class CustomizeView : MonoBehaviour  {
         timer.GetComponent<InputField>().text = oldTime.ToString();
         isCustomizeDoneFromLocal = true;
     }
-
-
-  
-  
 }

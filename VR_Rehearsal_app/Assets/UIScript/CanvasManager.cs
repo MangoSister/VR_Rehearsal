@@ -13,9 +13,49 @@ public class CanvasManager : MonoBehaviour {
     public GameObject rotation;
 	public GameObject showCaseButton;
 	private SetupManager _setupManager;
+    private string _showCaseName;
+    private int _sizeOfRoom;
+    private int _numberOfAudience;
+    private string _localPath;
+    private string _id;
+    private int _expectedTime;
+    public bool isFromCustom;
 
-   
-	void Awake () {
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
+    {
+
+        _showCaseName = showCanseName;
+        _sizeOfRoom = sizeOfRoom;
+        _numberOfAudience = numberOfAudience;
+        _localPath = localPath;
+        _id = id;
+        _expectedTime = time;
+    }
+    public string GetShowCaseName()
+    {
+        return _showCaseName;
+    }
+    public int GetRoom()
+    {
+        return _sizeOfRoom;
+    }
+    public int GetAudience()
+    {
+        return _numberOfAudience;
+    }
+    public string GetLocalPath()
+    {
+        return _localPath;
+    }
+    public string GetPPTID()
+    {
+        return _id;
+    }
+    public int GetTime()
+    {
+        return _expectedTime;
+    }
+    void Awake () {
         localShowCase.SetActive(false);
         fileTranser.SetActive(false);
         navigation.SetActive(false);
@@ -29,7 +69,15 @@ public class CanvasManager : MonoBehaviour {
         calibration.SetActive(false);
         rotation.SetActive(false);
     }
-    
+   public void SetisFromCustom(bool res)
+    {
+        isFromCustom = res;
+    }
+    public bool GetisFromCustom()
+    {
+        return isFromCustom;
+        
+    }
     void Update () {
 
         ShowLocasShowView();
@@ -129,8 +177,6 @@ public class CanvasManager : MonoBehaviour {
             {
                 localShowCase.SetActive(false);
                 calibration.SetActive(true);
-               // rotation.SetActive(true);
-                //rotation.GetComponent<RotationView>().SetRotation(true);
             }
 
         }
@@ -149,8 +195,7 @@ public class CanvasManager : MonoBehaviour {
         }
 	}
     */
-
-    void NavigationBetweenView()
+      void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {

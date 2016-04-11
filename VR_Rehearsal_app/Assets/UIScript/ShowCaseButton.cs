@@ -15,9 +15,11 @@ public class ShowCaseButton : MonoBehaviour {
 	public bool isShowcaseButtonClicked;
     string deletedShowcaseID;
     public bool isCustomizeButtonClicked;
-
+    public bool isShocaseButtonData;
+  
     void Start () {
 		isShowcaseButtonClicked = false;
+        isShocaseButtonData = false;
         optionCover.GetComponent<Image>().color = gameObject.GetComponent<Button>().colors.normalColor;
     }
 	
@@ -38,6 +40,8 @@ public class ShowCaseButton : MonoBehaviour {
 
     public void OnShowCaseBUttonClicked()
     {
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetData(_showCaseName, _sizeOfRoom,_numberOfAudience, _localPath, _id, _expectedTime);
+        /*
         PresentationData.in_SlidePath = _localPath;
         PresentationData.in_ExpectedTime = _expectedTime;
 		// the unit of in_ExpectedTime is second
@@ -54,6 +58,7 @@ public class ShowCaseButton : MonoBehaviour {
                 PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
                 break;
           }
+          */
         isShowcaseButtonClicked = true;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowCalibrationView();
       //  GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();

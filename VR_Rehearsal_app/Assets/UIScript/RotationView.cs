@@ -10,7 +10,6 @@ public class RotationView : MonoBehaviour {
     private SetupManager _setManager;
     public float width = 16;
     public float height = 9f;
-    public GameObject camera;
     bShowcaseManager.showcase_Data customData;
     private string _showCaseName;
     private int _sizeOfRoom;
@@ -46,13 +45,53 @@ public class RotationView : MonoBehaviour {
         
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
-            if (Input.acceleration.y < 1.0f)
+          // bool res= GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom
+            if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
             {
                 PresentationData.in_SlidePath = _localPath;
-                PresentationData.in_ExpectedTime = _expectedTime;
-                Debug.Log("local Path = " + _localPath);
-                Debug.Log("expected Time = " + _expectedTime);
-                // the unit of in_ExpectedTime is second
+                PresentationData.in_ExpectedTime = _expectedTime * 60;
+                switch (_sizeOfRoom)
+                {
+                    case 0:
+                        PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                        break;
+                    case 2:
+                        PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                        break;
+
+                    case 3:
+                        PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                        break;
+                }
+            }
+            else
+            {
+                
+                PresentationData.in_SlidePath = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetLocalPath();
+                PresentationData.in_ExpectedTime = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetTime() * 60;
+                _sizeOfRoom = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetRoom();
+                switch (_sizeOfRoom)
+                {
+                    case 0:
+                        PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                        break;
+                    case 2:
+                        PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                        break;
+
+                    case 3:
+                        PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                        break;
+                }
+            }
+               GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
+               GlobalManager.EnterPresentation();
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
+            {
+                PresentationData.in_SlidePath = _localPath;
                 PresentationData.in_ExpectedTime = _expectedTime * 60;
                 switch (_sizeOfRoom)
                 {
@@ -68,31 +107,28 @@ public class RotationView : MonoBehaviour {
                         break;
 
                 }
-                GlobalManager.EnterPresentation();
+              
             }
-        }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            PresentationData.in_SlidePath = _localPath;
-            PresentationData.in_ExpectedTime = _expectedTime;
-            Debug.Log("local Path = " + _localPath);
-            Debug.Log("expected Time = " + _expectedTime);
-
-            PresentationData.in_ExpectedTime = _expectedTime * 60;
-            switch (_sizeOfRoom)
+            else
             {
-                case 0:
-                    PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
-                    break;
-                case 2:
-                    PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
-                    break;
+                PresentationData.in_SlidePath = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetLocalPath();
+                PresentationData.in_ExpectedTime = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetTime() * 60;
+                _sizeOfRoom = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetRoom();
+                switch (_sizeOfRoom)
+                {
+                    case 0:
+                        PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                        break;
+                    case 2:
+                        PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                        break;
 
-                case 3:
-                    PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
-                    break;
-
+                    case 3:
+                        PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                        break;
+                }
             }
+            GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
             GlobalManager.EnterPresentation();
         }
     }
