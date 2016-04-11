@@ -31,9 +31,7 @@ public class RotationView : MonoBehaviour {
     // Use this for initialization
     void Start () {
         isRotationDone = false;
-        landPanel.SetActive(false);
         verPanel.SetActive(true);
-      
 	}
 	
 	// Update is called once per frame
@@ -41,7 +39,6 @@ public class RotationView : MonoBehaviour {
         if (_isRotate == true)
         {
             IsRotate();
-            ChangeLandscapeImage();
         }
     }
     void IsRotate()
@@ -51,7 +48,6 @@ public class RotationView : MonoBehaviour {
         {
             if (Input.acceleration.y < 1.0f)
             {
-                ChangeLandscapeImage();
                 PresentationData.in_SlidePath = _localPath;
                 PresentationData.in_ExpectedTime = _expectedTime;
                 Debug.Log("local Path = " + _localPath);
@@ -72,11 +68,8 @@ public class RotationView : MonoBehaviour {
                         break;
 
                 }
-                // _setManager.BShowcaseMgr.End();
-                //prepHouse.GetComponent<PrepHouseKeeper>().NextScene();
                 GlobalManager.EnterPresentation();
             }
-
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
@@ -84,7 +77,7 @@ public class RotationView : MonoBehaviour {
             PresentationData.in_ExpectedTime = _expectedTime;
             Debug.Log("local Path = " + _localPath);
             Debug.Log("expected Time = " + _expectedTime);
-            // the unit of in_ExpectedTime is second
+
             PresentationData.in_ExpectedTime = _expectedTime * 60;
             switch (_sizeOfRoom)
             {
@@ -111,10 +104,4 @@ public class RotationView : MonoBehaviour {
     {
         _isRotate = rotation;
     }
-    void ChangeLandscapeImage()
-    {
-        camera.GetComponent<Camera>().aspect = width / height;
-        verPanel.SetActive(false);
-        landPanel.SetActive(true);
-    }
-}
+ }

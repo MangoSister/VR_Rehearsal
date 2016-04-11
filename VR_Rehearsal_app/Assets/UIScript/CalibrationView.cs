@@ -23,6 +23,8 @@ public class CalibrationView : MonoBehaviour
     public Text debugText;
 	public GameObject mainIcon_silence;
     public GameObject mainIcon_say;
+    public GameObject doneButton;
+    public GameObject resetButton;
 
 	float rate = 20f;
 	float max_time = 100f;
@@ -161,7 +163,7 @@ public class CalibrationView : MonoBehaviour
         }
     
 		//Second Button Click
-	if(currentStatus == (int)Status.Talking) { 
+	else if(currentStatus == (int)Status.Talking) { 
             Debug.Log("2nd Talking button Clicked");
 #if USE_ANDROID
             currentActivity.Call("startTestThreshold");
@@ -174,6 +176,10 @@ public class CalibrationView : MonoBehaviour
             //updateVolumeFlag = true;
             isFlag = true;
             currentStatus+=1;
+        }
+        else if(currentStatus == (int)Status.showText)
+        {
+            button.GetComponent<Button>().interactable = false;
         }
 
             
@@ -197,31 +203,36 @@ public class CalibrationView : MonoBehaviour
 
     public void DoneButtonClick()
     {
-        Debug.Log("threshold = " + threshold);
-        calibrtaionData.GetComponent<Text>().text = threshold.ToString();
-        gameObject.SetActive(false);
+        if (currentStatus == (int)Status.showText)
+        {
+            Debug.Log("threshold = " + threshold);
+            calibrtaionData.GetComponent<Text>().text = threshold.ToString();
+            gameObject.SetActive(false);
 
 #if USE_ANDROID
         debugText.text = (currentActivity.Call<int>("stopTestThreshold")).ToString();
 #endif
-        PresentationData.in_VoiceThreshold = threshold;
-        isCalibrationDone = true;
+            PresentationData.in_VoiceThreshold = threshold;
+            isCalibrationDone = true;
+        }
     }
 
     public void ResetButtonClicked()
     {
-
+        if (currentStatus == (int)Status.showText)
+        {
 #if USE_ANDROID
         currentActivity.Call<int>("stopTestThreshold");
 #endif
-        currentStatus = 0;
-        isFlag = false;
-        isButtonClicked = false;
-        stage = 0;
-        curr_time = 0;
-        if(currentStatus != (int)Status.Begin)
-        {
-            currentStatus = (int)Status.Begin;
+            currentStatus = 0;
+            isFlag = false;
+            isButtonClicked = false;
+            stage = 0;
+            curr_time = 0;
+            if (currentStatus != (int)Status.Begin)
+            {
+                currentStatus = (int)Status.Begin;
+            }
         }
     }
 }
