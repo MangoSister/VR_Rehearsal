@@ -58,8 +58,10 @@ public class ReplayController : MonoBehaviour {
             if (audioSource.isPlaying == true)
                 audioSource.Stop();
         }
+        CanvasManager.againTrigger = true;
+        Application.LoadLevel("sc_UI");
 
-        GlobalManager.EnterPresentation();
+        //GlobalManager.EnterPresentation();
     }
 
     public void exitRehearsal()
@@ -69,9 +71,9 @@ public class ReplayController : MonoBehaviour {
             if (audioSource.isPlaying == true)
                 audioSource.Stop();
         }
+        CanvasManager.finishTrigger = true;
+        Application.LoadLevel("sc_UI");
 
-
-        
     }
 
     private String getTimeString(float time)

@@ -68,7 +68,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			_token = "";
 		}
 
-		if (_token != "null" ||_token != "" ) {
+		if (_token != "null" && _token != "" ) {
 
 		
 		} else {
