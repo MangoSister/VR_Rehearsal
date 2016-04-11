@@ -47,12 +47,10 @@ public class SceneController : MonoBehaviour
     [SerializeField]
     public EnvDict envPrefabs = new EnvDict();
 
-#if UNITY_EDITOR
-    [HideInInspector]
+    //[HideInInspector, SerializeField]
     public bool overrideEnv;
-    [HideInInspector]
+    //[HideInInspector, SerializeField]
     public EnvType overrideEnvType;
-#endif
 
     public GameObject presenter;
     public Transform presenterHead;
