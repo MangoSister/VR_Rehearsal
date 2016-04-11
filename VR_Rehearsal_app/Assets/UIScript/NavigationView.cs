@@ -353,6 +353,7 @@ public class NavigationView : MonoBehaviour {
 				if(_currCloudType != 0){
 					ClearPanels();
 					SetupCloud(_currCloudType);
+                   
 				}
 			});
 		}

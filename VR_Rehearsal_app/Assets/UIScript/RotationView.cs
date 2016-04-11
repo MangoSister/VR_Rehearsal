@@ -27,13 +27,11 @@ public class RotationView : MonoBehaviour {
         _id = id;
         _expectedTime = time;
     }
-    // Use this for initialization
     void Start () {
         isRotationDone = false;
         verPanel.SetActive(true);
 	}
 	
-	// Update is called once per frame
 	void Update () {
         if (_isRotate == true)
         {
@@ -45,7 +43,6 @@ public class RotationView : MonoBehaviour {
         
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
-          // bool res= GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom
             if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
             {
                 PresentationData.in_SlidePath = _localPath;
@@ -89,8 +86,10 @@ public class RotationView : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
+  
             if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
             {
+                //pc local custombutton-> custom -> rotation -> scene;
                 PresentationData.in_SlidePath = _localPath;
                 PresentationData.in_ExpectedTime = _expectedTime * 60;
                 switch (_sizeOfRoom)
@@ -107,9 +106,13 @@ public class RotationView : MonoBehaviour {
                         break;
 
                 }
-              
+                Debug.Log("before DATA --------------");
+                Debug.Log(PresentationData.in_SlidePath);
+                Debug.Log(PresentationData.in_ExpectedTime);
+                Debug.Log(_sizeOfRoom);
             }
             else
+            //pc -> custom -> rotation -> scene;
             {
                 PresentationData.in_SlidePath = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetLocalPath();
                 PresentationData.in_ExpectedTime = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetTime() * 60;
@@ -129,6 +132,10 @@ public class RotationView : MonoBehaviour {
                 }
             }
             GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
+            Debug.Log("before DATA --------------");
+            Debug.Log(PresentationData.in_SlidePath);
+            Debug.Log(PresentationData.in_ExpectedTime);
+            Debug.Log(_sizeOfRoom);
             GlobalManager.EnterPresentation();
         }
     }

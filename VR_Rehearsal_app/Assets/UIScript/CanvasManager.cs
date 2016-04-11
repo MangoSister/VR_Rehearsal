@@ -12,6 +12,10 @@ public class CanvasManager : MonoBehaviour {
     public GameObject calibration;
     public GameObject rotation;
 	public GameObject showCaseButton;
+
+    static public bool againTrigger = false;
+    static public bool finishTrigger = false;
+
 	private SetupManager _setupManager;
     private string _showCaseName;
     private int _sizeOfRoom;
@@ -78,6 +82,14 @@ public class CanvasManager : MonoBehaviour {
         return isFromCustom;
         
     }
+   public void PlayAgainButtonClicked()
+    {
+        if(againTrigger == true)
+        {
+            ShowRotationView();
+        }
+
+    }
     void Update () {
 
         ShowLocasShowView();
@@ -98,6 +110,13 @@ public class CanvasManager : MonoBehaviour {
             localShowCase.SetActive(true);
             LogoView.isLogoSceneDone = false;
             fileTranser.SetActive(false);
+        }
+        else if(finishTrigger == true)
+        {
+            localShowCase.SetActive(true);
+            LogoView.isLogoSceneDone = false;
+            fileTranser.SetActive(false);
+            finishTrigger = false;
         }
     }
 
@@ -166,6 +185,17 @@ public class CanvasManager : MonoBehaviour {
         {
             CalibrationView.isCalibrationDone = false;
             rotation.SetActive(true);
+            rotation.GetComponent<RotationView>().SetRotation(true);
+        }
+        else if(againTrigger == true)
+        {
+            Debug.Log("After DATA --------------");
+            Debug.Log(_localPath);
+            Debug.Log(_expectedTime);
+            Debug.Log(_sizeOfRoom);
+            Debug.Log("---------------------------");
+            rotation.SetActive(true);
+            localShowCase.SetActive(false);
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
     }
