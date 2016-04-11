@@ -68,7 +68,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			_token = "";
 		}
 
-		if (_token.Length > 0 && _token != "" ) {
+		if (_token != "null" ||_token != "" ) {
 
 		
 		} else {
@@ -192,14 +192,14 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			#if UNITY_EDITOR
 				
 			#elif UNITY_ANDROID
-			if(_token == ""){
+			if(_token == "null" ||_token == ""){
 				AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 				AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
 				_token = currentActivity.Call<string> ("getTokenFromNative");
 			}
 			#endif
 
-			if (_token != "") {
+			if (_token != "" && _token != "null") {
 				_isGetToken = true;
 
 				bool res = SaveTokenBinaryInLocal();
