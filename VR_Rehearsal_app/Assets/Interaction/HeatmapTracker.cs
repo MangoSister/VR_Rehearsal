@@ -143,16 +143,6 @@ public class HeatmapTracker : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        StartTrack();
-    }
-
-    private void OnDisable()
-    {
-        StopTrack();
-    }
-
     public List<GazeSnapshot> output
     {
         get

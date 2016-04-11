@@ -13,9 +13,49 @@ public class CanvasManager : MonoBehaviour {
     public GameObject rotation;
 	public GameObject showCaseButton;
 	private SetupManager _setupManager;
+    private string _showCaseName;
+    private int _sizeOfRoom;
+    private int _numberOfAudience;
+    private string _localPath;
+    private string _id;
+    private int _expectedTime;
+    public bool isFromCustom;
 
-   
-	void Awake () {
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
+    {
+
+        _showCaseName = showCanseName;
+        _sizeOfRoom = sizeOfRoom;
+        _numberOfAudience = numberOfAudience;
+        _localPath = localPath;
+        _id = id;
+        _expectedTime = time;
+    }
+    public string GetShowCaseName()
+    {
+        return _showCaseName;
+    }
+    public int GetRoom()
+    {
+        return _sizeOfRoom;
+    }
+    public int GetAudience()
+    {
+        return _numberOfAudience;
+    }
+    public string GetLocalPath()
+    {
+        return _localPath;
+    }
+    public string GetPPTID()
+    {
+        return _id;
+    }
+    public int GetTime()
+    {
+        return _expectedTime;
+    }
+    void Awake () {
         localShowCase.SetActive(false);
         fileTranser.SetActive(false);
         navigation.SetActive(false);
@@ -29,45 +69,17 @@ public class CanvasManager : MonoBehaviour {
         calibration.SetActive(false);
         rotation.SetActive(false);
     }
-    
+   public void SetisFromCustom(bool res)
+    {
+        isFromCustom = res;
+    }
+    public bool GetisFromCustom()
+    {
+        return isFromCustom;
+        
+    }
     void Update () {
-        /*
-        if (LogoView.isLogoSceneDone)
-        {
-            localShowCase.SetActive(true);
-            LogoView.isLogoSceneDone = false;
-            fileTranser.SetActive(false);
-        }
-        if (LocalCaseView.isLocalCaseDone)
-        {
-            fileTranser.SetActive(true);
-            LocalCaseView.isLocalCaseDone = false;
-        }
-        if (FileTransferView.isFileTransferViewDone)
-        {
-            int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
-            navigation.SetActive(true);
-            Debug.Log(transferType);
-            navigation.GetComponent<NavigationView>().SetupCloud(transferType);
-            FileTransferView.isFileTransferViewDone = false;
-        }
-        if (NavigationView.isNavigationDone)
-        {
-            NavigationView.isNavigationDone = false;
-            customize.SetActive(true);
-        }
-        if (CustomizeView.isCustomizeDone)
-        {
-            CustomizeView.isCustomizeDone = false;
-            calibration.SetActive(true);
-        }
-        if (CalibrationView.isCalibrationDone)
-        {
-            CalibrationView.isCalibrationDone = false;
-            rotation.SetActive(true);
-            rotation.GetComponent<RotationView>().SetRotation(true);
-        }
-        */
+
         ShowLocasShowView();
         ShowFileTransferView();
         ShowNavigationView();
@@ -77,7 +89,6 @@ public class CanvasManager : MonoBehaviour {
         NavigationBetweenView();
         ShowCustomViewFromLocalCaseView();
         ShowCustomViewToLocalView();
-
 
     }
     public void ShowLocasShowView()
@@ -158,6 +169,19 @@ public class CanvasManager : MonoBehaviour {
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
     }
+    public void DirectShowCalibrationView()
+    {
+        foreach (GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
+        {
+            if (temp.GetComponent<ShowCaseButton>().isShowcaseButtonClicked == true)
+            {
+                localShowCase.SetActive(false);
+                calibration.SetActive(true);
+            }
+
+        }
+    }
+    /*
 	public void DirectShowRotationView(){
         foreach(GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
         {
@@ -170,7 +194,8 @@ public class CanvasManager : MonoBehaviour {
 
         }
 	}
-    void NavigationBetweenView()
+    */
+      void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {

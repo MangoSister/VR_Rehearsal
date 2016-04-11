@@ -67,8 +67,8 @@ public static class GlobalManager
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
 
-        if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
-            SceneManager.LoadScene(_PRESENT_SCENE_NAME);
+        //if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
+        SceneManager.LoadScene(_PRESENT_SCENE_NAME);
         //Application.LoadLevel(param.sceneName);
     }
 

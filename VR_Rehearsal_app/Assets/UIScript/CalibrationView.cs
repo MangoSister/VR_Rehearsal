@@ -64,8 +64,6 @@ public class CalibrationView : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("status = " + currentStatus);
-        Debug.Log("Stage = " + stage);
         if (currentStatus == (int)Status.Done)
         {
             updateVolumeFlag = true;
@@ -233,6 +231,7 @@ public class CalibrationView : MonoBehaviour
             {
                 currentStatus = (int)Status.Begin;
             }
+            button.GetComponent<Button>().interactable = true;
         }
     }
 }

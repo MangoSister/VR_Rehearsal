@@ -127,6 +127,7 @@ public class SceneController : MonoBehaviour
     private void BeginPractice()
     {
         crowdSim.StartSimulation();
+        heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
         timer.StartCounting();
     }
@@ -134,6 +135,7 @@ public class SceneController : MonoBehaviour
     public void EndPresentation()
     {
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
+        heatmapTracker.StartTrack();
         recordWrapper.EndRecording();
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
 #if UNITY_ANDROID
