@@ -26,12 +26,12 @@ public class SceneControllerInspector : Editor
         EditorHelper.ShowEnumDict(ref copy, ref tmpType, ref tmpObj, "Environments");
         ctrl.envPrefabs = new SceneController.EnvDict(copy);
 
-        ctrl.overrideEnv = EditorGUILayout.BeginToggleGroup("Override Env Type?", ctrl.overrideEnv);
-        ctrl.overrideEnvType = (EnvType)EditorGUILayout.EnumPopup("Type", ctrl.overrideEnvType);
+        //ctrl.overrideEnv = EditorGUILayout.BeginToggleGroup("Override Env Type?", ctrl.overrideEnv);
+        //ctrl.overrideEnvType = (EnvType)EditorGUILayout.EnumPopup("Type", ctrl.overrideEnvType);
         GUI.enabled = false;
         EditorGUILayout.TextField("Crowd Config File Name", SceneController.EnvInfoDict[ctrl.overrideEnvType].crowdConfigPath);
         GUI.enabled = true;
-        EditorGUILayout.EndToggleGroup();
+        //EditorGUILayout.EndToggleGroup();
 
         serializedObject.ApplyModifiedProperties();
     }
