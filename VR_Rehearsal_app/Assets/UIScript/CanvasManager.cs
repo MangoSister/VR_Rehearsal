@@ -17,6 +17,7 @@ public class CanvasManager : MonoBehaviour {
     static public bool finishTrigger = false;
 
 	private SetupManager _setupManager;
+    bShowcaseManager.showcase_Data customData;
     private string _showCaseName;
     private int _sizeOfRoom;
     private int _numberOfAudience;
@@ -27,7 +28,6 @@ public class CanvasManager : MonoBehaviour {
 
     public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
     {
-
         _showCaseName = showCanseName;
         _sizeOfRoom = sizeOfRoom;
         _numberOfAudience = numberOfAudience;
@@ -58,6 +58,20 @@ public class CanvasManager : MonoBehaviour {
     public int GetTime()
     {
         return _expectedTime;
+    }
+    public void SetPPTID(string str)
+    {
+        _id = str;
+        GetDataByID(_id);
+    }
+    public void GetDataByID(string pptID)
+    {
+        bShowcaseManager.showcase_Data? tempShocase = _setupManager.BShowcaseMgr.GetSignleShowcase(_id);
+        if (tempShocase != null) {
+
+            SetData(tempShocase.Value._showcaseName, (int)tempShocase.Value._mapIdx, (int)tempShocase.Value._percentageOfAudience, tempShocase.Value._pptFolderPath, tempShocase.Value._showcaseID, (int)tempShocase.Value._expetedTime_min);      
+        }
+        
     }
     void Awake () {
         localShowCase.SetActive(false);
@@ -117,6 +131,10 @@ public class CanvasManager : MonoBehaviour {
             LogoView.isLogoSceneDone = false;
             fileTranser.SetActive(false);
             finishTrigger = false;
+        }
+        else if (againTrigger ==true)
+        {
+            localShowCase.SetActive(false);
         }
     }
 
@@ -189,14 +207,11 @@ public class CanvasManager : MonoBehaviour {
         }
         else if(againTrigger == true)
         {
-            Debug.Log("After DATA --------------");
-            Debug.Log(_localPath);
-            Debug.Log(_expectedTime);
-            Debug.Log(_sizeOfRoom);
-            Debug.Log("---------------------------");
+
             rotation.SetActive(true);
             localShowCase.SetActive(false);
             rotation.GetComponent<RotationView>().SetRotation(true);
+
         }
     }
     public void DirectShowCalibrationView()

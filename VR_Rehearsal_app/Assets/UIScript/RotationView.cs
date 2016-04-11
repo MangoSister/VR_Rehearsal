@@ -43,7 +43,12 @@ public class RotationView : MonoBehaviour {
         
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
-            if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
+            if(CanvasManager.againTrigger == true)
+            {
+                GlobalManager.EnterPresentation();
+                CanvasManager.againTrigger = false;
+            }
+            else if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
             {
                 PresentationData.in_SlidePath = _localPath;
                 PresentationData.in_ExpectedTime = _expectedTime * 60;
@@ -63,7 +68,6 @@ public class RotationView : MonoBehaviour {
             }
             else
             {
-                
                 PresentationData.in_SlidePath = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetLocalPath();
                 PresentationData.in_ExpectedTime = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetTime() * 60;
                 _sizeOfRoom = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetRoom();
@@ -81,13 +85,18 @@ public class RotationView : MonoBehaviour {
                         break;
                 }
             }
-               GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
-               GlobalManager.EnterPresentation();
+            GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
+            GlobalManager.EnterPresentation();
         }
+
         else if (Input.GetKeyDown(KeyCode.R))
         {
-  
-            if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
+            if (CanvasManager.againTrigger)
+            {
+                GlobalManager.EnterPresentation();
+                CanvasManager.againTrigger = false;
+            }
+            else if (GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetisFromCustom())
             {
                 //pc local custombutton-> custom -> rotation -> scene;
                 PresentationData.in_SlidePath = _localPath;
@@ -106,10 +115,31 @@ public class RotationView : MonoBehaviour {
                         break;
 
                 }
-                Debug.Log("before DATA --------------");
-                Debug.Log(PresentationData.in_SlidePath);
-                Debug.Log(PresentationData.in_ExpectedTime);
-                Debug.Log(_sizeOfRoom);
+            }
+            else if (CanvasManager.againTrigger)
+            {
+                string id = PlayerPrefs.GetString("currentShowcase");
+                Debug.Log("TEST --=== " + id);
+                if (id != null)
+                {
+                    bShowcaseManager.showcase_Data? tempShowCaseData = _setManager.BShowcaseMgr.GetSignleShowcase(id);
+                    PresentationData.in_SlidePath = tempShowCaseData.Value._pptFolderPath;
+                    PresentationData.in_ExpectedTime = (int)tempShowCaseData.Value._expetedTime_min;
+                    _sizeOfRoom = (int)tempShowCaseData.Value._mapIdx;
+                    switch (_sizeOfRoom)
+                    {
+                        case 0:
+                            PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
+                            break;
+                        case 2:
+                            PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
+                            break;
+
+                        case 3:
+                            PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
+                            break;
+                    }
+                }
             }
             else
             //pc -> custom -> rotation -> scene;
@@ -131,11 +161,8 @@ public class RotationView : MonoBehaviour {
                         break;
                 }
             }
+        
             GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
-            Debug.Log("before DATA --------------");
-            Debug.Log(PresentationData.in_SlidePath);
-            Debug.Log(PresentationData.in_ExpectedTime);
-            Debug.Log(_sizeOfRoom);
             GlobalManager.EnterPresentation();
         }
     }

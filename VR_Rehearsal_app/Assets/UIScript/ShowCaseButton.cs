@@ -37,31 +37,14 @@ public class ShowCaseButton : MonoBehaviour {
         _id = id;
         _expectedTime = time;
     }
-
+  
     public void OnShowCaseBUttonClicked()
     {
-        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetData(_showCaseName, _sizeOfRoom,_numberOfAudience, _localPath, _id, _expectedTime);
-        /*
-        PresentationData.in_SlidePath = _localPath;
-        PresentationData.in_ExpectedTime = _expectedTime;
-		// the unit of in_ExpectedTime is second
-		PresentationData.in_ExpectedTime = _expectedTime * 60;
-        switch (_sizeOfRoom) {
-            case 0:
-                PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
-                    break;
-            case 2:
-                PresentationData.in_EnvType = PresentationData.EnvType.EmptySpace;
-                break;
-
-            case 3:
-                PresentationData.in_EnvType = PresentationData.EnvType.ConferenceRoom;
-                break;
-          }
-          */
+       // GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetData(_showCaseName, _sizeOfRoom,_numberOfAudience, _localPath, _id, _expectedTime);
+        Debug.Log("ID  : " + _id);
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetPPTID(_id);
         isShowcaseButtonClicked = true;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowCalibrationView();
-      //  GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
 
     }
 
@@ -72,7 +55,6 @@ public class ShowCaseButton : MonoBehaviour {
     }
     public void CustomeButtonClicked()
     {
-        Debug.Log("Customize Button Clicked");
         isCustomizeButtonClicked = true;
         GameObject.Find("LocalCaseCanvas").GetComponent<LocalCaseView>().EditShowCase(_showCaseName, _sizeOfRoom,_numberOfAudience,_localPath, _id,_expectedTime);
     }

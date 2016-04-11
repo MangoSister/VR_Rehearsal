@@ -135,7 +135,18 @@ public class bShowcaseManager  {
 		return true;
 	}
 
-	public bool DeleteShowcase(string caseID){
+    public showcase_Data? GetSignleShowcase(string caseID) {
+        showcase_Data? tempShowcase = null;
+        bool res = LoadShowcaseBinaryFromLocal();
+        if (!res) return tempShowcase;
+
+        if (!_showcaseTable.ContainsKey(caseID))
+            return tempShowcase;
+
+        return (showcase_Data)_showcaseTable[caseID];
+    }
+
+    public bool DeleteShowcase(string caseID){
 
         bool res = LoadShowcaseBinaryFromLocal();
         if (!res) return false;
