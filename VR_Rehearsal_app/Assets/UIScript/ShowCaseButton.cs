@@ -55,7 +55,8 @@ public class ShowCaseButton : MonoBehaviour {
                 break;
           }
         isShowcaseButtonClicked = true;
-        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
+        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowCalibrationView();
+      //  GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().DirectShowRotationView();
 
     }
 

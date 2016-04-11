@@ -31,43 +31,7 @@ public class CanvasManager : MonoBehaviour {
     }
     
     void Update () {
-        /*
-        if (LogoView.isLogoSceneDone)
-        {
-            localShowCase.SetActive(true);
-            LogoView.isLogoSceneDone = false;
-            fileTranser.SetActive(false);
-        }
-        if (LocalCaseView.isLocalCaseDone)
-        {
-            fileTranser.SetActive(true);
-            LocalCaseView.isLocalCaseDone = false;
-        }
-        if (FileTransferView.isFileTransferViewDone)
-        {
-            int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
-            navigation.SetActive(true);
-            Debug.Log(transferType);
-            navigation.GetComponent<NavigationView>().SetupCloud(transferType);
-            FileTransferView.isFileTransferViewDone = false;
-        }
-        if (NavigationView.isNavigationDone)
-        {
-            NavigationView.isNavigationDone = false;
-            customize.SetActive(true);
-        }
-        if (CustomizeView.isCustomizeDone)
-        {
-            CustomizeView.isCustomizeDone = false;
-            calibration.SetActive(true);
-        }
-        if (CalibrationView.isCalibrationDone)
-        {
-            CalibrationView.isCalibrationDone = false;
-            rotation.SetActive(true);
-            rotation.GetComponent<RotationView>().SetRotation(true);
-        }
-        */
+
         ShowLocasShowView();
         ShowFileTransferView();
         ShowNavigationView();
@@ -77,7 +41,6 @@ public class CanvasManager : MonoBehaviour {
         NavigationBetweenView();
         ShowCustomViewFromLocalCaseView();
         ShowCustomViewToLocalView();
-
 
     }
     public void ShowLocasShowView()
@@ -158,6 +121,21 @@ public class CanvasManager : MonoBehaviour {
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
     }
+    public void DirectShowCalibrationView()
+    {
+        foreach (GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
+        {
+            if (temp.GetComponent<ShowCaseButton>().isShowcaseButtonClicked == true)
+            {
+                localShowCase.SetActive(false);
+                calibration.SetActive(true);
+               // rotation.SetActive(true);
+                //rotation.GetComponent<RotationView>().SetRotation(true);
+            }
+
+        }
+    }
+    /*
 	public void DirectShowRotationView(){
         foreach(GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
         {
@@ -170,6 +148,8 @@ public class CanvasManager : MonoBehaviour {
 
         }
 	}
+    */
+
     void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
