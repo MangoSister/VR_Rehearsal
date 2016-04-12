@@ -16,9 +16,25 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    [SerializeField]
-    public List<ClipNamePair> clips;
-    private Dictionary<string, AudioClip> _clipDict;
+    public enum SoundType
+    {
+        Ambient,
+        Chat,
+    }
+
+
+    [Serializable]
+    public class SoundDict : SerializableDictionary<SoundType, AudioClip>
+    {
+        public SoundDict() : base() { }
+        public SoundDict(IDictionary<SoundType, AudioClip> dict) : base(dict) { }
+    }
+
+    [HideInInspector, SerializeField]
+    public SoundDict clipDict = new SoundDict();
+
+    public CardboardAudioListener listener;
+    public CardboardAudioRoom room;
 
     //object pools
     public int maxUnitNumber;
@@ -27,12 +43,8 @@ public class AudioManager : MonoBehaviour
     private LinkedList<AudioUnit> _unitPool;
     private LinkedListNode<AudioUnit> _nextUnit;
 
-    private void Start()
+    public void Init()
     {
-        _clipDict = new Dictionary<string, AudioClip>();
-        foreach (var pair in clips)
-            _clipDict.Add(pair.name, pair.clip);
-
         maxUnitNumber = Mathf.Clamp(maxUnitNumber, 0, UNIT_NUM_LIMIT);
         _unitPool = new LinkedList<AudioUnit>();
         for (int i = 0; i < maxUnitNumber; i++)
@@ -51,7 +63,7 @@ public class AudioManager : MonoBehaviour
         if (_nextUnit == null)
         {
 #if UNITY_EDITOR
-            Debug.Log("no more free unit");
+            print("no more free unit");
 #endif
             unit = null;
             return false;
@@ -63,6 +75,9 @@ public class AudioManager : MonoBehaviour
             unit.selfNode = _nextUnit;
             unit.OnRecycle += RecycleUnit;
             _nextUnit = _nextUnit.Next;
+#if UNITY_EDITOR
+            print("allocate new unit");
+#endif
             return true;
         }
     }
@@ -72,11 +87,14 @@ public class AudioManager : MonoBehaviour
         if (unit == null || !unit.isAllocated)
         {
 #if UNITY_EDITOR
-            Debug.Log("invalid unit");
+            print("try to recycle invalid unit");
 #endif
             return;
         }
 
+#if UNITY_EDITOR
+        print("recycle unit");
+#endif
         LinkedListNode<AudioUnit> node = unit.selfNode;
         unit.selfNode = null;
         unit.OnRecycle -= RecycleUnit;
@@ -109,70 +127,16 @@ public class AudioManager : MonoBehaviour
         RecycleAll();
     }
 
-    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade, bool loop)
+    public bool Allocate3dSound(SoundType type, Transform parent, Vector3 localPos, out AudioUnit unit)
     {
-        AudioClip clip;
-        if (_clipDict.TryGetValue(clipName, out clip))
-            Play3dSound(clip, volume, parent, pos, fade, loop);
-    }
-
-    public void Play3dSound(string clipName, float volume, Transform parent, Vector3 pos, float fade, bool loop, ref AudioUnit unit)
-    {
-        AudioClip clip;
-        if (_clipDict.TryGetValue(clipName, out clip))
-            Play3dSound(clip, volume, parent, pos, fade, loop, ref unit);
-    }
-
-    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade, bool loop)
-    {
-        AudioUnit unit;
         if (!AllocateUnit(out unit))
-            return;
+            return false;
 
-        unit.source.spatialBlend = 1.0f;
-        unit.source.clip = clip;
-        unit.source.volume = Mathf.Clamp01(volume);
-        unit.source.loop = loop;
+        unit.source.clip = clipDict[type];
         unit.gameObject.transform.parent = parent != null ? parent : transform;
-        unit.gameObject.transform.localPosition = pos;
+        unit.gameObject.transform.localPosition = localPos;
 
-        unit.Play(fade);
-    }
-
-    public void Play3dSound(AudioClip clip, float volume, Transform parent, Vector3 pos, float fade, bool loop, ref AudioUnit unit)
-    {
-        if (!AllocateUnit(out unit))
-            return;
-
-        unit.source.spatialBlend = 1.0f;
-        unit.source.clip = clip;
-        unit.source.volume = Mathf.Clamp01(volume);
-        unit.source.loop = loop;
-        unit.gameObject.transform.parent = parent != null ? parent : transform;
-        unit.gameObject.transform.localPosition = pos;
-
-        unit.Play(fade);
-    }
-
-    public void Play2dSound(string clipName, float volume, float fade, bool loop)
-    {
-        AudioClip clip;
-        if (_clipDict.TryGetValue(clipName, out clip))
-            Play2dSound(clip, volume, fade, loop);
-    }
-
-    public void Play2dSound(AudioClip clip, float volume, float fade, bool loop)
-    {
-        AudioUnit unit;
-        if (!AllocateUnit(out unit))
-            return;
-
-        unit.source.spatialBlend = 0.0f;
-        unit.source.clip = clip;
-        unit.source.volume = Mathf.Clamp01(volume);
-        unit.source.loop = loop;
-
-        unit.Play(fade);
+        return true;
     }
 }
 
