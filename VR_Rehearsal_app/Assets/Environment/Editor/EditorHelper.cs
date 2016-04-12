@@ -12,6 +12,8 @@ public static class EditorHelper
         addButtonContent = new GUIContent("+", "add");
     private static GUILayoutOption miniButtonWidth = GUILayout.Width(20f);
 
+    public delegate void ShowElement<T>(ref T element);
+
     public static void ShowArray<T>(ref T[] array, string title) where T : Object
     {
         EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
@@ -24,9 +26,23 @@ public static class EditorHelper
             array = new T[num];
 
         for (int i = 0; i < num; i++)
-        {
             array[i] = EditorGUILayout.ObjectField(string.Format("Element {0}", i), array[i], typeof(T), false) as T;
-        }
+    }
+
+    public static void ShowArray<T>(ref T[] array, string title, ShowElement<T> elementFunc)
+    {
+        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+        int num = EditorGUILayout.IntField("Length", array == null ? 0 : array.Length);
+        if (num > 0 && array == null)
+            array = new T[num];
+        else if (num == 0 && array == null)
+            return;
+        else if (array != null && num != array.Length)
+            array = new T[num];
+
+        for (int i = 0; i < num; i++)
+            elementFunc(ref array[i]);
+        
     }
 
     public static void ShowEnumDict<TKey, TValue>(ref SerializableDictionary<TKey, TValue> dict, ref TKey newKey, ref TValue newObj, string title)
