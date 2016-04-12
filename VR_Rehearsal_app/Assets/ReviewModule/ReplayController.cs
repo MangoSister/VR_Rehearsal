@@ -177,7 +177,7 @@ public class ReplayController : MonoBehaviour {
                     arrayLength = pcmToUnityClip.endvalue;
                 else
                 {
-                    float widthRate = (((float)pcmToUnityClip.progress) / ((float)arrayLength));
+                    float widthRate = 1-(((float)pcmToUnityClip.progress) / ((float)arrayLength));
                     loadingBar.GetComponent<RectTransform>().sizeDelta = new Vector2((int)(widthRate * 800.0f), 10);
                     //UnityEngine.Debug.Log(pcmToUnityClip.progress + "/" + arrayLength);
                 }
