@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AudienceAnimWarehouse : MonoBehaviour
 {
@@ -21,14 +23,35 @@ public class AudienceAnimWarehouse : MonoBehaviour
     public GameObject laptopPrefab;
     public GameObject smartphonePrefab;
 
-    public AnimationClip[] basicFocusedClips;
-    public AnimationClip[] basicBoredClips;
-    public AnimationClip[] basicLeftChattingClips;
-    public AnimationClip[] basicRightChattingClips;
+    [HideInInspector]
+    public ProbabilitySingleClip[] basicFocusedClips;
+    [HideInInspector]
+    public ProbabilitySingleClip[] basicBoredClips;
+    [HideInInspector]
+    public ProbabilityClipPair[] basicChattingClips;
+    [HideInInspector]
+    public ProbabilitySingleClip[] followFocusedClips;
+    [HideInInspector]
+    public ProbabilitySingleClip[] followBoredClips;
+    [HideInInspector]
+    public ProbabilityClipPair[] followChattingClips;
+}
 
-    public AnimationClip[] followFocusedClips;
-    public AnimationClip[] followBoredClips;
-    public AnimationClip[] followLeftChattingClips;
-    public AnimationClip[] followRightChattingClips;
+[Serializable]
+public class ProbabilitySingleClip
+{
+    public AnimationClip clip;
 
+    [Range(0f, 1f)]
+    public float probability;
+}
+
+[Serializable]
+public class ProbabilityClipPair
+{
+    public AnimationClip clip1;
+    public AnimationClip clip2;
+
+    [Range(0f, 1f)]
+    public float probability;
 }

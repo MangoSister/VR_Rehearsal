@@ -150,7 +150,7 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
         if (holder == null)
             return;
         AnimatorOverrideController overCtrl = new AnimatorOverrideController();
-        overCtrl.name = "Audience Override Anim Ctrl";
+        overCtrl.name = "Follow Audience Override Anim Ctrl";
         overCtrl.runtimeAnimatorController = controller.runtimeAnimatorController;
         var clipPairs = overCtrl.clips;
 
@@ -164,9 +164,15 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
                 bool found = false;
                 foreach (var clip in holder.followFocusedClips)
                 {
-                    if (pair.originalClip == clip)
+                    if (pair.originalClip == clip.clip)
                     {
-                        pair.overrideClip = holder.followFocusedClips[Random.Range(0, holder.followFocusedClips.Length)];
+                        float sample = Random.value;
+                        for (int i = 0; i < holder.followFocusedClips.Length; ++i)
+                            if (sample < holder.followFocusedClips[i].probability)
+                            {
+                                pair.overrideClip = holder.followFocusedClips[i].clip;
+                                break;
+                            }
                         found = true;
                         break;
                     }
@@ -180,9 +186,15 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
                 bool found = false;
                 foreach (var clip in holder.followBoredClips)
                 {
-                    if (pair.originalClip == clip)
+                    if (pair.originalClip == clip.clip)
                     {
-                        pair.overrideClip = holder.followBoredClips[Random.Range(0, holder.followBoredClips.Length)];
+                        float sample = Random.value;
+                        for (int i = 0; i < holder.followBoredClips.Length; ++i)
+                            if (sample < holder.followBoredClips[i].probability)
+                            {
+                                pair.overrideClip = holder.followBoredClips[i].clip;
+                                break;
+                            }
                         found = true;
                         break;
                     }
@@ -191,27 +203,17 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
                     continue;
             }
 
-            if (holder.followLeftChattingClips != null && holder.followLeftChattingClips.Length > 0)
+            if (holder.followChattingClips != null && holder.followChattingClips.Length > 0)
             {
                 bool found = false;
-                foreach (var clip in holder.followLeftChattingClips)
+                foreach (var clip in holder.followChattingClips)
                 {
-                    if (pair.originalClip == clip)
+                    if (pair.originalClip == clip.clip1)
                     {
                         leftChatPair = pair;
                         break;
                     }
-                }
-                if (found)
-                    continue;
-            }
-
-            if (holder.followRightChattingClips != null && holder.followRightChattingClips.Length > 0)
-            {
-                bool found = false;
-                foreach (var clip in holder.followRightChattingClips)
-                {
-                    if (pair.originalClip == clip)
+                    else if (pair.originalClip == clip.clip2)
                     {
                         rightChatPair = pair;
                         break;
@@ -222,9 +224,14 @@ public class AudienceAnimHandlerFollow : AudienceAnimHandlerBasic
             }
         }
 
-        int chatClipIdx = Random.Range(0, holder.followLeftChattingClips.Length);
-        leftChatPair.overrideClip = holder.followLeftChattingClips[chatClipIdx];
-        rightChatPair.overrideClip = holder.followRightChattingClips[chatClipIdx];
+        float s = Random.value;
+        for (int i = 0; i < holder.followChattingClips.Length; ++i)
+            if (s < holder.followChattingClips[i].probability)
+            {
+                leftChatPair.overrideClip = holder.followChattingClips[i].clip1;
+                rightChatPair.overrideClip = holder.followChattingClips[i].clip2;
+                break;
+            }
 
         overCtrl.clips = clipPairs;
         controller.runtimeAnimatorController = overCtrl;
