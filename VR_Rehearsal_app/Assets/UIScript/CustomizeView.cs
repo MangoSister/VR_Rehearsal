@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class CustomizeView : MonoBehaviour  {
 
+
+
     public static bool isCustomizeDone;
     public bool isCustomizeDoneFromLocal;
     private SetupManager _setManager;
@@ -30,6 +32,18 @@ public class CustomizeView : MonoBehaviour  {
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
     public bool isFromCustom;
+
+    [Header("Venue Select")]
+    public Button btnRoom1;
+    public Button btnRoom2;
+    public Button btnRoom3;
+    public Sprite room1Checked;
+    public Sprite room1Unchecked;
+    public Sprite room2Checked;
+    public Sprite room2Unchecked;
+    public Sprite room3Checked;
+    public Sprite room3Unchecked;
+
      void Start () {
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
@@ -42,14 +56,26 @@ public class CustomizeView : MonoBehaviour  {
         switch (index)
         {
             case 2:
+                btnRoom3.GetComponent<Image>().sprite = room3Checked;
+                btnRoom1.GetComponent<Image>().sprite = room1Unchecked;
+                btnRoom2.GetComponent<Image>().sprite = room2Unchecked;
+                
                 Debug.Log("Fucking Large");
                 customData._mapIdx = (ushort)1;
                 break;
             case 1:
+                btnRoom3.GetComponent<Image>().sprite = room3Unchecked;
+                btnRoom1.GetComponent<Image>().sprite = room1Unchecked;
+                btnRoom2.GetComponent<Image>().sprite = room2Checked;
+                
                 Debug.Log("Fucking Medi");
                 customData._mapIdx = (ushort)2;
                 break;
             case 0:
+                btnRoom3.GetComponent<Image>().sprite = room3Unchecked;
+                btnRoom1.GetComponent<Image>().sprite = room1Checked;
+                btnRoom2.GetComponent<Image>().sprite = room2Unchecked;
+                
                 Debug.Log("Fucking small");
                 customData._mapIdx = (ushort)3;
                 break;

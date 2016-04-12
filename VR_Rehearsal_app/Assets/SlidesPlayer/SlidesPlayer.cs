@@ -85,13 +85,19 @@ public class SlidesPlayer : MonoBehaviour
             string[] imgNames_png = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
             string[] imgNames_jpg = Directory.GetFiles(path, "*.jpg", SearchOption.TopDirectoryOnly);
             string[] imgNames_bmp = Directory.GetFiles(path, "*.bmp", SearchOption.TopDirectoryOnly);
+			string[] imgNames_PNG = Directory.GetFiles(path, "*.PNG", SearchOption.TopDirectoryOnly);
+			string[] imgNames_JPG = Directory.GetFiles(path, "*.JPG", SearchOption.TopDirectoryOnly);
+			string[] imgNames_BMP = Directory.GetFiles(path, "*.BMP", SearchOption.TopDirectoryOnly);
 
             
-            string[] imgNames = new string[imgNames_png.Length + imgNames_jpg.Length + imgNames_bmp.Length];
+			string[] imgNames = new string[imgNames_png.Length + imgNames_jpg.Length + imgNames_bmp.Length + imgNames_PNG.Length + imgNames_JPG.Length + imgNames_BMP.Length];
             
             System.Array.Copy(imgNames_png, imgNames, imgNames_png.Length);
             System.Array.Copy(imgNames_jpg, 0, imgNames, imgNames_png.Length, imgNames_jpg.Length);
             System.Array.Copy(imgNames_bmp, 0, imgNames, imgNames_jpg.Length, imgNames_bmp.Length);
+			System.Array.Copy(imgNames_PNG, 0, imgNames, imgNames_bmp.Length, imgNames_PNG.Length);
+			System.Array.Copy(imgNames_JPG, 0, imgNames, imgNames_PNG.Length, imgNames_JPG.Length);
+			System.Array.Copy(imgNames_BMP, 0, imgNames, imgNames_JPG.Length, imgNames_BMP.Length);
             
             _slides = new List<Texture2D>();
             foreach (string name in imgNames)
