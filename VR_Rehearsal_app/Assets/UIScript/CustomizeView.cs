@@ -88,7 +88,7 @@ public class CustomizeView : MonoBehaviour  {
             navi.GetComponent<NavigationView>().storedButton.Clear();
         }
         rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min);
-        isCustomizeDone = true;
+        isCustomizeDone = true; //this will trigger the scene to move forward to calibration
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
         gameObject.SetActive(false);
     }

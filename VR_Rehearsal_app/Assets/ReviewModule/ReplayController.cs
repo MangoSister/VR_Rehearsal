@@ -17,6 +17,7 @@ public class ReplayController : MonoBehaviour {
     private bool isProcessingAudio = false; //for the threaded job audio processing
     private AudioProcessingJob pcmToUnityClip;
     private float[] floatArray;
+    private int arrayLength = 0;
 
     [Header("Playback Slider Control")]
     public Slider playbackSlider;
@@ -41,6 +42,8 @@ public class ReplayController : MonoBehaviour {
     [Header("Loading")]
     public GameObject loadingText;
     public GameObject groupReplayObjects;
+    public GameObject loadingGroup;
+    public Image loadingBar;
 
     enum PLAY_STATUS
     {
@@ -168,12 +171,22 @@ public class ReplayController : MonoBehaviour {
 
         if (isProcessingAudio == true)
         {
-            loadingText.GetComponent<Text>().text = "Loading... (" + pcmToUnityClip.progress + "/" + pcmToUnityClip.endvalue+")";
-            
-            if (pcmToUnityClip.IsDone)
+            if (pcmToUnityClip.IsDone == false) //show progress
+            {
+                if (arrayLength == 0)
+                    arrayLength = pcmToUnityClip.endvalue;
+                else
+                {
+                    float widthRate = (((float)pcmToUnityClip.progress) / ((float)arrayLength));
+                    loadingBar.GetComponent<RectTransform>().sizeDelta = new Vector2((int)(widthRate * 800.0f), 10);
+                    //UnityEngine.Debug.Log(pcmToUnityClip.progress + "/" + arrayLength);
+                }
+            }
+            else //show slider
             {
                 loadingText.SetActive(false);
-                
+                loadingGroup.SetActive(false);
+
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
                 UnityEngine.Debug.Log(floatArray.Length);

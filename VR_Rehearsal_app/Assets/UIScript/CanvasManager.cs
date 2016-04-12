@@ -199,9 +199,11 @@ public class CanvasManager : MonoBehaviour {
     public void ShowRotationView()
     {
 		
-        if (CalibrationView.isCalibrationDone)
+        //if (CalibrationView.isCalibrationDone)
+        if (CalibrationControlNew.isCalibrationDone)
         {
-            CalibrationView.isCalibrationDone = false;
+            //CalibrationView.isCalibrationDone = false;
+            CalibrationControlNew.isCalibrationDone = false;
             rotation.SetActive(true);
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
