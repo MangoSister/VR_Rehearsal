@@ -58,6 +58,8 @@ public class ReplayController : MonoBehaviour {
             if (audioSource.isPlaying == true)
                 audioSource.Stop();
         }
+
+       // PlayerPrefs.SetString("currentShowcase", _id);
         CanvasManager.againTrigger = true;
         Application.LoadLevel("sc_UI");
 
