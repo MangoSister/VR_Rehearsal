@@ -254,15 +254,32 @@ public class CanvasManager : MonoBehaviour {
             }
             if (navigation.activeSelf)
             {
+				//1. Auth Failed Case
+				if (!navigation.GetComponent<NavigationView> ().GetAuthenticationStatus ()) {
+					navigation.SetActive(false);
+					NavigationView.isNavigationDone = false;
+					navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
+					fileTranser.SetActive(true);
+					return;
+				}
+					
+				//2. Back button Keep pushing case
                 string str = navigation.GetComponent<NavigationView>().RecentPath();
                 Debug.Log(str);
+				if (str == "null") {
+					return;
+				}
+
                 if (str == "/" || str == ""){
                     navigation.SetActive(false);
                     NavigationView.isNavigationDone = false;
                     navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
                     fileTranser.SetActive(true);
                 }
+
             }
         }
     }
+
+
 }

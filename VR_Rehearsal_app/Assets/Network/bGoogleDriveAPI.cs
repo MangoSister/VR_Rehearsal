@@ -36,6 +36,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	//For Callback
 	//1. Authentication
 	bool _isAuthenticationDone = false;
+	bool _isAuthenticationSucceed = false;
 	/*Authentication callback*/
 	bhClowdDriveAPI.Authentication_Callback _authen_callback;
 
@@ -71,7 +72,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 	void Update(){
 		if (_isAuthenticationDone == true) {
-			_authen_callback (_isAuthenticationDone);
+			_authen_callback (_isAuthenticationSucceed);
 			_isAuthenticationDone = false;
 		}
 
@@ -134,10 +135,11 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		if (_initInProgress == false) { 
 			_isAuthenticationDone = false;
 			StartCoroutine (StartAuthentication_internal (delegate(bool res) {
+				_isAuthenticationDone = true;
 				if(res)
-					_isAuthenticationDone = true;
+					_isAuthenticationSucceed = true;
 				else
-					_isAuthenticationDone = false;
+					_isAuthenticationSucceed = false;
 			}));
 		}
 	}
@@ -278,7 +280,8 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		if (authorization.Current is Exception) {
 			#if UNITY_EDITOR
 			Debug.LogWarning (authorization.Current as Exception);
-			goto finish;
+			_initInProgress = false;
+			callback (_initInProgress);
 			#endif
 		} else {
 			#if UNITY_EDITOR
@@ -286,9 +289,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			#endif
 			callback (_initInProgress);
 		}
-
-		finish:
-		_initInProgress = false;
+			
 	}
 
 

@@ -210,7 +210,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 
 				_authen_callback (true);
-			} else if (_timeOut > 15.0) {
+			} else if (_timeOut > 10.0) {
 				_authen_callback (false);
 				_timeOut = 0;
 			}

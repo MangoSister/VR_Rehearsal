@@ -46,9 +46,14 @@ public class NavigationView : MonoBehaviour {
      //Download button components
     public GameObject progressCircle;
     public GameObject loadingView;
-    public GameObject downloadButton;
+   
     public Sprite[] thumbnails;  // 0 folder, 1 files , 2 pics.
     bool isOkToDown;
+
+
+	public GameObject Icon_emptyFolder;
+	public GameObject Button_Download;
+	public GameObject Icon_AuthFailed;
 
     //Customize Data
     string showCaseName;
@@ -60,6 +65,7 @@ public class NavigationView : MonoBehaviour {
 	//Authentication Check
 	AuthCheck _authCheck = AuthCheck.failed;
 	int _currCloudType = 0;
+	float _timerForAuth = 0;
 
     void Start() {
 		
@@ -68,11 +74,36 @@ public class NavigationView : MonoBehaviour {
         isNavigationDone = false;
         _initialScrollContentSize = new Vector2(contentRect.rect.height, contentRect.rect.width);
         _bType = bType;
+
+		ResetIcons ();
+	
     }
+	//Reset icons to be default mode
+	void ResetIcons(){
+		ResetSetting ();
+
+		Icon_emptyFolder.SetActive(false);
+		Button_Download.SetActive(false);
+		Icon_AuthFailed.SetActive (false);
+	}
+
+	void ResetSetting(){
+		_timerForAuth = 0;
+
+	}
 	
 	// Update is called once per frame
 	void Update () {
         
+		if(_authCheck == AuthCheck.failed){
+			_timerForAuth += Time.deltaTime;
+
+			if (_timerForAuth > 10.0f) {
+				Icon_AuthFailed.SetActive (true);
+			}
+		}
+
+
         if (_userDrive != null)
         {
             _userDrive.Update();
@@ -82,16 +113,12 @@ public class NavigationView : MonoBehaviour {
             ButtonListener();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (gameObject.activeSelf && _userDrive.GetRecentPath() == "/")
-            {
-                // go back fileTransfer
-            }
-            else if (gameObject.activeSelf && _userDrive.GetRecentPath() == empty)
-            { 
-                // go back fileTransfer
-            }
-            else {
+        {	
+
+			if (!this.gameObject.activeSelf)
+				return;
+
+			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == empty) {
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
                     isReseting = true;
@@ -108,8 +135,19 @@ public class NavigationView : MonoBehaviour {
     }
     public string RecentPath()
     {
-        return _userDrive.GetRecentPath();
+		if (_userDrive != null)
+			return _userDrive.GetRecentPath ();
+		else
+			return "null";
     }
+
+	public bool GetAuthenticationStatus(){
+		if (_authCheck == AuthCheck.Succeed) {
+			return true;
+		}
+		return false;
+	}
+
     public void SetSetupManager(SetupManager mg)
     {
         _setManager = mg;
@@ -130,9 +168,11 @@ public class NavigationView : MonoBehaviour {
             if (res)
             {
 				_authCheck = AuthCheck.Succeed;
+				_timerForAuth = 0;
                 _userDrive.GetFileListFromPath("/", CreatePanels);
 			}else{
 				_authCheck = AuthCheck.failed;
+				Icon_AuthFailed.SetActive(true);
 			}
         });
 
@@ -177,6 +217,7 @@ public class NavigationView : MonoBehaviour {
             }
         }
         storedButton.Clear();
+		ResetIcons ();
         isCopy = false;
     }
 
@@ -189,6 +230,9 @@ public class NavigationView : MonoBehaviour {
 			}
 		}
 		storedButton.Clear();
+
+		//icon
+		ResetIcons ();
 	}
 
 
@@ -200,6 +244,9 @@ public class NavigationView : MonoBehaviour {
         float cellSize = gLayout.cellSize.y;
         float spacing = gLayout.spacing.y;
         float totalSizeofRect = (cellSize) * parseResult["entries"].Count;
+
+		CheckFileList (parseResult);
+
         //  contentRect.offsetMax = new Vector2(contentRect.offsetMin.x, 0.0f);
         if (parseResult["entries"].Count < 7)
         {
@@ -247,24 +294,31 @@ public class NavigationView : MonoBehaviour {
 	public void CheckFileList(JSONNode parseResult){
 
 		bool isThereNoEntre = false;
+		bool isDownloadable = false;
 		for (int index = 0; index < parseResult ["entries"].Count; index++) {
 			
-			/*1. Checking Empty or not in the selected folder for Showing empty indication icon */
-			if (parseResult["entries"][index][".tag"].Value == "folder") {
-				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
-					string extentionFormatStr = GetFileExtentionFormat (parseResult ["entries"] [index] ["name"].Value);
 
+			if (parseResult["entries"][index][".tag"].Value == "folder" || parseResult ["entries"] [index] [".tag"].Value == "file") {
+				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
+					
+					string extentionFormatStr = GetFileExtentionFormat (parseResult ["entries"] [index] ["name"].Value);
+					if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
+					{
+						/* + Checking that there is downloadable files in the selected folder for Showing Downdload icon */
+						isDownloadable = true;
+					}
 				}
+
+				/* + Checking Empty or not in the selected folder for Showing empty indication icon */
 				isThereNoEntre = true;
 			}
 		
 		}
 
 
-		if (isThereNoEntre) { // Showing empty indication icon 
-				
-		} 
 
+		Icon_emptyFolder.SetActive(!isThereNoEntre);
+		Button_Download.SetActive(isDownloadable);
 	}
 
 	string GetFileExtentionFormat(string fileName){
@@ -309,6 +363,7 @@ public class NavigationView : MonoBehaviour {
 
     public void DownloadButtonClicked()
     {
+		/*
           foreach(GameObject btn in storedButton)
         {
             if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
@@ -323,7 +378,7 @@ public class NavigationView : MonoBehaviour {
             
         }
         if (isOkToDown == true)
-        {
+        {*/
             try
             {
                 if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
@@ -366,7 +421,7 @@ public class NavigationView : MonoBehaviour {
             {
                 Debug.Log(e.ToString());
             }
-        }
+       // }
         
     }
 
