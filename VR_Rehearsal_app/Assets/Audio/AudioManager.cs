@@ -201,7 +201,7 @@ public class AudioManager : MonoBehaviour
             pos += miscBound.bound.center;
             if (AllocateRand3dSound(SoundCollection.Miscs, miscBound.transform, pos, out miscUnit))
             {
-                miscUnit.source.volume = miscVolume;
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.1f);
                 miscUnit.PlayUnloopFadeInout(0f);
             }
         }
@@ -218,7 +218,22 @@ public class AudioManager : MonoBehaviour
             pos += miscBound.bound.center;
             if (AllocateRand3dSound(SoundCollection.Miscs, miscBound.transform, pos, out miscUnit))
             {
-                miscUnit.source.volume = miscVolume;
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.2f);
+                miscUnit.source.pitch = URandom.Range(0.8f, 1.2f);
+                miscUnit.PlayUnloopFadeInout(0f);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            AudioUnit miscUnit;
+            Vector3 pos = new Vector3(URandom.Range(-1f, 1f), URandom.Range(-1f, 1f), URandom.Range(-1f, 1f));
+            pos = Vector3.Scale(pos, miscBound.bound.extents);
+            pos += miscBound.bound.center;
+            if (AllocateRand3dSound(SoundCollection.Whispering, miscBound.transform, pos, out miscUnit))
+            {
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.2f);
+                miscUnit.source.pitch = URandom.Range(0.8f, 1.2f);
                 miscUnit.PlayUnloopFadeInout(0f);
             }
         }

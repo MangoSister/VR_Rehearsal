@@ -86,9 +86,12 @@ public class SceneController : MonoBehaviour
         recordWrapper.Init();
 
         audioManager.Init();
-        audioManager.AllocateRand3dSound(SoundCollection.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
-        _ambientUnit.source.loop = true;
-        _ambientUnit.Play();
+        if (recordWrapper.EarphonePlugged())
+        {
+            audioManager.AllocateRand3dSound(SoundCollection.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
+            _ambientUnit.source.loop = true;
+            _ambientUnit.Play();
+        }
 
         inputManager.OnPracticeBegin += BeginPractice;
     }
@@ -118,7 +121,8 @@ public class SceneController : MonoBehaviour
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
-        _ambientUnit.StopFadeAndRecycle(1.0f);
+        if (_ambientUnit != null)
+            _ambientUnit.StopFadeAndRecycle(1.0f);
         if (recordWrapper.EarphonePlugged())
             audioManager.StartMiscSound();
         timer.StartCounting();

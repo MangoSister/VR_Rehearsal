@@ -50,7 +50,11 @@ public class SocialGroup : MonoBehaviour
     {
         AudioUnit unit;
         if (AudioManager.currAudioManager.AllocateRand3dSound(SoundCollection.Whispering, transform, centerPos, out unit))
+        {
+            unit.source.volume = AudioManager.currAudioManager.chatVolume * Random.Range(0.8f, 1.2f);
+            unit.source.pitch = Random.Range(0.8f, 1.2f);
             unit.Play();
+        }
         yield return new WaitForSeconds(CrowdSimulator.currSim.chatLength);
         unit.StopAndRecycle();
         shouldChat = false;
