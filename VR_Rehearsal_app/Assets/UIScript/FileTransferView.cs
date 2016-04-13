@@ -6,11 +6,14 @@ public class FileTransferView : MonoBehaviour {
 
     public static bool isFileTransferViewDone;
     public int transferNumber = 0; //( 1 : dropbox, 2 : googleDrive, 3: USB)
+	public GameObject warningTextUI_connection;
 
     void Start () {
         GetComponent<RectTransform>().SetAsLastSibling();
         isFileTransferViewDone = false;
         transferNumber = 0;
+
+		warningTextUI_connection.SetActive (false);
     }
 
 	private bool CheckForInternetConnection(){
@@ -42,6 +45,8 @@ public class FileTransferView : MonoBehaviour {
         
 		bool res = CheckForInternetConnection ();
 		if (!res) {
+			warningTextUI_connection.SetActive (true);
+			StartCoroutine(DelayForWarningMessage(1.0f));
 			#if UNITY_EDITOR
 			Debug.Log("Check Internet connection");
 			#endif
@@ -57,9 +62,12 @@ public class FileTransferView : MonoBehaviour {
 
 		bool res = CheckForInternetConnection ();
 		if (!res) {
+			warningTextUI_connection.SetActive (true);
+			StartCoroutine(DelayForWarningMessage(1.0f));
 			#if UNITY_EDITOR
 			Debug.Log("Check Internet connection");
 			#endif
+
 			return;
 		}
         transferNumber = 2;
@@ -73,4 +81,9 @@ public class FileTransferView : MonoBehaviour {
         gameObject.SetActive(false);
         isFileTransferViewDone = true;
     }
+
+	IEnumerator DelayForWarningMessage(float duration){
+		yield return new WaitForSeconds (duration);
+		warningTextUI_connection.SetActive (false);
+	}
 }

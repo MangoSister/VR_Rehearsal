@@ -32,7 +32,7 @@ public class CrowdSimulator : MonoBehaviour
         }
     }
 
-    public const int characterNum = 7;
+    public const int characterNum = 14;
     public Animator[] fullSizeBody;
     public Animator[] halfSizeBody;
     public Vector3 asseblingPos = new Vector3(0f, -0.31f, 0f);
@@ -49,6 +49,9 @@ public class CrowdSimulator : MonoBehaviour
     public GameObject prefabEyeIcon;
 
     public Transform crowdParent;
+    private List<int> _characterIdxShuffledList;
+    private int _nextCharacterIdx;
+
     public string crowdConfigFileName;
     public float stepIntervalInt;
     public float stepIntervalExt;
@@ -139,6 +142,11 @@ public class CrowdSimulator : MonoBehaviour
         //instantiate audience
         CrowdConfigInfo tx = spaceInfoParser.Parse(crowdConfigFileName);
         audiences = new List<Audience>();
+        _characterIdxShuffledList = new List<int>(characterNum);
+        for (int i = 0; i < characterNum; ++i)
+            _characterIdxShuffledList.Add(i);
+        Shuffle(_characterIdxShuffledList);
+        _nextCharacterIdx = 0;
 
         for (int i = 0; i < tx.seat_RowNum * tx.seat_ColNum; i++)
         {
@@ -307,7 +315,7 @@ public class CrowdSimulator : MonoBehaviour
                 }
             case LOD.FullSize_Diffuse_FullAnim:
                 {
-                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    int idx = _characterIdxShuffledList[(_nextCharacterIdx++) % characterNum];
                     GameObject adObj = new GameObject("Lv "+ (int)lod + " agent", typeof(Audience));
                     Animator body = Instantiate(fullSizeBody[idx]) as Animator;
                     body.transform.parent = adObj.transform;
@@ -344,7 +352,7 @@ public class CrowdSimulator : MonoBehaviour
                 }
             case LOD.FullSize_Diffuse_FollowAnim:
                 {
-                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    int idx = _characterIdxShuffledList[(_nextCharacterIdx++) % characterNum];
                     GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
                     Animator body = Instantiate(fullSizeBody[idx]) as Animator;
                     body.transform.parent = adObj.transform;
@@ -380,7 +388,7 @@ public class CrowdSimulator : MonoBehaviour
                 }
             case LOD.FullSize_Diffuse_BasicAnim:
                 {
-                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    int idx = _characterIdxShuffledList[(_nextCharacterIdx++) % characterNum];
                     GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
                     Animator body = Instantiate(fullSizeBody[idx]) as Animator;
                     body.transform.parent = adObj.transform;
@@ -416,7 +424,7 @@ public class CrowdSimulator : MonoBehaviour
                 }
             case LOD.HalfSize_Diffuse_BasicAnim: default:
                 {
-                    int idx = URandom.Range(0, fullSizeBody.Length);
+                    int idx = _characterIdxShuffledList[(_nextCharacterIdx++) % characterNum];
                     GameObject adObj = new GameObject("Lv " + (int)lod + " agent", typeof(Audience));
                     Animator body = Instantiate(halfSizeBody[idx]) as Animator;
                     body.transform.parent = adObj.transform;

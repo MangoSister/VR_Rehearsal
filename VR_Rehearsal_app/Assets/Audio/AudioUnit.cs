@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public delegate void AudioUnitRecycle_Handler(AudioUnit unit);
 
-[RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(CardboardAudioSource))]
 public class AudioUnit : MonoBehaviour
 {
     [HideInInspector]
@@ -13,42 +13,65 @@ public class AudioUnit : MonoBehaviour
 
     public event AudioUnitRecycle_Handler OnRecycle;
 
-    public AudioSource source
+    public CardboardAudioSource source
     {
         get
         {
-            var src = GetComponent<AudioSource>();
+            var src = GetComponent<CardboardAudioSource>();
             if (src == null)
-                return gameObject.AddComponent<AudioSource>();
+                return gameObject.AddComponent<CardboardAudioSource>();
             else return src;
         }
     }
 
-    public void Play(float fadeTime)
+    public bool Play()
     {
         if (!isAllocated)
-            return;
+            return false;
+
+        source.Play();
+        return true;
+    }
+
+    public bool PlayUnloopFadeInout(float fadeTime)
+    {
+        if (!isAllocated)
+            return false;
 
         source.Play();
         if (!source.loop)
             StartCoroutine(MaintainAndRecycle(source.clip.length, fadeTime));
+        return true;
     }
 
-    public void Play(float lifeSpan, float fadeTime)
+    public bool PlayUnloopFadeInout(float lifeSpan, float fadeTime)
     {
         if (!isAllocated)
-            return;
+            return false;
 
         source.Play();
         StartCoroutine(MaintainAndRecycle(lifeSpan, fadeTime));
+        return true;
     }
 
-    public void Stop(float fadeTime)
+    public bool StopAndRecycle()
     {
         if (!isAllocated)
-            return;
+            return false;
+
+        if (OnRecycle != null)
+            OnRecycle(this);
+        return true;
+    }
+
+
+    public bool StopFadeAndRecycle(float fadeTime)
+    {
+        if (!isAllocated)
+            return false;
 
         StartCoroutine(FadeAndRecycle(fadeTime));
+        return true;
     }
 
 

@@ -13,6 +13,13 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
         {States.Chatting, 1 }
     };
 
+    private static readonly Dictionary<States, float[]> subStateCmf = new Dictionary<States, float[]>()
+    {
+        {States.Focused, new float[3]{ 0.3f, 0.9f, 1.0f} },
+        {States.Bored, new float[5]{0.2f, 0.25f, 0.55f, 0.9f, 1.0f } },
+        {States.Chatting, new float[1] { 1.0f } }
+    };
+
     public static readonly float laptopAnimLength = 0.75f;
 
     public Vector2 repeatPeriodBound = new Vector2(3f, 8f);
@@ -28,7 +35,13 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
     public override void UpdateStateAnim()
     {
         base.UpdateStateAnim();
-        int nextSubState = Random.Range(0, subStateNum[_audience.currState]);
+        float sample = Random.value;
+        int nextSubState = 0;
+        for (nextSubState = 0; nextSubState < subStateNum[_audience.currState]; ++nextSubState)
+        {
+            if (sample < subStateCmf[_audience.currState][nextSubState])
+                break;
+        }
         controller.SetInteger(_paramIdSubState, nextSubState);
         float nextBlendFactor0 = Random.value;
         controller.SetFloat(_paramIdBlendFactor0, nextBlendFactor0);
