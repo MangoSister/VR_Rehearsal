@@ -223,12 +223,7 @@ public class NavigationView : MonoBehaviour {
                 createInstance.GetComponent<RectTransform>().FindChild("thumbnail").GetComponent<Image>().sprite = thumbnails[0];
 
             }else {
-                string resFileName = parseResult["entries"][index]["name"].Value;
-                string[] elements = resFileName.Split('.');
-                extentionFormat = elements[elements.Length - 1];
-                if (extentionFormat.Split(' ').Length - 1 > 0) {
-                    extentionFormat = extentionFormat.Substring(0, extentionFormat.Length - 1);
-                }
+				string extentionFormat = GetFileExtentionFormat( parseResult["entries"][index]["name"].Value);
               
                 if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
                 {
@@ -248,6 +243,38 @@ public class NavigationView : MonoBehaviour {
         _userDrive.JobDone();
         isButtonSelected = false;
     }
+
+	public void CheckFileList(JSONNode parseResult){
+
+		bool isThereNoEntre = false;
+		for (int index = 0; index < parseResult ["entries"].Count; index++) {
+			
+			/*1. Checking Empty or not in the selected folder for Showing empty indication icon */
+			if (parseResult["entries"][index][".tag"].Value == "folder") {
+				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
+					string extentionFormatStr = GetFileExtentionFormat (parseResult ["entries"] [index] ["name"].Value);
+
+				}
+				isThereNoEntre = true;
+			}
+		
+		}
+
+
+		if (isThereNoEntre) { // Showing empty indication icon 
+				
+		} 
+
+	}
+
+	string GetFileExtentionFormat(string fileName){
+		string[] elements = fileName.Split('.');
+		extentionFormat = elements[elements.Length - 1];
+		if (extentionFormat.Split(' ').Length - 1 > 0) {
+			extentionFormat = extentionFormat.Substring(0, extentionFormat.Length - 1);
+		}
+		return extentionFormat;
+	}
 
     void ButtonListener()
     {
