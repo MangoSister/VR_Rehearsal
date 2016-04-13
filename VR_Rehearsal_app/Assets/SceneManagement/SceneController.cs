@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using EnvType = PresentationData.EnvType;
+using SoundType = AudioManager.SoundType;
 
 public class SceneController : MonoBehaviour
 {
@@ -44,7 +45,7 @@ public class SceneController : MonoBehaviour
         public EnvDict(IDictionary<EnvType, GameObject> dict) : base(dict) { }
     }
 
-    [SerializeField]
+    [SerializeField, HideInInspector]
     public EnvDict envPrefabs = new EnvDict();
 
     //[HideInInspector, SerializeField]
@@ -59,6 +60,7 @@ public class SceneController : MonoBehaviour
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
+    public AudioManager audioManager;
     public InputManager inputManager;
     public ClockTimer timer;
     public Tutorial_PptKaraoke tutManager;
@@ -81,8 +83,9 @@ public class SceneController : MonoBehaviour
 
         recordWrapper.Init();
 
-        OperateAmbient(true);
-        StartCoroutine(SilenceAfterOpenning_CR());
+        audioManager.Init();
+        audioManager.Allocate3dSound(SoundType.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
+        _ambientUnit.PlayUnloopFadeInout(300f, 2f);
 
         inputManager.OnPracticeBegin += BeginPractice;
     }
@@ -101,25 +104,10 @@ public class SceneController : MonoBehaviour
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
 
+        audioManager.room = env.transform.GetComponentInChildren<CardboardAudioRoom>();
+
         //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
         //tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
-    }
-
-    private void OperateAmbient(bool enable)
-    {
-        if (enable)
-            AudioManager.currAudioManager.Play3dSound("Unrest", 1.0f, transform, Vector3.zero, 2.0f, true, ref _ambientUnit);
-        else
-        {
-            _ambientUnit.Stop(2.0f);
-            _ambientUnit = null;
-        }
-    }
-
-    private IEnumerator SilenceAfterOpenning_CR()
-    {
-        yield return new WaitForSeconds(5f);
-        OperateAmbient(false);
     }
 
     private void BeginPractice()
@@ -127,6 +115,7 @@ public class SceneController : MonoBehaviour
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
+        _ambientUnit.StopAndRecycle();
         timer.StartCounting();
     }
 
