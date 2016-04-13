@@ -430,7 +430,7 @@ public class NavigationView : MonoBehaviour {
 	}
 
 	public void ClickLogoutButton(){
-		Debug.Log ("Logout BUtton?/?");
+		
 		if (_authCheck == AuthCheck.Succeed) {
 			_userDrive.Revoke (delegate(){
 				if(_currCloudType != 0){
@@ -440,7 +440,6 @@ public class NavigationView : MonoBehaviour {
 				}
 			});
 		}
-
 	}
 
     public void ShowLoadingPanel()

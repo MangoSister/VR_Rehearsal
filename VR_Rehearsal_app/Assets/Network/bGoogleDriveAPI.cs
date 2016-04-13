@@ -140,6 +140,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 					_isAuthenticationSucceed = true;
 				else
 					_isAuthenticationSucceed = false;
+
 			}));
 		}
 	}
@@ -280,16 +281,17 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		if (authorization.Current is Exception) {
 			#if UNITY_EDITOR
 			Debug.LogWarning (authorization.Current as Exception);
-			_initInProgress = false;
-			callback (_initInProgress);
+
+			callback (false);
 			#endif
 		} else {
 			#if UNITY_EDITOR
 			Debug.Log("User Account: " + _drive.UserAccount);	
 			#endif
-			callback (_initInProgress);
+			callback (true);
 		}
 			
+		_initInProgress = false;
 	}
 
 
