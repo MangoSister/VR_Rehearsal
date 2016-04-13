@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using URandom = UnityEngine.Random;
 
 public class AudioManager : MonoBehaviour
 {
@@ -18,10 +19,32 @@ public class AudioManager : MonoBehaviour
 
     public enum SoundType
     {
-        Ambient,
-        Chat,
+        Ambient1,
+        Ambient2,
+        Whispering1,
+        Whispering2,
+        CaughingMan,
+        CaughingWoman,
+        Chair,
+        PhoneSMS,
+        PhoneVibration1,
+        PhoneVibration2,
     }
 
+    public enum SoundCollection
+    {
+        Ambient,
+        Whispering,
+        Miscs,
+    }
+
+    private static readonly Dictionary<SoundCollection, List<SoundType>> soundRandomCollect
+         = new Dictionary<SoundCollection, List<SoundType>>()
+         {
+             { SoundCollection.Ambient,  new List<SoundType>() { SoundType.Ambient1, SoundType.Ambient2 }  },
+             { SoundCollection.Whispering,  new List<SoundType>() { SoundType.Whispering1, SoundType.Whispering2 }  },
+             { SoundCollection.Miscs, new List<SoundType>() { SoundType.CaughingMan, SoundType.CaughingWoman, SoundType.Chair, SoundType.PhoneSMS, SoundType.PhoneVibration1, SoundType.PhoneVibration2 } },
+         };
 
     [Serializable]
     public class SoundDict : SerializableDictionary<SoundType, AudioClip>
@@ -35,6 +58,16 @@ public class AudioManager : MonoBehaviour
 
     public CardboardAudioListener listener;
     public CardboardAudioRoom room;
+    public AudioBound miscBound;
+
+    [Range(0f, 1f)]
+    public float ambientVolume;
+    [Range(0f, 1f)]
+    public float miscVolume;
+    [Range(0f, 1f)]
+    public float chatVolume;
+
+    public Vector2 miscSoundInterval;
 
     //object pools
     public int maxUnitNumber;
@@ -138,11 +171,72 @@ public class AudioManager : MonoBehaviour
 
         return true;
     }
-}
 
-[Serializable]
-public class ClipNamePair
-{
-    public string name;
-    public AudioClip clip;
+    public bool AllocateRand3dSound(SoundCollection collection, Transform parent, Vector3 localPos, out AudioUnit unit)
+    {
+        if (!AllocateUnit(out unit))
+            return false;
+
+        SoundType type = soundRandomCollect[collection][URandom.Range(0, soundRandomCollect[collection].Count)];
+        unit.source.clip = clipDict[type];
+        unit.gameObject.transform.parent = parent != null ? parent : transform;
+        unit.gameObject.transform.localPosition = localPos;
+
+        return true;
+    }
+
+    public void StartMiscSound()
+    {
+        StartCoroutine(MiscSound_CR());
+    }
+
+    private IEnumerator MiscSound_CR()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(URandom.Range(miscSoundInterval.x, miscSoundInterval.y));
+            AudioUnit miscUnit;
+            Vector3 pos = new Vector3(URandom.Range(-1f, 1f), URandom.Range(-1f, 1f), URandom.Range(-1f, 1f));
+            pos = Vector3.Scale(pos, miscBound.bound.extents);
+            pos += miscBound.bound.center;
+            if (AllocateRand3dSound(SoundCollection.Miscs, miscBound.transform, pos, out miscUnit))
+            {
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.1f);
+                miscUnit.PlayUnloopFadeInout(0f);
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            AudioUnit miscUnit;
+            Vector3 pos = new Vector3(URandom.Range(-1f, 1f), URandom.Range(-1f, 1f), URandom.Range(-1f, 1f));
+            pos = Vector3.Scale(pos, miscBound.bound.extents);
+            pos += miscBound.bound.center;
+            if (AllocateRand3dSound(SoundCollection.Miscs, miscBound.transform, pos, out miscUnit))
+            {
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.2f);
+                miscUnit.source.pitch = URandom.Range(0.8f, 1.2f);
+                miscUnit.PlayUnloopFadeInout(0f);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            AudioUnit miscUnit;
+            Vector3 pos = new Vector3(URandom.Range(-1f, 1f), URandom.Range(-1f, 1f), URandom.Range(-1f, 1f));
+            pos = Vector3.Scale(pos, miscBound.bound.extents);
+            pos += miscBound.bound.center;
+            if (AllocateRand3dSound(SoundCollection.Whispering, miscBound.transform, pos, out miscUnit))
+            {
+                miscUnit.source.volume = miscVolume * URandom.Range(0.8f, 1.2f);
+                miscUnit.source.pitch = URandom.Range(0.8f, 1.2f);
+                miscUnit.PlayUnloopFadeInout(0f);
+            }
+        }
+    }
+#endif
 }

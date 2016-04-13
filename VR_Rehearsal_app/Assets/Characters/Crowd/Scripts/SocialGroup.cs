@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using SoundType = AudioManager.SoundType;
+using SoundCollection = AudioManager.SoundCollection;
 
 public class SocialGroup : MonoBehaviour
 {
@@ -49,8 +49,12 @@ public class SocialGroup : MonoBehaviour
     private IEnumerator Chat_CR()
     {
         AudioUnit unit;
-        if (AudioManager.currAudioManager.Allocate3dSound(SoundType.Chat, transform, centerPos, out unit))
+        if (AudioManager.currAudioManager.AllocateRand3dSound(SoundCollection.Whispering, transform, centerPos, out unit))
+        {
+            unit.source.volume = AudioManager.currAudioManager.chatVolume * Random.Range(0.8f, 1.2f);
+            unit.source.pitch = Random.Range(0.8f, 1.2f);
             unit.Play();
+        }
         yield return new WaitForSeconds(CrowdSimulator.currSim.chatLength);
         unit.StopAndRecycle();
         shouldChat = false;

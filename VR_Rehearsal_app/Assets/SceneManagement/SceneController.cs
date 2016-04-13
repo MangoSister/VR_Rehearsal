@@ -5,7 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using EnvType = PresentationData.EnvType;
-using SoundType = AudioManager.SoundType;
+using SoundCollection = AudioManager.SoundCollection;
+using URandom = UnityEngine.Random;
 
 public class SceneController : MonoBehaviour
 {
@@ -65,6 +66,7 @@ public class SceneController : MonoBehaviour
     public ClockTimer timer;
     public Tutorial_PptKaraoke tutManager;
 
+
     private AudioUnit _ambientUnit = null;
 
     void Start ()
@@ -84,8 +86,12 @@ public class SceneController : MonoBehaviour
         recordWrapper.Init();
 
         audioManager.Init();
-        audioManager.Allocate3dSound(SoundType.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
-        _ambientUnit.PlayUnloopFadeInout(300f, 2f);
+        if (recordWrapper.EarphonePlugged())
+        {
+            audioManager.AllocateRand3dSound(SoundCollection.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
+            _ambientUnit.source.loop = true;
+            _ambientUnit.Play();
+        }
 
         inputManager.OnPracticeBegin += BeginPractice;
     }
@@ -105,7 +111,7 @@ public class SceneController : MonoBehaviour
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
 
         audioManager.room = env.transform.GetComponentInChildren<CardboardAudioRoom>();
-
+        audioManager.miscBound = env.transform.GetComponentInChildren<AudioBound>();
         //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
         //tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
     }
@@ -115,14 +121,17 @@ public class SceneController : MonoBehaviour
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
-        _ambientUnit.StopAndRecycle();
+        if (_ambientUnit != null)
+            _ambientUnit.StopFadeAndRecycle(1.0f);
+        if (recordWrapper.EarphonePlugged())
+            audioManager.StartMiscSound();
         timer.StartCounting();
     }
 
     public void EndPresentation()
     {
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
-        heatmapTracker.StartTrack();
+        heatmapTracker.StopTrack();
         recordWrapper.EndRecording();
         //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
 #if UNITY_ANDROID
@@ -147,6 +156,7 @@ public class SceneController : MonoBehaviour
             EndPresentation();
     }
 #endif
+
 
     private void LoadLightProbes(string path)
     {

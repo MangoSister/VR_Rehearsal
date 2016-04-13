@@ -66,6 +66,10 @@ public class RecordingWrapper : MonoBehaviour
     {
         recordingFilePath = Application.persistentDataPath + "/record.pcm";
         fluencyRecord = new List<KeyValuePair<bool, int>>();
+#if !UNITY_EDITOR && UNITY_ANDROID
+        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+#endif
     }
 
     public void StartRecording()
@@ -74,8 +78,6 @@ public class RecordingWrapper : MonoBehaviour
             File.Delete(recordingFilePath);
 
 #if !UNITY_EDITOR && UNITY_ANDROID
-        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
         //currentActivity.Call("finish");
         //currentActivity.Call("recreate");
 		currentActivity.Call("initialize_recordNplayback", recordingFilePath, PresentationData.in_VoiceThreshold);
@@ -176,6 +178,16 @@ public class RecordingWrapper : MonoBehaviour
             debugText.text += "\n" + fluencyFactor;
             debugText.text += "\n" + "delta: " + fluencyDelta;
         }
+#endif
+
+    }
+
+    public bool EarphonePlugged()
+    {
+#if !UNITY_EDITOR && UNITY_ANDROID
+        return currentActivity.Call<bool>("checkHeadsetPlugged");
+#else
+        return true;
 #endif
 
     }

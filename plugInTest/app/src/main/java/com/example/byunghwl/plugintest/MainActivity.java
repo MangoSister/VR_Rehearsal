@@ -64,6 +64,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     final static private String APP_SECRET = "1wd56pmx1hl8173";
     private String accessToken = "";
     private boolean bIsDropboxApiInitated = false;
+    private boolean bIsUpdating = false;
     private boolean bIsVRrecord = false;
 
     public void start_Dropbox_Authentication(){
@@ -76,6 +77,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 mDBApi = new DropboxAPI<AndroidAuthSession>(session);
                 mDBApi.getSession().startOAuth2Authentication(currContext);
                 bIsDropboxApiInitated = true;
+                bIsUpdating = true;
             }
         });
     }
@@ -91,9 +93,25 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
             } catch (IllegalStateException e) {
                 Log.i("DbAuthLog", "Error authenticating", e);
+                accessToken = "Authfailed";
             }
+
+
+        }else if(bIsUpdating == false){
+            accessToken = "Authfailed";
         }
         return accessToken;
+    }
+
+    /*Microphon Checking*/
+    public boolean checkHeadsetPlugged(){
+        AudioManager am1 = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        boolean res = false;
+        if(am1.isWiredHeadsetOn()){
+            res = true;
+        }
+
+        return res;
     }
     /*
         Consider Super class order
@@ -130,7 +148,9 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 } catch (IllegalStateException e) {
                     Log.i("DbAuthLog", "Error authenticating", e);
                 }
+
             }
+            bIsUpdating = false;
         }
     }
 
