@@ -179,4 +179,14 @@ public class RecordingWrapper : MonoBehaviour
 #endif
 
     }
+
+    public bool EarphonePlugged()
+    {
+#if !UNITY_EDITOR && UNITY_ANDROID
+        return currentActivity.Call<bool>("checkHeadsetPlugged");
+#else
+        return true;
+#endif
+
+    }
 }
