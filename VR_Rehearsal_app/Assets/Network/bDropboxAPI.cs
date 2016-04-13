@@ -16,7 +16,6 @@ using System.ComponentModel;
 public class bDropboxAPI : bhClowdDriveAPI{
 
 	private string _token;
-	private float _timeOut;
 	private JobStatus _status = JobStatus.NotStarted;
 	private bool _isGetToken = false;
 
@@ -188,7 +187,6 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 		if (!_isGetToken) {
 
-			_timeOut += Time.deltaTime;
 			#if UNITY_EDITOR
 				
 			#elif UNITY_ANDROID
@@ -202,18 +200,18 @@ public class bDropboxAPI : bhClowdDriveAPI{
 			if (_token != "" && _token != "null") {
 				_isGetToken = true;
 
-				bool res = SaveTokenBinaryInLocal();
-				#if UNITY_EDITOR
-				if(!res)
-				Debug.LogError("Error: Token Binary saving failed");
-				#endif
+				if (_token == "Authfailed") {
+					_authen_callback (false);
+				} else {
+					bool res = SaveTokenBinaryInLocal();
+					#if UNITY_EDITOR
+					if(!res)
+						Debug.LogError("Error: Token Binary saving failed");
+					#endif
 
-
-				_authen_callback (true);
-			} else if (_timeOut > 10.0) {
-				_authen_callback (false);
-				_timeOut = 0;
-			}
+					_authen_callback (true);
+				}
+			} 
 
 		}
 

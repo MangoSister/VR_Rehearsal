@@ -93,6 +93,10 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 Log.i("DbAuthLog", "Error authenticating", e);
                 accessToken = "Authfailed";
             }
+
+            if(!mDBApi.getSession().isLinked()){
+                accessToken = "Authfailed";
+            }
         }
         return accessToken;
     }
