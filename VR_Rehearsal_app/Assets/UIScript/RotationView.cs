@@ -85,6 +85,7 @@ public class RotationView : MonoBehaviour {
                         break;
                 }
             }
+
             GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
             GlobalManager.EnterPresentation();
         }
