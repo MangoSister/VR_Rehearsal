@@ -91,9 +91,21 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
             } catch (IllegalStateException e) {
                 Log.i("DbAuthLog", "Error authenticating", e);
+                accessToken = "Authfailed";
             }
         }
         return accessToken;
+    }
+
+    /*Microphon Checking*/
+    public boolean checkHeadsetPlugged(){
+        AudioManager am1 = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        boolean res = false;
+        if(am1.isWiredHeadsetOn()){
+            res = true;
+        }
+
+        return res;
     }
     /*
         Consider Super class order
