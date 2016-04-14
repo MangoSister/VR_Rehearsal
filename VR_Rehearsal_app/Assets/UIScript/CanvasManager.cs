@@ -259,6 +259,7 @@ public class CanvasManager : MonoBehaviour {
 					navigation.SetActive(false);
 					NavigationView.isNavigationDone = false;
 					navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
+					navigation.GetComponent<NavigationView> ().Initialize ();
 					fileTranser.SetActive(true);
 					return;
 				}
@@ -274,6 +275,7 @@ public class CanvasManager : MonoBehaviour {
                     navigation.SetActive(false);
                     NavigationView.isNavigationDone = false;
                     navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
+					navigation.GetComponent<NavigationView> ().Initialize ();
                     fileTranser.SetActive(true);
                 }
 

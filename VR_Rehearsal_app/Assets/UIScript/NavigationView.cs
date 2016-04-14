@@ -38,9 +38,9 @@ public class NavigationView : MonoBehaviour {
     bool isButtonSelected = false;
 
     //ETC
-    private string empty = "";
-    private bool isReseting = false;
-    private bool isCopy = false;
+    private string _empty = "";
+    private bool _isReseting = false;
+    private bool _isCopy = false;
     public GameObject customView;
 
      //Download button components
@@ -56,16 +56,23 @@ public class NavigationView : MonoBehaviour {
 	public GameObject Icon_AuthFailed;
 
     //Customize Data
-    string showCaseName;
-    int audience;
-    int roomSize;
-    int timer;
-    string extentionFormat;
+	private string _showCaseName;
+	private int _audience;
+	private int _roomSize;
+	private int _timer;
+	private string _extentionFormat;
 
 	//Authentication Check
 	AuthCheck _authCheck = AuthCheck.failed;
 	int _currCloudType = 0;
 	float _timerForAuth = 0;
+
+	//Loading
+	bool _isLoading = false;
+	public Sprite[] loadingAnimSprites;
+	public GameObject loadingAnimPlaceholder;
+	float _load_CR_timer = 0;
+
 
     void Start() {
 		
@@ -82,14 +89,30 @@ public class NavigationView : MonoBehaviour {
 	void ResetIcons(){
 		ResetSetting ();
 
+		loadingAnimPlaceholder.SetActive (false);
 		Icon_emptyFolder.SetActive(false);
 		Button_Download.SetActive(false);
 		Icon_AuthFailed.SetActive (false);
 	}
 
 	void ResetSetting(){
-		_timerForAuth = 0;
+		 _timerForAuth = 0;
+	}
 
+	public void Initialize(){
+		ResetIcons ();
+
+		_authCheck = AuthCheck.failed;
+		_currCloudType = 0;
+
+		isButtonSelected = false;
+
+		//ETC
+		_empty = "";
+		_isReseting = false;
+		_isCopy = false;
+
+		FinishLoading ();
 	}
 	
 	// Update is called once per frame
@@ -98,7 +121,7 @@ public class NavigationView : MonoBehaviour {
 		if(_authCheck == AuthCheck.failed){
 			_timerForAuth += Time.deltaTime;
 
-			if (_timerForAuth > 10.0f) {
+			if (_timerForAuth > 15.0f) {
 				Icon_AuthFailed.SetActive (true);
 			}
 		}
@@ -108,7 +131,7 @@ public class NavigationView : MonoBehaviour {
         {
             _userDrive.Update();
         }
-        if (isReseting == false)
+        if (_isReseting == false)
         {
             ButtonListener();
         }
@@ -118,17 +141,20 @@ public class NavigationView : MonoBehaviour {
 			if (!this.gameObject.activeSelf)
 				return;
 
-			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == empty) {
+			/*navigation back- go to parent paht*/
+			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
+				
+
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
-                    isReseting = true;
+                    _isReseting = true;
                     if (storedButton.Count != 0)
                     {
                         DeletePanels(true, "dd");
                     }
                     _userDrive.JobDone();
                     CreatePanels(resJson);
-                    isReseting = false;
+                    _isReseting = false;
                 });
             }
         }
@@ -151,7 +177,6 @@ public class NavigationView : MonoBehaviour {
     public void SetSetupManager(SetupManager mg)
     {
         _setManager = mg;
-    
     }
  
     
@@ -160,11 +185,17 @@ public class NavigationView : MonoBehaviour {
         if (_userDrive == null)
             _userDrive = new bUserCloudDrive();
 
+
 		_currCloudType = cloudType;
         _userDrive.Setup(_googleDirve);
         _userDrive.Initialize(cloudType);
+
+		StartLoading ();
+
         _userDrive.StartAuthentication(delegate (bool res)
         {
+			FinishLoading();
+
             if (res)
             {
 				_authCheck = AuthCheck.Succeed;
@@ -179,30 +210,35 @@ public class NavigationView : MonoBehaviour {
     }
     public void CreateButtons(string _folder)
     {
+		StartLoading ();
+
         _userDrive.GetSelectedFolderFileList(_folder, delegate (string resJson)
         {
-            isReseting = true;
+			FinishLoading();
+
+            _isReseting = true;
             if (storedButton.Count != 0)
             {
                 DeletePanels(true, "dd");
             }
             _userDrive.JobDone();
             CreatePanels(resJson);
-            isReseting = false;
+            _isReseting = false;
         });
     }
 
 
-
+	/*
     public void UpdateButtons(string _folderName)
     {
         _userDrive.GetSelectedFolderFileList(_folderName, CreatePanels);
-    }
+    }*/
 
     void StoreAllButtonStatus(GameObject button)
     {
         storedButton.Add(button);
     }
+
 
     public void DeletePanels(bool isSelected, string whichButton)
     {
@@ -218,7 +254,7 @@ public class NavigationView : MonoBehaviour {
         }
         storedButton.Clear();
 		ResetIcons ();
-        isCopy = false;
+        _isCopy = false;
     }
 
 	public void ClearPanels(){
@@ -270,9 +306,9 @@ public class NavigationView : MonoBehaviour {
                 createInstance.GetComponent<RectTransform>().FindChild("thumbnail").GetComponent<Image>().sprite = thumbnails[0];
 
             }else {
-				string extentionFormat = GetFileExtentionFormat( parseResult["entries"][index]["name"].Value);
+				string _extentionFormat = GetFileExtentionFormat( parseResult["entries"][index]["name"].Value);
               
-                if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
+                if (_extentionFormat == "jpg" || _extentionFormat == "JPG" || _extentionFormat == "png" || _extentionFormat == "PNG" || _extentionFormat == "Jpg" || _extentionFormat == "Png")
                 {
                     createInstance.GetComponent<RectTransform>().FindChild("thumbnail").GetComponent<Image>().sprite = thumbnails[2];
                 }
@@ -301,33 +337,31 @@ public class NavigationView : MonoBehaviour {
 			if (parseResult["entries"][index][".tag"].Value == "folder" || parseResult ["entries"] [index] [".tag"].Value == "file") {
 				if (parseResult ["entries"] [index] [".tag"].Value == "file") {
 					
-					string extentionFormatStr = GetFileExtentionFormat (parseResult ["entries"] [index] ["name"].Value);
-					if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
+					string _extentionFormatStr = GetFileExtentionFormat (parseResult ["entries"] [index] ["name"].Value);
+					if (_extentionFormat == "jpg" || _extentionFormat == "JPG" || _extentionFormat == "png" || _extentionFormat == "PNG" || _extentionFormat == "Jpg" || _extentionFormat == "Png")
 					{
 						/* + Checking that there is downloadable files in the selected folder for Showing Downdload icon */
 						isDownloadable = true;
 					}
 				}
 
-				/* + Checking Empty or not in the selected folder for Showing empty indication icon */
+				/* + Checking _empty or not in the selected folder for Showing _empty indication icon */
 				isThereNoEntre = true;
 			}
 		
 		}
-
-
-
+			
 		Icon_emptyFolder.SetActive(!isThereNoEntre);
 		Button_Download.SetActive(isDownloadable);
 	}
 
 	string GetFileExtentionFormat(string fileName){
 		string[] elements = fileName.Split('.');
-		extentionFormat = elements[elements.Length - 1];
-		if (extentionFormat.Split(' ').Length - 1 > 0) {
-			extentionFormat = extentionFormat.Substring(0, extentionFormat.Length - 1);
+		_extentionFormat = elements[elements.Length - 1];
+		if (_extentionFormat.Split(' ').Length - 1 > 0) {
+			_extentionFormat = _extentionFormat.Substring(0, _extentionFormat.Length - 1);
 		}
-		return extentionFormat;
+		return _extentionFormat;
 	}
 
     void ButtonListener()
@@ -341,14 +375,14 @@ public class NavigationView : MonoBehaviour {
             }
             if (_button.GetComponent<ButtonType>().isSelected == true )//&& isButtonSelected == false)
             {
-                if (isCopy == false)
+                if (_isCopy == false)
                 {
                     if (GameObject.Find("PPT_Practice(Clone)(Clone)"))
                     {
                         Destroy(GameObject.Find("PPT_Practice(Clone)(Clone)"));
                     }
                     _selectedButton = Instantiate(_button) as GameObject;
-                    isCopy = true;
+                    _isCopy = true;
                 }
                 if (_button.GetComponent<ButtonType>().buttonType == "folder")
                 {
@@ -366,7 +400,7 @@ public class NavigationView : MonoBehaviour {
 		/*
           foreach(GameObject btn in storedButton)
         {
-            if (extentionFormat == "jpg" || extentionFormat == "JPG" || extentionFormat == "png" || extentionFormat == "PNG" || extentionFormat == "Jpg" || extentionFormat == "Png")
+            if (_extentionFormat == "jpg" || _extentionFormat == "JPG" || _extentionFormat == "png" || _extentionFormat == "PNG" || _extentionFormat == "Jpg" || _extentionFormat == "Png")
             {
                 isOkToDown = true;
             }
@@ -387,7 +421,7 @@ public class NavigationView : MonoBehaviour {
                     ShowLoadingPanel();
                     string str = _userDrive.GetRecentPath();
 
-					_pptID = _setManager.BShowcaseMgr.AddShowcase("empty", 0, "/empty" , 30, 5);
+					_pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty" , 30, 5);
 					_setManager.BShowcaseMgr.EditShowcase_path(_pptID,  (Application.persistentDataPath + "/" + _pptID));
                     customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
                     _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, 
@@ -455,5 +489,34 @@ public class NavigationView : MonoBehaviour {
         gameObject.SetActive(false);
     } 
 
+	void StartLoading(){
+		_isLoading = true;
+		loadingAnimPlaceholder.SetActive (true);
+		StartCoroutine (StartLoadingIcon ());
+	}
+	void FinishLoading(){
+		_isLoading = false;
+		loadingAnimPlaceholder.SetActive (false);
+	}
+
+	IEnumerator StartLoadingIcon(){
+		
+		float timer = 0;
+		int idx = 0;
+
+		while(_isLoading){
+			/* Animation */
+			timer += Time.deltaTime;
+
+			if (timer > 0.5f) {
+				int tempIdx = (++idx) % loadingAnimSprites.Length;
+				loadingAnimPlaceholder.GetComponent<Image>().sprite = loadingAnimSprites [tempIdx];
+				timer = 0;
+			}
+				
+			yield return null;
+		}
+
+	}
 
 }
