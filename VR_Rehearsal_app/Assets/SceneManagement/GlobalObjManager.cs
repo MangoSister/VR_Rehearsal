@@ -111,6 +111,7 @@ public static class GlobalManager
             List<GazeSnapshot> HGGazeData,
             Texture2D screenshot,
             List<KeyValuePair<float, int>> transitionRecord,
+            List<Texture2D> slides,
             string recordingFilePath,
             List<KeyValuePair<bool, int>> fluencyRecord
         )
@@ -120,6 +121,7 @@ public static class GlobalManager
         PresentationData.out_HGGazeData = HGGazeData;
         PresentationData.out_Screenshot = screenshot;
         PresentationData.out_SlidesTransitionRecord = transitionRecord;
+        PresentationData.out_Slides = slides;
         PresentationData.out_RecordingFilePath = recordingFilePath;
         PresentationData.out_FluencyRecord = fluencyRecord;
         PresentationData.out_ExitTime = Time.time;
@@ -188,6 +190,7 @@ public static class PresentationData
     public static List<GazeSnapshot> out_HGGazeData;
     public static Texture2D out_Screenshot;
     public static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
+    public static List<Texture2D> out_Slides;
     public static string out_RecordingFilePath;
     public static List<KeyValuePair<bool, int>> out_FluencyRecord;
 
