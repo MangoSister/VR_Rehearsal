@@ -58,6 +58,7 @@ public class SceneController : MonoBehaviour
     public Transform presenterHead;
     public MeshRenderer exitRenderer;
 
+    public SlidesPlayer slidesPlayer;
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
     public RecordingWrapper recordWrapper;
@@ -105,11 +106,11 @@ public class SceneController : MonoBehaviour
 
         timer = env.transform.GetComponentInChildren<ClockTimer>();
         timer.SetMaxTime((int)PresentationData.in_ExpectedTime);
-
+        
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
         crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
         recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
-
+        slidesPlayer = env.transform.GetComponentInChildren<SlidesPlayer>();
         audioManager.room = env.transform.GetComponentInChildren<CardboardAudioRoom>();
         audioManager.miscBound = env.transform.GetComponentInChildren<AudioBound>();
         //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
@@ -144,6 +145,7 @@ public class SceneController : MonoBehaviour
                 heatmapTracker.output,
                 heatmapTracker.scn,
                 inputManager.outputTransitionRecord,
+                slidesPlayer._slides,
                 recordWrapper.recordingFilePath,
                 recordWrapper.outputFluencyRecord
             );

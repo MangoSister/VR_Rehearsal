@@ -13,7 +13,7 @@ public class SlidesPlayer : MonoBehaviour
     public List<MeshRenderer> displays;
     public float blendInterval = 1f;
 
-    private List<Texture2D> _slides;
+    public List<Texture2D> _slides { get; private set; }
     private bool _isPlaying;
     private bool _isBlending;
     private int _currIdx;
@@ -116,7 +116,7 @@ public class SlidesPlayer : MonoBehaviour
             return false;
 
         //foreach (Texture2D page in _slides)
-        //    Texture2D.Destroy(page);
+        //    Destroy(page);
 
         _slides = null;
         return true;
