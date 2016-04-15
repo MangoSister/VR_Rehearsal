@@ -4,9 +4,9 @@ using System.Collections;
 public class CanvasManager : MonoBehaviour {
 
     public GameObject logo;
-    public GameObject localShowCase;
-    public GameObject fileTranser;
-    public GameObject navigation;
+    public LocalCaseView localShowCase;
+    public FileTransferView fileTranser;
+    public NavigationView navigation;
     public GameObject loading;
     public GameObject customize;
     public GameObject calibration;
