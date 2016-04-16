@@ -128,6 +128,7 @@ public class CanvasManager : MonoBehaviour {
         {
             localShowCase.gameObject.SetActive(true);
             LogoView.isLogoSceneDone = false;
+            logo.gameObject.SetActive(false);
             fileTranser.gameObject.SetActive(false);
             //     customize.gameObject.SetActive(false);
             finishTrigger = false;
@@ -171,6 +172,7 @@ public class CanvasManager : MonoBehaviour {
         if (LocalCaseView.isCustomizeButtonClicked)
         {
             LocalCaseView.isCustomizeButtonClicked = false;
+  
             localShowCase.gameObject.SetActive(false);
             customize.gameObject.SetActive(true);
         }

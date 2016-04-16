@@ -9,7 +9,11 @@ public class LogoView : MonoBehaviour {
     {
         isLogoSceneDone = false;
         GetComponent<RectTransform>().SetAsLastSibling();
-        StartCoroutine("ChangePanel");
+        if (!CanvasManager.finishTrigger)
+        {
+            StartCoroutine("ChangePanel");
+        }
+        
     }
     public IEnumerator ChangePanel()
     {

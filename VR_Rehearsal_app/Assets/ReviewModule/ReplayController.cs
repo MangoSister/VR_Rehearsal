@@ -172,7 +172,7 @@ public class ReplayController : MonoBehaviour {
     }
 
     public void RefreshTopChart()
-    {
+    {/*
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
         int YMid = 60, YRange = 190;
@@ -232,7 +232,7 @@ public class ReplayController : MonoBehaviour {
 
         //update wave shapes
 
-
+        */
     }
     
 	// Use this for initialization
