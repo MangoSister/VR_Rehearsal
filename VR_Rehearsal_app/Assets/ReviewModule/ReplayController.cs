@@ -19,6 +19,14 @@ public class ReplayController : MonoBehaviour {
     private float[] floatArray;
     private int arrayLength = 0;
 
+    [Header("Heatmap Generation")]
+    private HeatmapGenerator heatMapGen;
+    public GameObject heatmapHolder;
+    public GameObject screenshotHolder;
+
+    private const int CHART_INTERVAL = 30; //30s
+    private float chartStartTime = 0.0f;
+
     [Header("Playback Slider Control")]
     public Slider playbackSlider;
     public bool preventTrigger = false;
@@ -34,16 +42,24 @@ public class ReplayController : MonoBehaviour {
     public bool isTransitionDisplay = true;
     public bool isPauseDisplay = true;
     public GameObject groupTransitionMarker;
-    public GameObject prefabTransitionMarker;
+    //public GameObject prefabTransitionMarker;
     public GameObject groupPauseMarker;
-    public GameObject prefabPauseMarker;
-    [Header("Marker Control")]
+    //public GameObject prefabPauseMarker;
+    [Header("For Debugging")]
     public Text testText;
     [Header("Loading")]
     public GameObject loadingText;
     public GameObject groupReplayObjects;
     public GameObject loadingGroup;
     public Image loadingBar;
+
+    [Header("Updating Zoom-In Of AudioClip")]
+    public GameObject currentPositionMarker;
+    public GameObject groupOfPauseMarkers;
+    public GameObject prefabPauseArea;
+    public GameObject prefabSlideEntrance;
+    public GameObject prefabWave;
+    private Sprite[] slidesTexture;
 
     enum PLAY_STATUS
     {
@@ -83,10 +99,23 @@ public class ReplayController : MonoBehaviour {
 
     private String getTimeString(float time)
     {
-        if (time > 60.0f)
-            return (int)(time / 60.0f) + ":" + (time - (time / 60) * 60) + "." + (int)((time - (int)(time)) * 100.0f);
+        string timestring = "";
+
+        //get minute
+        if (time >= 600.0f)
+            timestring = (int)(time / 60.0f) + ":" ;
+        else if (time > 60.0f)
+            timestring = "0" + (int)(time / 60.0f) + ":";
         else
-            return (int)(time) + "." + (int)((time - (int)(time)) * 100.0f);
+            timestring = "00:";
+
+        //get second
+        if (((int)(time) % 60) >= 10)
+            timestring += ((int)(time) % 60).ToString();// + "." + (int)((time - (int)(time)) * 100.0f);
+        else
+            timestring += "0" + ((int)(time) % 60);// + "." + (int)((time - (int)(time)) * 100.0f);
+
+        return timestring;
     }
 
     public void jumpInPlayback()
@@ -142,9 +171,85 @@ public class ReplayController : MonoBehaviour {
                 break;
         }
     }
+
+    public void RefreshTopChart()
+    {
+        //const for now. need detection algorithm
+        int XTop = -133, XBottom = 630;
+        int YMid = 60, YRange = 190;
+
+        //update the position marker
+        //get the interval first
+        float nowTime = playbackSlider.value;
+        float startTime = ((int)(nowTime / (float)(CHART_INTERVAL))) * CHART_INTERVAL;
+        float offset = nowTime - startTime;
+
+        currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(XTop+offset*(XBottom-XTop)/CHART_INTERVAL, YMid, 0f);
+        
+        //if ((playbackSlider.value >= chartStartTime) && (playbackSlider.value <= chartStartTime + CHART_INTERVAL))
+        //    return; 
+
+        if (isProcessingAudio == true) return;
+
+        //update pauses
+
+        //remove old pauses
+        var currentMarkers = new List<GameObject>();
+        foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
+        currentMarkers.ForEach(marker => Destroy(marker));
+
+        //find new pauses
+        for (int i=0; i<out_PauseRecord.Count; i++)
+        {
+            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value < startTime)
+                continue;
+
+            if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
+                break;
+
+            UnityEngine.Debug.Log("this record is picked: " + out_PauseRecord[i].Key + " (" + out_PauseRecord[i].Value + "s)");
+
+            float startX, endX;
+
+            if (out_PauseRecord[i].Key <= startTime) //start=0
+                startX = XTop;
+            else
+                startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
+
+            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value >= startTime+CHART_INTERVAL) //start=0
+                endX = XBottom;
+            else
+                endX = out_PauseRecord[i].Value * (XBottom - XTop) / CHART_INTERVAL+startX;
+
+            //instantiate a pause marker
+            var go = Instantiate(prefabPauseArea) as GameObject;
+            go.transform.parent = groupOfPauseMarkers.transform;
+
+            go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX-startX, YRange);
+        }
+
+        //update slide transitions
+
+        //update wave shapes
+
+
+    }
     
 	// Use this for initialization
 	void Start () {
+        //setup heatmap
+        heatMapGen = this.GetComponent<HeatmapGenerator>();
+        Texture2D tempTex;
+        float maxTime;
+        float outOfBoundRatio;
+        if (PresentationData.out_HGGazeData != null)
+        {
+            heatMapGen.GenerateMap(PresentationData.out_HGGazeData, 0, PresentationData.out_ExitTime, out tempTex, out maxTime, out outOfBoundRatio);
+            heatmapHolder.GetComponent<Image>().sprite = Sprite.Create(tempTex, new Rect(0, 0, tempTex.width, tempTex.height), new Vector2(0.5f, 0.5f));
+            screenshotHolder.GetComponent<Image>().sprite = Sprite.Create(PresentationData.out_Screenshot, new Rect(0, 0, PresentationData.out_Screenshot.width, PresentationData.out_Screenshot.height), new Vector2(0.5f, 0.5f));
+        }
+
         //set up audio source
         if (audioSource == null)
         {
@@ -167,6 +272,8 @@ public class ReplayController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        RefreshTopChart();
+
         preventTrigger = true;
 
         if (isProcessingAudio == true)
@@ -182,7 +289,7 @@ public class ReplayController : MonoBehaviour {
                     //UnityEngine.Debug.Log(pcmToUnityClip.progress + "/" + arrayLength);
                 }
             }
-            else //show slider
+            else //prepare data, show slider
             {
                 loadingText.SetActive(false);
                 loadingGroup.SetActive(false);
@@ -209,21 +316,23 @@ public class ReplayController : MonoBehaviour {
                 playbackSlider.value = 0;
                 preventTrigger = false;
 
+                
                 if ((PresentationData.out_SlidesTransitionRecord != null) && (PresentationData.out_SlidesTransitionRecord.Count >= 0))
                     out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
                 else
                 {
                     //give it some test data
                     out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
+                    
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
                 }
 
                 //instantiate markers
-                if (isTransitionDisplay == true)
+                /*if (isTransitionDisplay == true)
                 { 
                     foreach (KeyValuePair<float, int> transitionRecord in out_SlidesTransitionRecord)
                     {
@@ -235,10 +344,10 @@ public class ReplayController : MonoBehaviour {
 
                         go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, 0f);
                     }
-                }
+                }*/
 
                 out_PauseRecord = new List<KeyValuePair<float, int>>();
-
+                
                 if ((PresentationData.out_FluencyRecord != null) && (PresentationData.out_FluencyRecord.Count >= 0))
                 {
                     //long pause threshold is set to 1.5s
@@ -265,14 +374,16 @@ public class ReplayController : MonoBehaviour {
                 {
                     //give it some test data
                     out_PauseRecord = new List<KeyValuePair<float, int>>();
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
-                }
+                    
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
+                } 
 
                 //instantiate markers
+                /*
                 if (isPauseDisplay == true)
                 {
                     foreach (KeyValuePair<float, int> pauseRecord in out_PauseRecord)
@@ -289,6 +400,7 @@ public class ReplayController : MonoBehaviour {
                 }
 
                 groupReplayObjects.SetActive(true);
+                */
             }
         }
 
