@@ -105,7 +105,7 @@ public class CanvasManager : MonoBehaviour {
     }
     void Update () {
 
-        ShowLocasShowView();
+        ShowLocalShowView();
         ShowFileTransferView();
         ShowNavigationView();
         ShowCustomView();
@@ -116,7 +116,7 @@ public class CanvasManager : MonoBehaviour {
         ShowCustomViewToLocalView();
 
     }
-    public void ShowLocasShowView()
+    public void ShowLocalShowView()
     {
         if (LogoView.isLogoSceneDone)
         {

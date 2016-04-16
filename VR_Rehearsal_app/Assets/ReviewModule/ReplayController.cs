@@ -65,8 +65,7 @@ public class ReplayController : MonoBehaviour {
        // PlayerPrefs.SetString("currentShowcase", _id);
         CanvasManager.againTrigger = true;
         Application.LoadLevel("sc_UI");
-
-        //GlobalManager.EnterPresentation();
+         //GlobalManager.EnterPresentation();
     }
 
     public void exitRehearsal()
@@ -189,7 +188,7 @@ public class ReplayController : MonoBehaviour {
 
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
-                UnityEngine.Debug.Log(floatArray.Length);
+         //       UnityEngine.Debug.Log(floatArray.Length);
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
