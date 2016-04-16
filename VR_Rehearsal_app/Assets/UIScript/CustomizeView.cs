@@ -4,9 +4,6 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class CustomizeView : MonoBehaviour  {
-
-
-
     public static bool isCustomizeDone;
     public bool isCustomizeDoneFromLocal;
     private SetupManager _setManager;
@@ -59,24 +56,18 @@ public class CustomizeView : MonoBehaviour  {
                 btnRoom3.GetComponent<Image>().sprite = room3Checked;
                 btnRoom1.GetComponent<Image>().sprite = room1Unchecked;
                 btnRoom2.GetComponent<Image>().sprite = room2Unchecked;
-                
-                Debug.Log("Fucking Large");
                 customData._mapIdx = (ushort)1;
                 break;
             case 1:
                 btnRoom3.GetComponent<Image>().sprite = room3Unchecked;
                 btnRoom1.GetComponent<Image>().sprite = room1Unchecked;
                 btnRoom2.GetComponent<Image>().sprite = room2Checked;
-                
-                Debug.Log("Fucking Medi");
                 customData._mapIdx = (ushort)2;
                 break;
             case 0:
                 btnRoom3.GetComponent<Image>().sprite = room3Unchecked;
                 btnRoom1.GetComponent<Image>().sprite = room1Checked;
                 btnRoom2.GetComponent<Image>().sprite = room2Unchecked;
-                
-                Debug.Log("Fucking small");
                 customData._mapIdx = (ushort)3;
                 break;
             default:
@@ -116,6 +107,7 @@ public class CustomizeView : MonoBehaviour  {
         rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min);
         isCustomizeDone = true; //this will trigger the scene to move forward to calibration
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
+        Debug.Log(customData._mapIdx);
         gameObject.SetActive(false);
     }
     public void SetPPTID(string id)
@@ -135,7 +127,6 @@ public class CustomizeView : MonoBehaviour  {
         customData._percentageOfAudience = (ushort)oldAudience;
         customData._pptFolderPath = oldLocalPath;
         customData._expetedTime_min = (ushort)oldTime;
-
         showCaseTitle.GetComponent<InputField>().text = oldTitle;
         switch (oldSizeOfRoom)
         {

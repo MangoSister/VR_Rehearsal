@@ -105,7 +105,7 @@ public class CanvasManager : MonoBehaviour {
     }
     void Update () {
 
-        ShowLocalShowView();
+        ShowLocalFromReview();
         ShowFileTransferView();
         ShowNavigationView();
         ShowCustomView();
@@ -116,7 +116,7 @@ public class CanvasManager : MonoBehaviour {
         ShowCustomViewToLocalView();
 
     }
-    public void ShowLocalShowView()
+    public void ShowLocalFromReview()
     {
         if (LogoView.isLogoSceneDone)
         {
@@ -129,6 +129,7 @@ public class CanvasManager : MonoBehaviour {
             localShowCase.gameObject.SetActive(true);
             LogoView.isLogoSceneDone = false;
             fileTranser.gameObject.SetActive(false);
+            //     customize.gameObject.SetActive(false);
             finishTrigger = false;
         }
         else if (againTrigger ==true)

@@ -142,6 +142,7 @@ public class LocalCaseView : MonoBehaviour {
         customView.GetComponent<CustomizeView>().SetPPTID(_id);
         customView.GetComponent<CustomizeView>().SetCustomValueFromLocalView(_title, _sizeOfRoom, _audience, _localPath, _time);
         isCustomizeButtonClicked = true;
+       
     }
  
 }
