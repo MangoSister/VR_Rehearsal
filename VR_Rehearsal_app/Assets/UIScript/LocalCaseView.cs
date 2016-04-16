@@ -139,7 +139,6 @@ public class LocalCaseView : MonoBehaviour {
 
      public void EditShowCase(string _title, int _sizeOfRoom, int _audience, string _localPath, string _id, int _time)
     {
-        Debug.Log("call Edit Function");
         customView.GetComponent<CustomizeView>().SetPPTID(_id);
         customView.GetComponent<CustomizeView>().SetCustomValueFromLocalView(_title, _sizeOfRoom, _audience, _localPath, _time);
         isCustomizeButtonClicked = true;

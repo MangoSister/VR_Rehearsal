@@ -3,14 +3,14 @@ using System.Collections;
 
 public class CanvasManager : MonoBehaviour {
 
-    public GameObject logo;
+    public LogoView logo;
     public LocalCaseView localShowCase;
     public FileTransferView fileTranser;
     public NavigationView navigation;
     public GameObject loading;
-    public GameObject customize;
-    public GameObject calibration;
-    public GameObject rotation;
+    public CustomizeView customize;
+    public CalibrationView calibration;
+    public RotationView rotation;
 	public GameObject showCaseButton;
 
     static public bool againTrigger = false;
@@ -74,18 +74,18 @@ public class CanvasManager : MonoBehaviour {
         
     }
     void Awake () {
-        localShowCase.SetActive(false);
-        fileTranser.SetActive(false);
-        navigation.SetActive(false);
+        localShowCase.gameObject.SetActive(false);
+        fileTranser.gameObject.SetActive(false);
+        navigation.gameObject.SetActive(false);
         loading.SetActive(false);
-        customize.SetActive(false);
+        customize.gameObject.SetActive(false);
         _setupManager = new SetupManager();
         localShowCase.GetComponent<LocalCaseView>().SetSetupManager(_setupManager);
         navigation.GetComponent<NavigationView>().SetSetupManager(_setupManager);
         customize.GetComponent<CustomizeView>().SetSetupManager(_setupManager);
         rotation.GetComponent<RotationView>().SetSetupManager(_setupManager);
-        calibration.SetActive(false);
-        rotation.SetActive(false);
+        calibration.gameObject.SetActive(false);
+        rotation.gameObject.SetActive(false);
     }
    public void SetisFromCustom(bool res)
     {
@@ -102,7 +102,6 @@ public class CanvasManager : MonoBehaviour {
         {
             ShowRotationView();
         }
-
     }
     void Update () {
 
@@ -121,20 +120,20 @@ public class CanvasManager : MonoBehaviour {
     {
         if (LogoView.isLogoSceneDone)
         {
-            localShowCase.SetActive(true);
+            localShowCase.gameObject.SetActive(true);
             LogoView.isLogoSceneDone = false;
-            fileTranser.SetActive(false);
+            fileTranser.gameObject.SetActive(false);
         }
         else if(finishTrigger == true)
         {
-            localShowCase.SetActive(true);
+            localShowCase.gameObject.SetActive(true);
             LogoView.isLogoSceneDone = false;
-            fileTranser.SetActive(false);
+            fileTranser.gameObject.SetActive(false);
             finishTrigger = false;
         }
         else if (againTrigger ==true)
         {
-            localShowCase.SetActive(false);
+            localShowCase.gameObject.SetActive(false);
         }
     }
 
@@ -142,7 +141,7 @@ public class CanvasManager : MonoBehaviour {
     {
         if (LocalCaseView.isLocalCaseDone && localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked==true)
         {
-            fileTranser.SetActive(true);
+            fileTranser.gameObject.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
             localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked = false;
         }
@@ -152,8 +151,7 @@ public class CanvasManager : MonoBehaviour {
         if (FileTransferView.isFileTransferViewDone)
         {
             int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
-            navigation.SetActive(true);
-            Debug.Log(transferType);
+            navigation.gameObject.SetActive(true);
             navigation.GetComponent<NavigationView>().SetupCloud(transferType);
             FileTransferView.isFileTransferViewDone = false;
         }
@@ -163,7 +161,7 @@ public class CanvasManager : MonoBehaviour {
          if (NavigationView.isNavigationDone)
         {
             NavigationView.isNavigationDone = false;
-            customize.SetActive(true);
+            customize.gameObject.SetActive(true);
             loading.SetActive(false);
         }
     }
@@ -172,8 +170,8 @@ public class CanvasManager : MonoBehaviour {
         if (LocalCaseView.isCustomizeButtonClicked)
         {
             LocalCaseView.isCustomizeButtonClicked = false;
-            localShowCase.SetActive(false);
-            customize.SetActive(true);
+            localShowCase.gameObject.SetActive(false);
+            customize.gameObject.SetActive(true);
         }
     }
     public void ShowCustomViewToLocalView()
@@ -181,10 +179,9 @@ public class CanvasManager : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.Escape) && customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
         {
-                customize.SetActive(false);
-                localShowCase.SetActive(true);
-                customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
-          
+             customize.gameObject.SetActive(false);
+             localShowCase.gameObject.SetActive(true);
+             customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
         }
     }
     public void ShowCalibrationView()
@@ -192,7 +189,7 @@ public class CanvasManager : MonoBehaviour {
         if (CustomizeView.isCustomizeDone)
         {
             CustomizeView.isCustomizeDone = false;
-            calibration.SetActive(true);
+            calibration.gameObject.SetActive(true);
         }
        
     }
@@ -204,14 +201,14 @@ public class CanvasManager : MonoBehaviour {
         {
             //CalibrationView.isCalibrationDone = false;
             CalibrationControlNew.isCalibrationDone = false;
-            rotation.SetActive(true);
+            rotation.gameObject.SetActive(true);
             rotation.GetComponent<RotationView>().SetRotation(true);
         }
         else if(againTrigger == true)
         {
 
-            rotation.SetActive(true);
-            localShowCase.SetActive(false);
+            rotation.gameObject.SetActive(true);
+            localShowCase.gameObject.SetActive(false);
             rotation.GetComponent<RotationView>().SetRotation(true);
 
         }
@@ -222,8 +219,8 @@ public class CanvasManager : MonoBehaviour {
         {
             if (temp.GetComponent<ShowCaseButton>().isShowcaseButtonClicked == true)
             {
-                localShowCase.SetActive(false);
-                calibration.SetActive(true);
+                localShowCase.gameObject.SetActive(false);
+                calibration.gameObject.SetActive(true);
             }
 
         }
@@ -246,42 +243,41 @@ public class CanvasManager : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (fileTranser.activeSelf)
+            NavigationView nv = navigation.GetComponent<NavigationView>();
+            if (fileTranser.gameObject.activeSelf)
             {
-                fileTranser.SetActive(false);
+                fileTranser.gameObject.SetActive(false);
                 FileTransferView.isFileTransferViewDone = false;
-                localShowCase.SetActive(true);
+                localShowCase.gameObject.SetActive(true);
             }
-            if (navigation.activeSelf)
+            if (navigation.gameObject.activeSelf)
             {
 				//1. Auth Failed Case
-				if (!navigation.GetComponent<NavigationView> ().GetAuthenticationStatus ()) {
-					navigation.SetActive(false);
+				if (!nv.GetAuthenticationStatus ()) {
+					navigation.gameObject.SetActive(false);
 					NavigationView.isNavigationDone = false;
-					navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
-					navigation.GetComponent<NavigationView> ().Initialize ();
-					fileTranser.SetActive(true);
+					nv.DeletePanels(true, "ok");
+					nv.Initialize ();
+					fileTranser.gameObject.SetActive(true);
 					return;
 				}
 					
 				//2. Back button Keep pushing case
-                string str = navigation.GetComponent<NavigationView>().RecentPath();
+                string str = nv.RecentPath();
                 Debug.Log(str);
 				if (str == "null") {
 					return;
 				}
 
                 if (str == "/" || str == ""){
-                    navigation.SetActive(false);
+                    navigation.gameObject.SetActive(false);
                     NavigationView.isNavigationDone = false;
-                    navigation.GetComponent<NavigationView>().DeletePanels(true, "ok");
-					navigation.GetComponent<NavigationView> ().Initialize ();
-                    fileTranser.SetActive(true);
+                    nv.DeletePanels(true, "ok");
+					nv.Initialize ();
+                    fileTranser.gameObject.SetActive(true);
                 }
 
             }
         }
     }
-
-
 }
