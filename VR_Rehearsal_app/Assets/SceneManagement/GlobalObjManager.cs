@@ -25,7 +25,7 @@ public static class GlobalManager
     public static readonly string _PRELOAD_SCENE_NAME = "sc_preload";
     public static readonly string _PREP_SCENE_NAME = "sc_UI";
     public static readonly string _PRESENT_SCENE_NAME = "sc_present_0";
-    public static readonly string _EVAL_SCENE_NAME = "sc_evalutation";
+    public static readonly string _EVAL_SCENE_NAME = "sc_evaluationNew";
 
     // global-wide monohehaviour, make sure they are in preload scene
     public static GlobalBehaviorCleaner globalBehaviorCleaner;
