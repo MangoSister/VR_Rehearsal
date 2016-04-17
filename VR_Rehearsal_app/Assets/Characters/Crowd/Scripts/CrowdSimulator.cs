@@ -190,18 +190,18 @@ public class CrowdSimulator : MonoBehaviour
                 neighbors.Add(audiences[col * tx.seat_RowNum + row + 1]);
             if (row > 0 && audiences[col * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.25f)
                 neighbors.Add(audiences[col * tx.seat_RowNum + row - 1]);
-            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
+            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[(col + 1) * tx.seat_RowNum + row]);
-            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
+            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[(col - 1) * tx.seat_RowNum + row]);
 
-            if (row < tx.seat_RowNum - 1 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.25f)
+            if (row < tx.seat_RowNum - 1 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.05f)
                 neighbors.Add(audiences[(col + 1) * tx.seat_RowNum + row + 1]);
-            if (row > 0 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.25f)
+            if (row > 0 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.05f)
                 neighbors.Add(audiences[(col + 1) * tx.seat_RowNum + row - 1]);
-            if (row < tx.seat_RowNum - 1 && col > 0 && audiences[(col - 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.25f)
+            if (row < tx.seat_RowNum - 1 && col > 0 && audiences[(col - 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.05f)
                 neighbors.Add(audiences[(col - 1) * tx.seat_RowNum + row + 1]);
-            if (row > 0 && col > 0 && audiences[(col - 1) * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.25f)
+            if (row > 0 && col > 0 && audiences[(col - 1) * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.05f)
                 neighbors.Add(audiences[(col - 1) * tx.seat_RowNum + row - 1]);
 
             if (neighbors.Count > 0)
@@ -337,6 +337,7 @@ public class CrowdSimulator : MonoBehaviour
                     adObj.AddComponent(typeof(AudienceAnimHandlerFull)); //template version will crash Unity...
                     var handler = adObj.GetComponent<AudienceAnimHandlerFull>();
                     handler.controller = body;
+                    handler.LerpAnimLayerSpeed = 2f;
                     handler.repeatPeriodBound = new Vector2(30f, 60f);
                     handler.SwitchFollowDegSpeed = URandom.Range(80f, 120f);
 
@@ -375,6 +376,7 @@ public class CrowdSimulator : MonoBehaviour
                     adObj.AddComponent(typeof(AudienceAnimHandlerFollow)); //template version will crash Unity...
                     var handler = adObj.GetComponent<AudienceAnimHandlerFollow>();
                     handler.controller = body;
+                    handler.LerpAnimLayerSpeed = 2f;
                     handler.SwitchFollowDegSpeed = URandom.Range(80f, 120f);
 
                     var icon = Instantiate<GameObject>(prefabEyeIcon) as GameObject;
