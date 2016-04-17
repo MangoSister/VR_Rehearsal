@@ -128,7 +128,7 @@ public static class GlobalManager
 
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
         {
-            Screen.orientation = ScreenOrientation.Portrait;
+            Screen.orientation = ScreenOrientation.LandscapeLeft;
             Screen.autorotateToLandscapeLeft = false;
             Screen.autorotateToLandscapeRight = false;
             Screen.autorotateToPortrait = false;

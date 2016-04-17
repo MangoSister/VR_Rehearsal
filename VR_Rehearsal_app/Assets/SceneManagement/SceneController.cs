@@ -142,6 +142,8 @@ public class SceneController : MonoBehaviour
 
         _packedEnv.SetActive(false);
         exitNotice.SetActive(true);
+        Camera.main.backgroundColor = Color.white;
+        Camera.main.GetComponent<StereoController>().UpdateStereoValues();
     }
 
     public void ExitEnv()
