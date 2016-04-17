@@ -105,7 +105,7 @@ public class CanvasManager : MonoBehaviour {
     }
     void Update () {
 
-        ShowLocasShowView();
+        ShowLocalFromReview();
         ShowFileTransferView();
         ShowNavigationView();
         ShowCustomView();
@@ -116,7 +116,7 @@ public class CanvasManager : MonoBehaviour {
         ShowCustomViewToLocalView();
 
     }
-    public void ShowLocasShowView()
+    public void ShowLocalFromReview()
     {
         if (LogoView.isLogoSceneDone)
         {
@@ -128,7 +128,9 @@ public class CanvasManager : MonoBehaviour {
         {
             localShowCase.gameObject.SetActive(true);
             LogoView.isLogoSceneDone = false;
+            logo.gameObject.SetActive(false);
             fileTranser.gameObject.SetActive(false);
+            //     customize.gameObject.SetActive(false);
             finishTrigger = false;
         }
         else if (againTrigger ==true)
@@ -170,6 +172,7 @@ public class CanvasManager : MonoBehaviour {
         if (LocalCaseView.isCustomizeButtonClicked)
         {
             LocalCaseView.isCustomizeButtonClicked = false;
+  
             localShowCase.gameObject.SetActive(false);
             customize.gameObject.SetActive(true);
         }
