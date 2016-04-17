@@ -100,8 +100,7 @@ public class HeatmapGenerator : MonoBehaviour
         maxElementTime = outputTime.Max();
         for (int i = 0; i < heatmap.width * heatmap.height; ++i)
         {
-            outputCol[i] = heatmapGradient.Evaluate
-				(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
+            outputCol[i] = heatmapGradient.Evaluate(Mathf.Clamp01(heatmapColorCurve.Evaluate(outputTime[i] / maxElementTime)));
         }
 
 

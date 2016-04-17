@@ -291,7 +291,7 @@ public class ReplayController : MonoBehaviour {
             {
                 loadingText.SetActive(false);
                 loadingGroup.SetActive(false);
-
+                
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
          //       UnityEngine.Debug.Log(floatArray.Length);
@@ -378,7 +378,7 @@ public class ReplayController : MonoBehaviour {
                     out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
-                } 
+                }
 
                 //instantiate markers
                 /*
@@ -396,9 +396,9 @@ public class ReplayController : MonoBehaviour {
                         go.GetComponent<PauseController>().time = pauseRecord.Key;
                     }
                 }
-
-                groupReplayObjects.SetActive(true);
                 */
+                groupReplayObjects.SetActive(true);
+                
             }
             
         }
