@@ -211,7 +211,7 @@ public class CrowdSimulatorInspector : Editor
 
 
         
-        var rect = EditorGUILayout.BeginVertical(gazeBlockStyle);
+        EditorGUILayout.BeginVertical(gazeBlockStyle);
         groupSwitch[SimModule.Gaze] = EditorGUILayout.BeginToggleGroup(SimModule.Gaze.ToString(), groupSwitch[SimModule.Gaze]);
         sim.gazeCollision = EditorGUILayout.ObjectField("Gaze Collision", sim.gazeCollision, typeof(SimpleGazeCollision), true) as SimpleGazeCollision;
         sim.gazeCumulativeIntensity = EditorGUILayout.Slider("Gaze Cumulative Intensity", sim.gazeCumulativeIntensity, 0f, 1f);

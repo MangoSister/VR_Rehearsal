@@ -15,5 +15,5 @@ public abstract class AudienceAnimHandlerAbstract : MonoBehaviour
     public static GameObject eyeIconPrefab;
 
     public abstract void UpdateStateAnim();
-    public abstract void UpdateChatDirection(Vector2 dir);
+    public abstract void UpdateChatDirection(float dir);
 }

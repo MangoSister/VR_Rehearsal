@@ -70,6 +70,7 @@ public class SocialGroup : MonoBehaviour
         Gizmos.color = Color.red;
         foreach (Audience ad in members)
             Gizmos.DrawCube(ad.transform.position, Vector3.one * 0.5f);
+        Gizmos.DrawWireSphere(centerPos, 0.3f);
         Gizmos.color = oldColor;
     }
 #endif

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 
 public class RecordingWrapper : MonoBehaviour
@@ -62,6 +63,10 @@ public class RecordingWrapper : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
+    private List<KeyValuePair<bool, int>> _mockList;
+#endif
+
     public void Init()
     {
         recordingFilePath = Application.persistentDataPath + "/record.pcm";
@@ -69,6 +74,8 @@ public class RecordingWrapper : MonoBehaviour
 #if !UNITY_EDITOR && UNITY_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+#else
+        _mockList = new List<KeyValuePair<bool, int>>();
 #endif
     }
 
@@ -82,6 +89,8 @@ public class RecordingWrapper : MonoBehaviour
         //currentActivity.Call("recreate");
 		currentActivity.Call("initialize_recordNplayback", recordingFilePath, PresentationData.in_VoiceThreshold);
         currentActivity.Call("setReverbStrength", reverbStrength);
+#else
+        StartCoroutine(MockVoiceDetect_CR());
 #endif
     }
 
@@ -106,7 +115,10 @@ public class RecordingWrapper : MonoBehaviour
 
         return statusQueue;
 #else
-        return new Queue<KeyValuePair<bool, int>>();
+        //mock-up
+        var statusQueue = new Queue<KeyValuePair<bool, int>>(_mockList);
+        _mockList.Clear();
+        return statusQueue;
 #endif
     }
 
@@ -121,6 +133,7 @@ public class RecordingWrapper : MonoBehaviour
         }
         else return false;
 #else
+        StopAllCoroutines();
         return true;
 #endif
     }
@@ -129,7 +142,7 @@ public class RecordingWrapper : MonoBehaviour
     {
         if (debugText != null)
             debugText.text = string.Empty;
-#if !UNITY_EDITOR && UNITY_ANDROID
+
         Queue<KeyValuePair<bool, int>> statusQueue = CaptureVoiceStatus();
         float oldFactor = fluencyFactor;
 
@@ -152,6 +165,9 @@ public class RecordingWrapper : MonoBehaviour
 
 
             fluencyFactor = (float)speakingLength / (float)(speakingLength + silenceLength);
+#if UNITY_EDITOR
+            print(string.Format("(ratio: {0})", fluencyFactor));
+#endif
             if (debugText != null)
                 debugText.text += fluencyFactor;
             fluencyFactor = CrowdSimulator.currSim.fluencyCurve.Evaluate(fluencyFactor);
@@ -162,23 +178,9 @@ public class RecordingWrapper : MonoBehaviour
                 debugText.text += "\n" + fluencyFactor;
                 debugText.text += "\n" + "delta: " + fluencyDelta;
             }
-            
+
             fluencyRecord.AddRange(statusQueue);
         }
-#else
-        float oldFactor = fluencyFactor;
-        fluencyFactor = fakeFluencyFactor;
-        if (debugText != null)
-            debugText.text += fluencyFactor;
-        fluencyFactor = CrowdSimulator.currSim.fluencyCurve.Evaluate(fluencyFactor);
-        fluencyFactor = Mathf.Clamp(fluencyFactor, -1f, 1f);
-        fluencyDelta = fluencyFactor - oldFactor;
-        if (debugText != null)
-        {
-            debugText.text += "\n" + fluencyFactor;
-            debugText.text += "\n" + "delta: " + fluencyDelta;
-        }
-#endif
 
     }
 
@@ -191,4 +193,62 @@ public class RecordingWrapper : MonoBehaviour
 #endif
 
     }
+
+#if UNITY_EDITOR
+    private IEnumerator MockVoiceDetect_CR()
+    {
+        while (true)
+        {
+            if (Input.GetKey(KeyCode.S))
+            {
+                if (_mockList.Count == 0)
+                {
+                    _mockList.Add(new KeyValuePair<bool, int>(true, Mathf.FloorToInt(1000 * Time.deltaTime)));
+#if UNITY_EDITOR
+                    print("Speaking");
+#endif
+                }
+                else
+                {
+                    if (_mockList[_mockList.Count - 1].Key == false)
+                    {
+                        _mockList.Add(new KeyValuePair<bool, int>(true, Mathf.FloorToInt(1000 * Time.deltaTime)));
+#if UNITY_EDITOR
+                        print("Speaking");
+#endif
+                    }
+                    else
+                        _mockList[_mockList.Count - 1] = new KeyValuePair<bool, int>(true,
+                            _mockList[_mockList.Count - 1].Value + Mathf.FloorToInt(1000 * Time.deltaTime));
+                }
+            }
+            else
+            {
+                if (_mockList.Count == 0)
+                {
+                    _mockList.Add(new KeyValuePair<bool, int>(false, Mathf.FloorToInt(1000 * Time.deltaTime)));
+#if UNITY_EDITOR
+                    print("Silent");
+#endif
+                }
+                else
+                {
+                    if (_mockList[_mockList.Count - 1].Key == true)
+                    {
+                        _mockList.Add(new KeyValuePair<bool, int>(false, Mathf.FloorToInt(1000 * Time.deltaTime)));
+#if UNITY_EDITOR
+                        print("Silent");
+#endif
+                    }
+                    else
+                        _mockList[_mockList.Count - 1] = new KeyValuePair<bool, int>(false,
+                            _mockList[_mockList.Count - 1].Value + Mathf.FloorToInt(1000 * Time.deltaTime));
+                }
+            }
+
+            yield return null;
+        }
+
+    }
+#endif
 }

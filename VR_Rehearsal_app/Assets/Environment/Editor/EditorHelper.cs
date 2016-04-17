@@ -59,7 +59,7 @@ public static class EditorHelper
             List<KeyValuePair<TKey, TValue>> entryToChange = new List<KeyValuePair<TKey, TValue>>();
             foreach (var entry in dict)
             {
-                Rect rect = EditorGUILayout.BeginHorizontal(GUI.skin.box);
+                EditorGUILayout.BeginHorizontal(GUI.skin.box);
                 GUI.enabled = false;
                 EditorGUILayout.EnumPopup((entry.Key) as System.Enum);
                 GUI.enabled = true;
