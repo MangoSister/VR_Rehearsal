@@ -13,21 +13,25 @@ public class CustomizeView : MonoBehaviour  {
     //Set Name of Showcase
     public InputField showCaseTitle;
     public string showCaseName;
+    private string _defaultTitle = "Title";
 
     //size of room
     public GameObject tgroup;
     public int roomNumber;
+    private int _defaultRoom = 1;
 
     //percentage of audience
     public Slider sliderVal;
        //set timer
     public InputField timer;
     public string time;
+    private string _defaultTime = "5";
 
     //local ppt ID
     private string _pptID;
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
+    public bool defaultValue = false;
     public bool isFromCustom;
 
     [Header("Venue Select")]
@@ -42,10 +46,23 @@ public class CustomizeView : MonoBehaviour  {
     public Sprite room3Unchecked;
 
      void Start () {
+      
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
-        isCustomizeDoneFromLocal = false;
+      //  isCustomizeDoneFromLocal = false;
+        /*Default Value for Customize 
+        show case titl = Title
+        timer = 5
+        room = RPIS
+        */
+
+    }
+    public void DefaultValueSetting()
+    {
+        showCaseTitle.GetComponent<InputField>().text = _defaultTitle;
+        timer.GetComponent<InputField>().text = _defaultTime;
+        tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = true;
     }
 
     public void CheckToggle(int index)
@@ -141,12 +158,13 @@ public class CustomizeView : MonoBehaviour  {
                 break;
             default:
                 tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = false;
-                tgroup.GetComponent<RectTransform>().FindChild("Medium").GetComponent<Toggle>().isOn = false;
+                tgroup.GetComponent<RectTransform>().FindChild("Medium ").GetComponent<Toggle>().isOn = false;
                 tgroup.GetComponent<RectTransform>().FindChild("SmallRoom").GetComponent<Toggle>().isOn = false;
                 break;
         }
         timer.GetComponent<RectTransform>().FindChild("Text").GetComponent<Text>().text = oldTime.ToString();
         timer.GetComponent<InputField>().text = oldTime.ToString();
         isCustomizeDoneFromLocal = true;
+        defaultValue = false;
     }
 }
