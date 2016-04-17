@@ -61,11 +61,38 @@ public class ReplayController : MonoBehaviour {
     public GameObject prefabWave;
     private Sprite[] slidesTexture;
 
+    [Header("Panel Control")]
+    public Button btnChangeToHeatmap;
+    public Button btnChangeToSpeech;
+    public Sprite heatmapOn;
+    public Sprite heatmapOff;
+    public Sprite speechOn;
+    public Sprite speechOff;
+    public GameObject panelHeatmap;
+    public GameObject panelSpeech;
+
+
     enum PLAY_STATUS
     {
         STOP = 0,
         PLAY = 1,
         PAUSE = 2
+    }
+
+    public void SwitchToHeatMap()
+    {
+        btnChangeToHeatmap.image.sprite = heatmapOn;
+        btnChangeToSpeech.image.sprite = speechOff;
+        panelHeatmap.SetActive(true);
+        panelSpeech.SetActive(false);
+    }
+
+    public void SwitchToSpeech()
+    {
+        btnChangeToHeatmap.image.sprite = heatmapOff;
+        btnChangeToSpeech.image.sprite = speechOn;
+        panelHeatmap.SetActive(false);
+        panelSpeech.SetActive(true);
     }
 
     //public Text t1, t2, t3, t4;
@@ -175,7 +202,7 @@ public class ReplayController : MonoBehaviour {
     {
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
-        int YMid = 60, YRange = 190;
+        int YMid = 60, YRange = 240;
 
         //update the position marker
         //get the interval first
@@ -263,8 +290,8 @@ public class ReplayController : MonoBehaviour {
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
             pcmToUnityClip.setUpFile(PresentationData.out_RecordingFilePath);
         else
-            //pcmToUnityClip.setUpFile(@"C:\Users\xunchis\record.pcm");
-            pcmToUnityClip.setUpFile(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm");
+            pcmToUnityClip.setUpFile(@"C:\Users\xunchis\record.pcm");
+            //pcmToUnityClip.setUpFile(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm");
 
         pcmToUnityClip.Start();
         isProcessingAudio = true;
@@ -291,7 +318,7 @@ public class ReplayController : MonoBehaviour {
             {
                 loadingText.SetActive(false);
                 loadingGroup.SetActive(false);
-                
+
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
          //       UnityEngine.Debug.Log(floatArray.Length);
@@ -314,13 +341,14 @@ public class ReplayController : MonoBehaviour {
                 playbackSlider.value = 0;
                 preventTrigger = false;
 
-                
+                out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+
                 if ((PresentationData.out_SlidesTransitionRecord != null) && (PresentationData.out_SlidesTransitionRecord.Count >= 0))
                     out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
                 else
                 {
                     //give it some test data
-                    out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+                    //out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
                     
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
@@ -371,14 +399,14 @@ public class ReplayController : MonoBehaviour {
                 else
                 {
                     //give it some test data
-                    out_PauseRecord = new List<KeyValuePair<float, int>>();
+                    //out_PauseRecord = new List<KeyValuePair<float, int>>();
                     
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
-                }
+                    //out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
+                    //out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
+                    //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
+                    //out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
+                    //out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
+                } 
 
                 //instantiate markers
                 /*
@@ -398,7 +426,6 @@ public class ReplayController : MonoBehaviour {
                 }
                 */
                 groupReplayObjects.SetActive(true);
-                
             }
             
         }
@@ -458,7 +485,8 @@ public class AudioProcessingJob : ThreadedAudioJob
         else
         {
 #endif
-        byteArray = File.ReadAllBytes(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm"); //for testing
+        //byteArray = File.ReadAllBytes(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm"); //for testing
+        byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm"); //for testing
 #if !UNITY_EDITOR && UNITY_ANDROID
         }
 #endif
