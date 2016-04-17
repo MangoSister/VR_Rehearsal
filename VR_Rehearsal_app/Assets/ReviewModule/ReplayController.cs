@@ -172,7 +172,7 @@ public class ReplayController : MonoBehaviour {
     }
 
     public void RefreshTopChart()
-    {/*
+    {
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
         int YMid = 60, YRange = 190;
@@ -232,7 +232,7 @@ public class ReplayController : MonoBehaviour {
 
         //update wave shapes
 
-        */
+        
     }
     
 	// Use this for initialization
@@ -263,7 +263,8 @@ public class ReplayController : MonoBehaviour {
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
             pcmToUnityClip.setUpFile(PresentationData.out_RecordingFilePath);
         else
-            pcmToUnityClip.setUpFile(@"C:\Users\xunchis\record.pcm");
+            //pcmToUnityClip.setUpFile(@"C:\Users\xunchis\record.pcm");
+            pcmToUnityClip.setUpFile(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm");
 
         pcmToUnityClip.Start();
         isProcessingAudio = true;
@@ -271,8 +272,6 @@ public class ReplayController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        RefreshTopChart();
-
         preventTrigger = true;
 
         if (isProcessingAudio == true)
@@ -401,7 +400,10 @@ public class ReplayController : MonoBehaviour {
                 groupReplayObjects.SetActive(true);
                 */
             }
+            
         }
+        else
+            RefreshTopChart();
 
         if (audioSource != null)
         {
@@ -447,6 +449,7 @@ public class AudioProcessingJob : ThreadedAudioJob
     protected override void ThreadFunction()
     {
         byte[] byteArray = null;
+#if !UNITY_EDITOR && UNITY_ANDROID
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
             try { 
                 byteArray = File.ReadAllBytes(PresentationData.out_RecordingFilePath); 
@@ -454,9 +457,11 @@ public class AudioProcessingJob : ThreadedAudioJob
             catch (FileNotFoundException e) { }
         else
         {
-            byteArray = File.ReadAllBytes(@"C:\Users\xunchis\record.pcm"); //for testing
+#endif
+        byteArray = File.ReadAllBytes(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm"); //for testing
+#if !UNITY_EDITOR && UNITY_ANDROID
         }
-
+#endif
         //byte > unity float
         if (byteArray == null)
         {
