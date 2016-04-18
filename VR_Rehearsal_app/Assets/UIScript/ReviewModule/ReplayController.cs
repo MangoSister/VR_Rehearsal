@@ -599,7 +599,7 @@ public class AudioProcessingJob : ThreadedAudioJob
             if (valueS > max) max = valueS;
 
             //translate to -1.0~1.0f
-            float valueF = ((float)valueS * 8f) / 32768.0f;
+            float valueF = ((float)valueS) / 32768.0f;
             floatArray[i / 2] = valueF;
             if (i % 100000 == 0) progress = i/2;
         }
