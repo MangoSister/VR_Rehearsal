@@ -238,13 +238,13 @@ public class ReplayController : MonoBehaviour {
         //find new pauses
         for (int i=0; i<out_PauseRecord.Count; i++)
         {
-            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value < startTime)
+            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f < startTime)
                 continue;
 
             if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
                 break;
 
-            UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + out_PauseRecord[i].Value + "s)");
+            UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
 
             float startX, endX;
 
@@ -253,10 +253,17 @@ public class ReplayController : MonoBehaviour {
             else
                 startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
 
-            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f >= startTime+CHART_INTERVAL) //start=0
+            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f >= startTime+CHART_INTERVAL) //end=end
                 endX = XBottom;
             else
-                endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL*1000.0f) + startX;
+            {
+                if (out_PauseRecord[i].Key<=startTime)
+                {
+                    endX = ((out_PauseRecord[i].Value / 1000.0f)-(startTime-out_PauseRecord[i].Key))*(XBottom - XTop) / CHART_INTERVAL + startX;
+                }
+                else
+                    endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL*1000.0f) + startX;
+            }
 
             //instantiate a pause marker
             var go = Instantiate(prefabPauseArea) as GameObject;
