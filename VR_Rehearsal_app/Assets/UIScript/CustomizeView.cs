@@ -61,8 +61,11 @@ public class CustomizeView : MonoBehaviour  {
     public void DefaultValueSetting()
     {
         showCaseTitle.GetComponent<InputField>().text = _defaultTitle;
+        customData._showcaseName = _defaultTitle;
         timer.GetComponent<InputField>().text = _defaultTime;
         tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = true;
+
+        customData._expetedTime_min = (ushort)(int.Parse(_defaultTime));
     }
 
     public void CheckToggle(int index)
