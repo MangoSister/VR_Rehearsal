@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using EnvType = PresentationData.EnvType;
 using SoundCollection = AudioManager.SoundCollection;
-using URandom = UnityEngine.Random;
 
 public class SceneController : MonoBehaviour
 {

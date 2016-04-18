@@ -205,13 +205,13 @@ public class CrowdSimulator : MonoBehaviour
 
             List<Audience> neighbors = new List<Audience>();
             //randomly create social groups for now, 8 connectivity neighbors
-            if (row < tx.seat_RowNum - 1 && audiences[col * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.25f)
+            if (row < tx.seat_RowNum - 1 && audiences[col * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[col * tx.seat_RowNum + row + 1]);
-            if (row > 0 && audiences[col * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.25f)
+            if (row > 0 && audiences[col * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[col * tx.seat_RowNum + row - 1]);
-            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
+            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
                 neighbors.Add(audiences[(col + 1) * tx.seat_RowNum + row]);
-            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
+            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
                 neighbors.Add(audiences[(col - 1) * tx.seat_RowNum + row]);
 
             if (row < tx.seat_RowNum - 1 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.05f)
