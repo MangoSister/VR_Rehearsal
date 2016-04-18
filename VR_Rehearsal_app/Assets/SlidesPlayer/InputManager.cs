@@ -56,7 +56,7 @@ public class InputManager : MonoBehaviour
             StartCoroutine(AutoAdvance_CR());
 
         _transitionRecord = new List<KeyValuePair<float, int>>();
-        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, 0));
+        _transitionRecord.Add(new KeyValuePair<float, int>(0f, 0));
         player.Play();
 
         exitRenderer.enabled = false;
@@ -125,14 +125,14 @@ public class InputManager : MonoBehaviour
                 {
                     if (touchCounter == 1) //single touches
                     {
-                        player.NextSlide();
-                        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+                        if (player.NextSlide())
+                            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
                         _startDetect = false;
                     }
                     else if (touchCounter > 1) //double touches
                     {
-                        player.PrevSlide();
-                        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+                        if (player.PrevSlide())
+                            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
                         _startDetect = false;
                     }
                     else
@@ -189,6 +189,7 @@ public class InputManager : MonoBehaviour
         if (success)
         {
             stage = PracticeStage.After;
+            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
             if (OnPracticeEnd != null)
                 OnPracticeEnd(); 
             exitRenderer.enabled = false;

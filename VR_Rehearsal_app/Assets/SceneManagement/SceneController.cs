@@ -135,6 +135,8 @@ public class SceneController : MonoBehaviour
 
     private void EndPractice()
     {
+        PresentationData.out_ExitTime = Time.time;
+
         crowdSim.StopSimulation();
         heatmapTracker.StopTrack();
         recordWrapper.EndRecording();

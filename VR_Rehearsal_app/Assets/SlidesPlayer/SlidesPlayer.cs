@@ -160,22 +160,24 @@ public class SlidesPlayer : MonoBehaviour
         mat.SetFloat("_Blend", 0f);
     }
 
-    public void NextSlide()
+    public bool NextSlide()
     {
         if (!_isPlaying || _isBlending || _currIdx >= _slides.Count - 1)
-            return;
+            return false;
         _currIdx++;
         mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
+        return true;
     }
 
-    public void PrevSlide()
+    public bool PrevSlide()
     {
         if (!_isPlaying || _isBlending || _currIdx <= 0)
-            return;
+            return false;
         _currIdx--;
         mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
+        return true;
     }
 
     private IEnumerator Blend_CR()

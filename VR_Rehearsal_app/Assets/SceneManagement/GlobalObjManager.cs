@@ -124,7 +124,6 @@ public static class GlobalManager
         PresentationData.out_Slides = slides;
         PresentationData.out_RecordingFilePath = recordingFilePath;
         PresentationData.out_FluencyRecord = fluencyRecord;
-        PresentationData.out_ExitTime = Time.time;
 
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
         {
