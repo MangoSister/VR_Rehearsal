@@ -89,6 +89,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 	public override void Revoke(revoke_Callback callback){
 		_token = "";
+		_isGetToken = false;
 		SaveTokenBinaryInLocal ();
 		callback ();
 	}
