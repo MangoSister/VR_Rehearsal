@@ -244,7 +244,7 @@ public class ReplayController : MonoBehaviour {
             if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
                 break;
 
-            UnityEngine.Debug.Log("this record is picked: " + out_PauseRecord[i].Key + " (" + out_PauseRecord[i].Value + "s)");
+            UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + out_PauseRecord[i].Value + "s)");
 
             float startX, endX;
 
@@ -278,7 +278,7 @@ public class ReplayController : MonoBehaviour {
             if (time > startTime + CHART_INTERVAL)
                 break;
 
-            UnityEngine.Debug.Log("this record is picked: " + time + " (#" + slideNo+")");
+            UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo+")");
 
             //get the duration
             float dur = out_SlidesTransitionRecord[i + 1].Key - time;
@@ -317,7 +317,7 @@ public class ReplayController : MonoBehaviour {
                 sum += Math.Abs(floatArray[k]);
             }
             float avg = sum / interval;
-            float max = 0.8f;
+            float max = 1.0f;
             float size = avg / max * YRange;
             if (size > YRange) size = YRange;
             
@@ -592,7 +592,7 @@ public class AudioProcessingJob : ThreadedAudioJob
             if (valueS > max) max = valueS;
 
             //translate to -1.0~1.0f
-            float valueF = ((float)valueS * 15f) / 32768.0f;
+            float valueF = ((float)valueS * 8f) / 32768.0f;
             floatArray[i / 2] = valueF;
             if (i % 100000 == 0) progress = i/2;
         }
