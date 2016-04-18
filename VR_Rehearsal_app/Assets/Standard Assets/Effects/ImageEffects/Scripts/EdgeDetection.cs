@@ -34,7 +34,7 @@ namespace UnityStandardAssets.ImageEffects
 
         public override bool CheckResources ()
 		{
-            CheckSupport (true);
+            CheckSupport(mode != EdgeDetectMode.TriangleLuminance);
 
             edgeDetectMaterial = CheckShaderAndCreateMaterial (edgeDetectShader,edgeDetectMaterial);
             if (mode != oldMode)
