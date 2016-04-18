@@ -255,7 +255,8 @@ public class CrowdSimulator : MonoBehaviour
         if (_behaviorTree != null)
         {
             StartCoroutine(Simulate_CR());
-            StartCoroutine(UpdateSocialGroup_CR());
+            if (socialGroups.Count > 0)
+                StartCoroutine(UpdateSocialGroup_CR());
             StartCoroutine(UpdateGazeEffect_CR());
             StartCoroutine(UpdateVoice_CR());
             StartCoroutine(UpdateStepIntervalInt_CR());
