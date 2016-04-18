@@ -121,6 +121,8 @@ public class SceneController : MonoBehaviour
 
     private void BeginPractice()
     {
+        PresentationData.in_EnterTime = Time.time;
+
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
@@ -147,9 +149,6 @@ public class SceneController : MonoBehaviour
 
     public void ExitEnv()
     {
-#if UNITY_ANDROID
-        Screen.orientation = ScreenOrientation.AutoRotation;
-#endif
         GlobalManager.EndPresentation
             (
                 heatmapTracker.verticalFOVDeg,
