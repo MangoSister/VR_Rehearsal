@@ -83,7 +83,13 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     }
 
     public String getTokenFromNative(){
+
         String accessToken = "null";
+
+        if(bIsUpdating || !bIsDropboxApiInitated)
+            return accessToken;
+
+
         if (mDBApi.getSession().authenticationSuccessful()) {
             try {
                 // Required to complete auth, sets the access token on the session
@@ -97,9 +103,12 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             }
 
 
-        }else if(bIsUpdating == false){
+        }else{
             accessToken = "Authfailed";
         }
+		Log.i("DbAuthLog", "AuthResult:" + accessToken);
+        Log.i("DbAuthLog", "AuthResult_update:" + bIsUpdating);
+        Log.i("DbAuthLog", "AuthResult_isInitiated:" + bIsDropboxApiInitated);
         return accessToken;
     }
 
