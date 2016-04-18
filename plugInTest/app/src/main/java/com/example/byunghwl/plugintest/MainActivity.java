@@ -102,14 +102,22 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
                 accessToken = "Authfailed";
             }
 
-
+            ResetDropbox();
         }else{
             accessToken = "Authfailed";
+            ResetDropbox();
         }
 		Log.i("DbAuthLog", "AuthResult:" + accessToken);
         Log.i("DbAuthLog", "AuthResult_update:" + bIsUpdating);
-        Log.i("DbAuthLog", "AuthResult_isInitiated:" + bIsDropboxApiInitated);
+        Log.i("DbAuthLog", "AuthResult_initiate:" + bIsDropboxApiInitated);
+
         return accessToken;
+    }
+
+    private void ResetDropbox(){
+        bIsDropboxApiInitated = false;
+        mDBApi =null;
+        bIsUpdating = false;
     }
 
     /*Microphon Checking*/
@@ -147,6 +155,12 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         }
 
         if(bIsDropboxApiInitated){
+
+            if(mDBApi == null) {
+                Log.i("DbAuthLog", "mDBApi NULL ERROR");
+                return;
+            }
+
             if (mDBApi.getSession().authenticationSuccessful()) {
                 try {
                     // Required to complete auth, sets the access token on the session
