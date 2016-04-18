@@ -195,7 +195,9 @@ public class CrowdSimulatorInspector : Editor
         sim.asseblingRot = Quaternion.Euler(EditorGUILayout.Vector3Field("Assembling Rot", sim.asseblingRot.eulerAngles));
 
         sim.crowdParent = EditorGUILayout.ObjectField("Crowd Parent", sim.crowdParent, typeof(Transform), true) as Transform;
+        GUI.enabled = false;
         sim.stepIntervalInt = EditorGUILayout.FloatField("Step Interval Int", sim.stepIntervalInt);
+        GUI.enabled = true;
         sim.stepIntervalExt = EditorGUILayout.FloatField("Step Interval Ext", sim.stepIntervalExt);
         sim.stepIntervalInput = EditorGUILayout.FloatField("Step Interval Input", sim.stepIntervalInput);
         sim.deterministic = EditorGUILayout.Toggle("Deterministic", sim.deterministic);
@@ -211,7 +213,7 @@ public class CrowdSimulatorInspector : Editor
 
 
         
-        var rect = EditorGUILayout.BeginVertical(gazeBlockStyle);
+        EditorGUILayout.BeginVertical(gazeBlockStyle);
         groupSwitch[SimModule.Gaze] = EditorGUILayout.BeginToggleGroup(SimModule.Gaze.ToString(), groupSwitch[SimModule.Gaze]);
         sim.gazeCollision = EditorGUILayout.ObjectField("Gaze Collision", sim.gazeCollision, typeof(SimpleGazeCollision), true) as SimpleGazeCollision;
         sim.gazeCumulativeIntensity = EditorGUILayout.Slider("Gaze Cumulative Intensity", sim.gazeCumulativeIntensity, 0f, 1f);
@@ -256,6 +258,7 @@ public class CrowdSimulatorInspector : Editor
         sim.globalAttentionAmp = EditorGUILayout.FloatField("Amplitude (Gaussian)", sim.globalAttentionAmp);
         sim.globalAttentionConstOffset = EditorGUILayout.FloatField("Constant offset", sim.globalAttentionConstOffset);
         sim.globalTimeCurve = EditorGUILayout.CurveField("Time Curve", sim.globalTimeCurve);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("globalInternalUpdatePeriod"), true);
         EditorGUILayout.EndToggleGroup();
         EditorGUILayout.EndVertical();
 

@@ -16,6 +16,11 @@ public class InputManager : MonoBehaviour
         AutoAdvance, Trigger
     };
 
+    private enum PracticeStage
+    {
+        Before, Practicing, After,
+    }
+
     public SlidesCtrlType ctrlType = SlidesCtrlType.Trigger;
 
     public float autoAdvanceInterval = 60f;
@@ -26,8 +31,11 @@ public class InputManager : MonoBehaviour
 
     public SlidesPlayer player;
 
-    public delegate void ExitHandler();
-    public ExitHandler OnExit;
+    private PracticeStage stage = PracticeStage.Before;
+    public delegate void StageChangeHandler();
+    public StageChangeHandler OnPracticeBegin;
+    public StageChangeHandler OnPracticeEnd;
+    public StageChangeHandler OnExitVRScene;
 
     public float exitInterval = 3f;
     public MeshRenderer exitRenderer;
@@ -35,9 +43,6 @@ public class InputManager : MonoBehaviour
     public float doubleClickInterval = 0.5f;
     private bool _startDetect = false;
 
-    private bool _beginPractice = false;
-    public delegate void BeginPracticeHandler();
-    public BeginPracticeHandler OnPracticeBegin;
 
     private void Start()
     {
@@ -51,11 +56,11 @@ public class InputManager : MonoBehaviour
             StartCoroutine(AutoAdvance_CR());
 
         _transitionRecord = new List<KeyValuePair<float, int>>();
-        _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, 0));
+        _transitionRecord.Add(new KeyValuePair<float, int>(0f, 0));
         player.Play();
 
         exitRenderer.enabled = false;
-        _beginPractice = false;
+        stage = PracticeStage.Before;
     }
 
     private IEnumerator AutoAdvance_CR()
@@ -106,32 +111,45 @@ public class InputManager : MonoBehaviour
             yield return null;
         }
 
-        if(_beginPractice)
+        switch (stage)
         {
-            if (touchCounter == 1) //single touches
-            {
-                player.NextSlide();
-                _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
-                _startDetect = false;
-            }
-            else if (touchCounter > 1) //double touches
-            {
-                player.PrevSlide();
-                _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
-                _startDetect = false;
-            }
-            else
-            {
-                //hold
-                yield return StartCoroutine(Hold_CR());
-            }
-        }
-        else
-        {
-            _beginPractice = true;
-            if (OnPracticeBegin != null)
-                OnPracticeBegin();
-            _startDetect = false;
+            case PracticeStage.Before:
+                {
+                    stage = PracticeStage.Practicing;
+                    if (OnPracticeBegin != null)
+                        OnPracticeBegin();
+                    _startDetect = false;
+                    break;
+                }
+            case PracticeStage.Practicing:
+                {
+                    if (touchCounter == 1) //single touches
+                    {
+                        if (player.NextSlide())
+                            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+                        _startDetect = false;
+                    }
+                    else if (touchCounter > 1) //double touches
+                    {
+                        if (player.PrevSlide())
+                            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+                        _startDetect = false;
+                    }
+                    else
+                    {
+                        //hold
+                        yield return StartCoroutine(Hold_CR());
+                    }
+                    break;
+                }
+            case PracticeStage.After:
+            default:
+                {
+                    if (OnExitVRScene != null)
+                        OnExitVRScene();
+                    _startDetect = false;
+                    break;
+                }
         }
     }
 
@@ -165,18 +183,23 @@ public class InputManager : MonoBehaviour
             if (!success)
                 break;
 #endif
-
-
             yield return null;
         }
 
-
-        if (success && OnExit != null)
+        if (success)
         {
-            OnExit();
+            stage = PracticeStage.After;
+            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+            if (OnPracticeEnd != null)
+                OnPracticeEnd(); 
+            exitRenderer.enabled = false;
+            yield return new WaitForSeconds(2f);
+            _startDetect = false;
         }
-
-        _startDetect = false;
-        exitRenderer.enabled = false;
+        else
+        {
+            _startDetect = false;
+            exitRenderer.enabled = false;
+        }
     }
 }

@@ -20,13 +20,15 @@ public class AudienceChatStateNode : BaseNode<Audience>
         Vector3 proj = Vector3.ProjectOnPlane((center - target.transform.position), target.transform.up);
         proj.Normalize();
         Vector2 chatDir = new Vector2
-            (Vector3.Dot(proj, target.transform.right),
-              Vector3.Dot(proj, target.transform.forward));
-
-        if (chatDir.y > 0f)
-            chatDir.x = chatDir.x > 0f ? 1f : -1f;
-
-        target.animHandler.UpdateChatDirection(chatDir);
+            (Vector3.Dot(proj, -target.transform.right),
+              Vector3.Dot(proj, -target.transform.forward));
+        float angle = 1 / Mathf.PI * Mathf.Atan2(chatDir.y, chatDir.x);
+        if (angle < -0.5f)
+            target.animHandler.UpdateChatDirection(-1f);
+        else if (angle < 0f && angle >= -0.5f)
+            target.animHandler.UpdateChatDirection(1f);
+        else
+            target.animHandler.UpdateChatDirection(Mathf.Lerp(1, -1, angle));
     }
 
     protected override void Enter(Tick<Audience> tick)

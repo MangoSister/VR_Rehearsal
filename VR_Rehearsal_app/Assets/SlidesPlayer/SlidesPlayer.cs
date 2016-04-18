@@ -80,6 +80,9 @@ public class SlidesPlayer : MonoBehaviour
         else
         {
             UnLoadSlides();
+
+            //it seems like windows & android have different case-sensitivity here
+#if !UNITY_EDITOR && UNITY_ANDROID
             //this multiple filter is not working. 
             //string[] imgNames = Directory.GetFiles(path, "*.png|*.jpg|*.bmp", SearchOption.TopDirectoryOnly);
             string[] imgNames_png = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
@@ -98,7 +101,17 @@ public class SlidesPlayer : MonoBehaviour
 			System.Array.Copy(imgNames_PNG, 0, imgNames, imgNames_bmp.Length + imgNames_jpg.Length + imgNames_png.Length, imgNames_PNG.Length);
 			System.Array.Copy(imgNames_JPG, 0, imgNames, imgNames_PNG.Length + imgNames_bmp.Length + imgNames_jpg.Length + imgNames_png.Length, imgNames_JPG.Length);
 			System.Array.Copy(imgNames_BMP, 0, imgNames, imgNames_JPG.Length + imgNames_PNG.Length + imgNames_bmp.Length + imgNames_jpg.Length + imgNames_png.Length, imgNames_BMP.Length);
-            
+#else
+            string[] imgNames_png = Directory.GetFiles(path, "*.png", SearchOption.TopDirectoryOnly);
+            string[] imgNames_jpg = Directory.GetFiles(path, "*.jpg", SearchOption.TopDirectoryOnly);
+            string[] imgNames_bmp = Directory.GetFiles(path, "*.bmp", SearchOption.TopDirectoryOnly);
+
+            string[] imgNames = new string[imgNames_png.Length + imgNames_jpg.Length + imgNames_bmp.Length];
+
+            System.Array.Copy(imgNames_png, imgNames, imgNames_png.Length);
+            System.Array.Copy(imgNames_jpg, 0, imgNames, imgNames_png.Length, imgNames_jpg.Length);
+            System.Array.Copy(imgNames_bmp, 0, imgNames, imgNames_jpg.Length + imgNames_png.Length, imgNames_bmp.Length);
+#endif
             _slides = new List<Texture2D>();
             foreach (string name in imgNames)
             {
@@ -147,22 +160,24 @@ public class SlidesPlayer : MonoBehaviour
         mat.SetFloat("_Blend", 0f);
     }
 
-    public void NextSlide()
+    public bool NextSlide()
     {
         if (!_isPlaying || _isBlending || _currIdx >= _slides.Count - 1)
-            return;
+            return false;
         _currIdx++;
         mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
+        return true;
     }
 
-    public void PrevSlide()
+    public bool PrevSlide()
     {
         if (!_isPlaying || _isBlending || _currIdx <= 0)
-            return;
+            return false;
         _currIdx--;
         mat.SetTexture("_NextTex", _slides[_currIdx]);
         StartCoroutine(Blend_CR());
+        return true;
     }
 
     private IEnumerator Blend_CR()

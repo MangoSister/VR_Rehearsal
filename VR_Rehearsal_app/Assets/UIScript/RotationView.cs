@@ -54,7 +54,7 @@ public class RotationView : MonoBehaviour {
                 PresentationData.in_ExpectedTime = _expectedTime * 60;
                 switch (_sizeOfRoom)
                 {
-                    case 0:
+                    case 1:
                         PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                         break;
                     case 2:
@@ -73,7 +73,7 @@ public class RotationView : MonoBehaviour {
                 _sizeOfRoom = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetRoom();
                 switch (_sizeOfRoom)
                 {
-                    case 0:
+                    case 1:
                         PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                         break;
                     case 2:
@@ -104,7 +104,7 @@ public class RotationView : MonoBehaviour {
                 PresentationData.in_ExpectedTime = _expectedTime * 60;
                 switch (_sizeOfRoom)
                 {
-                    case 0:
+                    case 1:
                         PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                         break;
                     case 2:
@@ -129,7 +129,7 @@ public class RotationView : MonoBehaviour {
                     _sizeOfRoom = (int)tempShowCaseData.Value._mapIdx;
                     switch (_sizeOfRoom)
                     {
-                        case 0:
+                        case 1:
                             PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                             break;
                         case 2:
@@ -150,7 +150,7 @@ public class RotationView : MonoBehaviour {
                 _sizeOfRoom = GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().GetRoom();
                 switch (_sizeOfRoom)
                 {
-                    case 0:
+                    case 1:
                         PresentationData.in_EnvType = PresentationData.EnvType.RPIS;
                         break;
                     case 2:

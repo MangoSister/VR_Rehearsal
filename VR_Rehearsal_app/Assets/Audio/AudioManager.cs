@@ -146,6 +146,9 @@ public class AudioManager : MonoBehaviour
 
     private void RecycleAll()
     {
+        if (_unitPool == null)
+            return;
+
         List<AudioUnit> allocated = new List<AudioUnit>();
         foreach (AudioUnit unit in _unitPool)
             if (unit.isAllocated)
@@ -188,6 +191,11 @@ public class AudioManager : MonoBehaviour
     public void StartMiscSound()
     {
         StartCoroutine(MiscSound_CR());
+    }
+
+    public void StopMiscSound()
+    {
+        StopAllCoroutines();
     }
 
     private IEnumerator MiscSound_CR()

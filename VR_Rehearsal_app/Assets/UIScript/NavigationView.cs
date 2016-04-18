@@ -73,9 +73,12 @@ public class NavigationView : MonoBehaviour {
 	public GameObject loadingAnimPlaceholder;
 	float _load_CR_timer = 0;
 
+    //flag
+    public bool letsdefault;
+
 
     void Start() {
-		
+        letsdefault = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -397,6 +400,7 @@ public class NavigationView : MonoBehaviour {
 
     public void DownloadButtonClicked()
     {
+        customView.GetComponent<CustomizeView>().DefaultValueSetting();
 		/*
           foreach(GameObject btn in storedButton)
         {

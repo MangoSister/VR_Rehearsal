@@ -20,6 +20,12 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
         {States.Chatting, new float[1] { 1.0f } }
     };
 
+    private static readonly Color[] propPalette = new Color[]
+    {
+        new Color(0.2f, 0.2f, 0.2f),
+        new Color(0.8f, 0.8f, 0.8f),
+    };
+
     public static readonly float laptopAnimLength = 0.75f;
 
     public Vector2 repeatPeriodBound = new Vector2(3f, 8f);
@@ -49,10 +55,10 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
         controller.SetBool(_paramIdMirror, nextMirror);
     }
 
-    public override void UpdateChatDirection(Vector2 dir)
+    public override void UpdateChatDirection(float dir)
     {
         base.UpdateChatDirection(dir);
-        if (Mathf.Abs(dir.y) < 0.5f)
+        if (Mathf.Abs((dir - 0.5f) * Mathf.PI) < Mathf.PI * 0.25)
             controller.SetFloat(_paramIdBlendFactor0, 0f);
     }
 
@@ -78,6 +84,7 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
                                select x).FirstOrDefault();
 
         laptop = Instantiate(AudienceAnimWarehouse.curr.laptopPrefab);
+        laptop.GetComponentInChildren<MeshRenderer>().material.color = propPalette[Random.Range(0, propPalette.Length)];
         laptop.transform.parent = laptopTransform;
         laptop.transform.localPosition = Vector3.zero;
         laptop.transform.localRotation = Quaternion.identity;
@@ -87,6 +94,7 @@ public class AudienceAnimHandlerFull : AudienceAnimHandlerFollow
                                    select x).FirstOrDefault();
 
         smartPhone = Instantiate(AudienceAnimWarehouse.curr.smartphonePrefab);
+        smartPhone.GetComponent<MeshRenderer>().material.color = propPalette[Random.Range(0, propPalette.Length)];
         smartPhone.transform.parent = smartphoneTransform;
         smartPhone.transform.localPosition = Vector3.zero;
         smartPhone.transform.localRotation = Quaternion.identity;

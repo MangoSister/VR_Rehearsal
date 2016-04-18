@@ -53,8 +53,6 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
             float currScale = Mathf.Lerp(initScale, 1f, currTime * eyeIconFreq);
             eyeIcon.transform.localScale = Vector3.one * eyeIconScale * currScale;
             currTime += Time.deltaTime;
-            //eyeIcon.transform.localScale = Vector3.one *
-              //  eyeIconScale * (0.1f * Mathf.Sin(Time.time * eyeIconFreq) + 1f);
             yield return null;
         }
 
@@ -67,10 +65,9 @@ public class AudienceAnimHandlerBasic : AudienceAnimHandlerAbstract
         controller.SetInteger(_paramIdState, (int)_audience.currState);
     }
 
-    public override void UpdateChatDirection(Vector2 dir)
+    public override void UpdateChatDirection(float dir)
     {
-        controller.SetFloat(_paramIdBlendFactor0, dir.x);
-        controller.SetFloat(_paramIdBlendFactor1, dir.y);
+        controller.SetFloat(_paramIdBlendFactor1, dir);
     }
 
     protected virtual void Awake()

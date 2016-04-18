@@ -3,19 +3,19 @@ using System.Collections;
 
 public class ClockTimer : MonoBehaviour
 {
-	public TextMesh textMesh;
+    public TextMesh textMesh;
     public Transform infoTransform;
     public Transform timerTransform;
     public string startInfo;
     public string endInfo;
-	public float _maxSecond = 0;
-	private float _currSecond = 0f; 
+    public float _maxSecond = 0;
+    private float _currSecond = 0f;
 
-	public void SetMaxTime(int time)
+    public void SetMaxTime(int time)
     {
-		_maxSecond = time;
-		_currSecond = _maxSecond;
-	}
+        _maxSecond = time;
+        _currSecond = _maxSecond;
+    }
 
     public void ResetTime()
     {
@@ -33,31 +33,32 @@ public class ClockTimer : MonoBehaviour
 
     public void StartCounting()
     {
-        enabled = true;
         textMesh.transform.parent = timerTransform;
         textMesh.transform.localPosition = Vector3.zero;
         textMesh.transform.localRotation = Quaternion.identity;
+        StartCoroutine(Timing_CR());
     }
 
     public void StopCounting()
     {
-        enabled = false;
+        StopAllCoroutines();
     }
 
-    private void Update()
+    private IEnumerator Timing_CR()
     {
-        if (_currSecond >= 0)
+        while (true)
         {
-            _currSecond -= Time.deltaTime;
-
+            if (_currSecond < 0)
+                break;
+            yield return new WaitForSeconds(1f);
+            _currSecond--;
             int minutes = (int)_currSecond / 60;
             int seconds = (int)_currSecond % 60;
             textMesh.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-
             if (_currSecond < 0.25f * _maxSecond)
                 textMesh.color = Color.red;
         }
-        else
-            textMesh.text = endInfo;
+
+        textMesh.text = endInfo;
     }
 }

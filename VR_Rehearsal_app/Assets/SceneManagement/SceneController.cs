@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using EnvType = PresentationData.EnvType;
 using SoundCollection = AudioManager.SoundCollection;
-using URandom = UnityEngine.Random;
 
 public class SceneController : MonoBehaviour
 {
@@ -56,8 +55,9 @@ public class SceneController : MonoBehaviour
 
     public GameObject presenter;
     public Transform presenterHead;
-    public MeshRenderer exitRenderer;
+    public GameObject exitNotice;
 
+    private GameObject _packedEnv;
     public SlidesPlayer slidesPlayer;
     public CrowdSimulator crowdSim;
     public HeatmapTracker heatmapTracker;
@@ -95,30 +95,34 @@ public class SceneController : MonoBehaviour
         }
 
         inputManager.OnPracticeBegin += BeginPractice;
+        exitNotice.SetActive(false);
     }
 
     private void LoadEnv()
     {
-        GameObject env = Instantiate(envPrefabs[PresentationData.in_EnvType]);
+        _packedEnv = Instantiate(envPrefabs[PresentationData.in_EnvType]);
 
-        inputManager.player = env.transform.GetComponentInChildren<SlidesPlayer>();
-        inputManager.OnExit += EndPresentation;
+        inputManager.player = _packedEnv.transform.GetComponentInChildren<SlidesPlayer>();
+        inputManager.OnPracticeEnd += EndPractice;
+        inputManager.OnExitVRScene += ExitEnv;
 
-        timer = env.transform.GetComponentInChildren<ClockTimer>();
+        timer = _packedEnv.transform.GetComponentInChildren<ClockTimer>();
         timer.SetMaxTime((int)PresentationData.in_ExpectedTime);
         
         crowdSim.crowdConfigFileName = EnvInfoDict[PresentationData.in_EnvType].crowdConfigPath;
-        crowdSim.crowdParent = env.transform.Find("CrowdParentTransform");
-        recordWrapper.debugText = env.transform.Find("RecordDebugText").GetComponent<TextMesh>();
-        slidesPlayer = env.transform.GetComponentInChildren<SlidesPlayer>();
-        audioManager.room = env.transform.GetComponentInChildren<CardboardAudioRoom>();
-        audioManager.miscBound = env.transform.GetComponentInChildren<AudioBound>();
+        crowdSim.crowdParent = _packedEnv.transform.Find("CrowdParentTransform");
+        recordWrapper.debugText = _packedEnv.transform.Find("RecordDebugText").GetComponent<TextMesh>();
+        slidesPlayer = _packedEnv.transform.GetComponentInChildren<SlidesPlayer>();
+        audioManager.room = _packedEnv.transform.GetComponentInChildren<CardboardAudioRoom>();
+        audioManager.miscBound = _packedEnv.transform.GetComponentInChildren<AudioBound>();
         //tutManager.slidePlayer = inputManager.GetComponent<SlidesPlayer>();
         //tutManager.timerPlayer = env.transform.GetComponentInChildren<clockTimer>();
     }
 
     private void BeginPractice()
     {
+        PresentationData.in_EnterTime = Time.time;
+
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
@@ -129,15 +133,24 @@ public class SceneController : MonoBehaviour
         timer.StartCounting();
     }
 
-    public void EndPresentation()
+    private void EndPractice()
     {
-        //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.whiteTexture;
+        PresentationData.out_ExitTime = Time.time;
+
+        crowdSim.StopSimulation();
         heatmapTracker.StopTrack();
         recordWrapper.EndRecording();
-        //slidesPlayerCtrl.exitRenderer.material.mainTexture = Texture2D.blackTexture;
-#if UNITY_ANDROID
-        Screen.orientation = ScreenOrientation.AutoRotation;
-#endif
+        if (recordWrapper.EarphonePlugged())
+            audioManager.StopMiscSound();
+
+        _packedEnv.SetActive(false);
+        exitNotice.SetActive(true);
+        Camera.main.backgroundColor = Color.white;
+        Camera.main.GetComponent<StereoController>().UpdateStereoValues();
+    }
+
+    public void ExitEnv()
+    {
         GlobalManager.EndPresentation
             (
                 heatmapTracker.verticalFOVDeg,
@@ -155,7 +168,10 @@ public class SceneController : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.L))
-            EndPresentation();
+        {
+            EndPractice();
+            ExitEnv();
+        }
     }
 #endif
 
