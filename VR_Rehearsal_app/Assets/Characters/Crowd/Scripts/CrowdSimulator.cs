@@ -53,7 +53,22 @@ public class CrowdSimulator : MonoBehaviour
     private int _nextCharacterIdx;
 
     public string crowdConfigFileName;
-    public float stepIntervalInt;
+    public float stepIntervalInt
+    {
+        get
+        { return _stepIntervalInt; }
+        set
+        {
+            _stepIntervalInt = value;
+            if (_waitNode == null)
+                _waitNode = new WaitNode<Audience>(value);
+            else _waitNode.waitTime = value;
+        }
+    }
+
+    private float _stepIntervalInt;
+    private WaitNode<Audience> _waitNode;
+
     public float stepIntervalExt;
     public float stepIntervalInput;
 
@@ -68,6 +83,8 @@ public class CrowdSimulator : MonoBehaviour
     public float globalAttentionStDev;
     public float globalAttentionAmp;
     public float globalAttentionConstOffset;
+    public float[] globalInternalUpdatePeriod = new float[3];
+
     public AnimationCurve globalTimeCurve;
 
     public AnimationCurve seatPosAttentionCurve;
@@ -122,11 +139,13 @@ public class CrowdSimulator : MonoBehaviour
 
     private void CreateBehaviorTree()
     {
+        if (_waitNode == null)
+            _waitNode = new WaitNode<Audience>(stepIntervalInt);
         _behaviorTree = new BehaviorTree<Audience>
             (new SequenceNode<Audience>
                 (new SelectorNode<Audience>
                     (new SequenceNode<Audience>
-                        (new InstantSuccessModifier<Audience>(new WaitNode<Audience>(stepIntervalInt)),
+                        (new InstantSuccessModifier<Audience>(_waitNode),
                         new AudienceInternalSimNode()),
                     new AudienceBypassInternalNode()),
                 new AudienceExternalSimNode(),
@@ -186,13 +205,13 @@ public class CrowdSimulator : MonoBehaviour
 
             List<Audience> neighbors = new List<Audience>();
             //randomly create social groups for now, 8 connectivity neighbors
-            if (row < tx.seat_RowNum - 1 && audiences[col * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.25f)
+            if (row < tx.seat_RowNum - 1 && audiences[col * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[col * tx.seat_RowNum + row + 1]);
-            if (row > 0 && audiences[col * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.25f)
+            if (row > 0 && audiences[col * tx.seat_RowNum + row - 1].socialGroup == null && URandom.value < 0.1f)
                 neighbors.Add(audiences[col * tx.seat_RowNum + row - 1]);
-            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
+            if (col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
                 neighbors.Add(audiences[(col + 1) * tx.seat_RowNum + row]);
-            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.1f)
+            if (col > 0 && audiences[(col - 1) * tx.seat_RowNum + row].socialGroup == null && URandom.value < 0.25f)
                 neighbors.Add(audiences[(col - 1) * tx.seat_RowNum + row]);
 
             if (row < tx.seat_RowNum - 1 && col < tx.seat_ColNum - 1 && audiences[(col + 1) * tx.seat_RowNum + row + 1].socialGroup == null && URandom.value < 0.05f)
@@ -223,6 +242,8 @@ public class CrowdSimulator : MonoBehaviour
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
 
+        stepIntervalInt = globalInternalUpdatePeriod[0];
+
         if (_behaviorTree == null)
             CreateBehaviorTree();
 
@@ -234,15 +255,41 @@ public class CrowdSimulator : MonoBehaviour
         if (_behaviorTree != null)
         {
             StartCoroutine(Simulate_CR());
-            StartCoroutine(UpdateSocialGroup_CR());
+            if (socialGroups.Count > 0)
+                StartCoroutine(UpdateSocialGroup_CR());
             StartCoroutine(UpdateGazeEffect_CR());
             StartCoroutine(UpdateVoice_CR());
+            StartCoroutine(UpdateStepIntervalInt_CR());
         }
     }
 
     public void StopSimulation()
     {
         StopAllCoroutines();
+    }
+
+    private IEnumerator UpdateStepIntervalInt_CR()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(stepIntervalInt);
+            float passedTime = Time.time - PresentationData.in_EnterTime;
+            if (passedTime > 0.66f * PresentationData.in_ExpectedTime)
+            {
+                stepIntervalInt = globalInternalUpdatePeriod[2];
+#if UNITY_EDITOR
+                print(string.Format("new period: {0}", stepIntervalInt));
+#endif
+                break;
+            }
+            else if (passedTime > 0.33f * PresentationData.in_ExpectedTime)
+            {
+                stepIntervalInt = globalInternalUpdatePeriod[1];
+#if UNITY_EDITOR
+                print(string.Format("new period: {0}", stepIntervalInt));
+#endif
+            }
+        }
     }
 
     private IEnumerator UpdateGazeEffect_CR()
@@ -269,7 +316,7 @@ public class CrowdSimulator : MonoBehaviour
         {
             yield return new WaitForSeconds(voiceUpdatePeriod);
             recordWrapper.UpdateFluencyScore();
-            if (Mathf.Abs(recordWrapper.fluencyDelta) > fluencySignificantThreshold)
+            if (recordWrapper.fluencyDelta > fluencySignificantThreshold)
             {
                 foreach (Audience ad in audiences)
                     ad.lazyUpdateLock = true;

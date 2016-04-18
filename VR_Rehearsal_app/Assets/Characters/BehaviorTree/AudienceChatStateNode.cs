@@ -21,10 +21,12 @@ public class AudienceChatStateNode : BaseNode<Audience>
         proj.Normalize();
         Vector2 chatDir = new Vector2
             (Vector3.Dot(proj, -target.transform.right),
-              Vector3.Dot(proj, target.transform.forward));
+              Vector3.Dot(proj, -target.transform.forward));
         float angle = 1 / Mathf.PI * Mathf.Atan2(chatDir.y, chatDir.x);
-        if (angle < 0f || angle > 1f)
-            target.animHandler.UpdateChatDirection(UnityEngine.Random.value < 0.5f ? -1f : 1f);
+        if (angle < -0.5f)
+            target.animHandler.UpdateChatDirection(-1f);
+        else if (angle < 0f && angle >= -0.5f)
+            target.animHandler.UpdateChatDirection(1f);
         else
             target.animHandler.UpdateChatDirection(Mathf.Lerp(1, -1, angle));
     }

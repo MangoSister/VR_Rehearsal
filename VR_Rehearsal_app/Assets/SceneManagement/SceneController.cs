@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using EnvType = PresentationData.EnvType;
 using SoundCollection = AudioManager.SoundCollection;
-using URandom = UnityEngine.Random;
 
 public class SceneController : MonoBehaviour
 {
@@ -122,6 +121,8 @@ public class SceneController : MonoBehaviour
 
     private void BeginPractice()
     {
+        PresentationData.in_EnterTime = Time.time;
+
         crowdSim.StartSimulation();
         heatmapTracker.StartTrack();
         recordWrapper.StartRecording();
@@ -142,13 +143,12 @@ public class SceneController : MonoBehaviour
 
         _packedEnv.SetActive(false);
         exitNotice.SetActive(true);
+        Camera.main.backgroundColor = Color.white;
+        Camera.main.GetComponent<StereoController>().UpdateStereoValues();
     }
 
     public void ExitEnv()
     {
-#if UNITY_ANDROID
-        Screen.orientation = ScreenOrientation.AutoRotation;
-#endif
         GlobalManager.EndPresentation
             (
                 heatmapTracker.verticalFOVDeg,
