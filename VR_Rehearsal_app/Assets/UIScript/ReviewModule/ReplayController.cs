@@ -253,10 +253,10 @@ public class ReplayController : MonoBehaviour {
             else
                 startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
 
-            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value >= startTime+CHART_INTERVAL) //start=0
+            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f >= startTime+CHART_INTERVAL) //start=0
                 endX = XBottom;
             else
-                endX = out_PauseRecord[i].Value * (XBottom - XTop) / CHART_INTERVAL+startX;
+                endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL*1000.0f) + startX;
 
             //instantiate a pause marker
             var go = Instantiate(prefabPauseArea) as GameObject;
@@ -317,7 +317,7 @@ public class ReplayController : MonoBehaviour {
                 sum += Math.Abs(floatArray[k]);
             }
             float avg = sum / interval;
-            float max = 0.5f;
+            float max = 0.8f;
             float size = avg / max * YRange;
             if (size > YRange) size = YRange;
             
@@ -327,6 +327,7 @@ public class ReplayController : MonoBehaviour {
 
             go.GetComponent<RectTransform>().localPosition = new Vector3(XTop+ 8*index, YMid, 0f);
             go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
+            go.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
 
             index++;
 
@@ -451,7 +452,7 @@ public class ReplayController : MonoBehaviour {
                     //long pause threshold is set to 1.5s
                     int accumulatedTime = 0; //in ms!
 
-                    for (int j = 0; j < PresentationData.out_FluencyRecord.Count; j++)
+                    for (int j = 0; j < PresentationData.out_FluencyRecord.Count-1; j++)
                     {
                         //check the length of current activity
                         int length = PresentationData.out_FluencyRecord[j].Value - accumulatedTime;
@@ -461,7 +462,7 @@ public class ReplayController : MonoBehaviour {
                             //testText.text += PresentationData.out_FluencyRecord[j].Key.ToString() + " " + length + "\n";
                             if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 1500))
                             {
-                                out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, 1));//not speaking
+                                out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, length));//not speaking
                             }
                         }
 
