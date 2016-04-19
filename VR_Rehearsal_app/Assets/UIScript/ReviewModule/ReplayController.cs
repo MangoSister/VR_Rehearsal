@@ -301,7 +301,8 @@ public class ReplayController : MonoBehaviour {
             go.GetComponent<RectTransform>().localPosition = new Vector3(posX, YMid, 0f);
             if (PresentationData.out_Slides!=null)
                 go.GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideNo]);
-            go.GetComponentInChildren<ChangeSlideText>().UpdateText("Slide #" + (slideNo + 1) + " (" + (int)dur + "s)");
+            //go.GetComponentInChildren<ChangeSlideText>().UpdateText("Slide #" + (slideNo + 1) + " (" + (int)dur + "s)");
+            go.GetComponentInChildren<ChangeSlideText>().UpdateText((int)dur + "s");
             go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         }
 
@@ -365,7 +366,7 @@ public class ReplayController : MonoBehaviour {
 
         if (audioSource.clip != null)
             audioSource.clip = null;
-
+        
         pcmToUnityClip = new AudioProcessingJob();
         if ((PresentationData.out_RecordingFilePath != null) && (PresentationData.out_RecordingFilePath != ""))
             pcmToUnityClip.setUpFile(PresentationData.out_RecordingFilePath);
