@@ -46,7 +46,11 @@ public class CustomizeView : MonoBehaviour  {
     public Sprite room3Unchecked;
 
      void Start () {
-      
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;

@@ -44,6 +44,11 @@ public class CalibrationView : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
         mainIcon_say.SetActive(false);
         isCalibrationDone = false;
 		descriptionPanel.SetActive(true);

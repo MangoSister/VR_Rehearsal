@@ -130,7 +130,6 @@ public class CanvasManager : MonoBehaviour {
             LogoView.isLogoSceneDone = false;
             logo.gameObject.SetActive(false);
             fileTranser.gameObject.SetActive(false);
-            //     customize.gameObject.SetActive(false);
             finishTrigger = false;
         }
         else if (againTrigger ==true)

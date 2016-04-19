@@ -8,6 +8,7 @@ using System;
 
 public class NavigationView : MonoBehaviour {
 
+	enum NavigationStatus { Processing, NotProcessing }
 	enum AuthCheck { Succeed, failed }
 
     // Dropbox API
@@ -75,16 +76,23 @@ public class NavigationView : MonoBehaviour {
 
     //flag
     public bool letsdefault;
+	NavigationStatus _NaviStatus;
 
 
     void Start() {
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         letsdefault = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
         _initialScrollContentSize = new Vector2(contentRect.rect.height, contentRect.rect.width);
         _bType = bType;
-
+		_NaviStatus = NavigationStatus.NotProcessing;
 		ResetIcons ();
 	
     }
@@ -104,7 +112,7 @@ public class NavigationView : MonoBehaviour {
 
 	public void Initialize(){
 		ResetIcons ();
-
+		_NaviStatus = NavigationStatus.NotProcessing;
 		_authCheck = AuthCheck.failed;
 		_currCloudType = 0;
 
@@ -141,9 +149,10 @@ public class NavigationView : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
         {	
 
-			if (!this.gameObject.activeSelf)
+			if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
 				return;
 
+			_NaviStatus = NavigationStatus.Processing;
 			/*navigation back- go to parent paht*/
 			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
 				
@@ -158,6 +167,8 @@ public class NavigationView : MonoBehaviour {
                     _userDrive.JobDone();
                     CreatePanels(resJson);
                     _isReseting = false;
+
+					_NaviStatus = NavigationStatus.NotProcessing;
                 });
             }
         }
@@ -185,7 +196,10 @@ public class NavigationView : MonoBehaviour {
     
     public void SetupCloud(int cloudType)
     {
-        if (_userDrive == null)
+		if (_NaviStatus == NavigationStatus.Processing)
+			return;
+
+		if (_userDrive == null)
             _userDrive = new bUserCloudDrive();
 
 
@@ -195,6 +209,7 @@ public class NavigationView : MonoBehaviour {
 
 		StartLoading ();
 
+		_NaviStatus = NavigationStatus.Processing;
         _userDrive.StartAuthentication(delegate (bool res)
         {
 			FinishLoading();
@@ -208,13 +223,19 @@ public class NavigationView : MonoBehaviour {
 				_authCheck = AuthCheck.failed;
 				Icon_AuthFailed.SetActive(true);
 			}
+
+			_NaviStatus = NavigationStatus.NotProcessing;
         });
 
     }
     public void CreateButtons(string _folder)
     {
+		if (_NaviStatus == NavigationStatus.Processing)
+			return;
+
 		StartLoading ();
 
+		_NaviStatus = NavigationStatus.Processing;
         _userDrive.GetSelectedFolderFileList(_folder, delegate (string resJson)
         {
 			FinishLoading();
@@ -227,6 +248,8 @@ public class NavigationView : MonoBehaviour {
             _userDrive.JobDone();
             CreatePanels(resJson);
             _isReseting = false;
+
+			_NaviStatus = NavigationStatus.NotProcessing;
         });
     }
 
@@ -277,7 +300,7 @@ public class NavigationView : MonoBehaviour {
 
     public void CreatePanels(string fileList)
     {
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        
         JSONNode parseResult = JSON.Parse(fileList);
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;
@@ -421,6 +444,8 @@ public class NavigationView : MonoBehaviour {
             {
                 if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
                 {
+					if (_NaviStatus == NavigationStatus.Processing)
+						return;	
 
                     ShowLoadingPanel();
                     string str = _userDrive.GetRecentPath();
@@ -428,6 +453,8 @@ public class NavigationView : MonoBehaviour {
 					_pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty" , 30, 5);
 					_setManager.BShowcaseMgr.EditShowcase_path(_pptID,  (Application.persistentDataPath + "/" + _pptID));
                     customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
+
+					_NaviStatus = NavigationStatus.Processing;
                     _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, 
 						delegate ()
 						{ 	/* completed Callback */
@@ -435,6 +462,7 @@ public class NavigationView : MonoBehaviour {
 	                        	Debug.Log("fileDownLoad Complete");
 							#endif
 							_userDrive.JobDone();
+							_NaviStatus = NavigationStatus.NotProcessing;
 	                        StartCoroutine("CompleteDownloading");
 						}, delegate (int totalFileNum, int completedFileNum) /* process Callback */
 	                    {
@@ -446,7 +474,7 @@ public class NavigationView : MonoBehaviour {
 								_setManager.BShowcaseMgr.DeleteShowcase(_pptID);
 								
 								_userDrive.JobDone();
-
+								_NaviStatus = NavigationStatus.NotProcessing;
 								loadingView.SetActive(false);
 	                    });
                 }
@@ -457,6 +485,8 @@ public class NavigationView : MonoBehaviour {
             }
             catch (Exception e)
             {
+				_userDrive.JobDone();
+				_NaviStatus = NavigationStatus.NotProcessing;
                 Debug.Log(e.ToString());
             }
        // }
@@ -470,12 +500,19 @@ public class NavigationView : MonoBehaviour {
 	public void ClickLogoutButton(){
 		
 		if (_authCheck == AuthCheck.Succeed) {
+
+			if (_NaviStatus == NavigationStatus.Processing)
+				return;	
+
+			_NaviStatus = NavigationStatus.Processing;
 			_userDrive.Revoke (delegate(){
 				if(_currCloudType != 0){
 					ClearPanels();
 					SetupCloud(_currCloudType);
                    
 				}
+
+				_NaviStatus = NavigationStatus.NotProcessing;
 			});
 		}
 	}
