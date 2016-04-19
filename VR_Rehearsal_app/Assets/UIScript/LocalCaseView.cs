@@ -29,7 +29,11 @@ public class LocalCaseView : MonoBehaviour {
     int deleteCount = 0;
 
     void Start () {
-      
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
         isLocalCaseDone = false;
         isCustomizeButtonClicked = false;
         if (deleteCount == 0)

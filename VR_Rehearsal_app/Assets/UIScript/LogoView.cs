@@ -7,6 +7,12 @@ public class LogoView : MonoBehaviour {
    public static bool isLogoSceneDone;
     void Start()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+
         isLogoSceneDone = false;
         GetComponent<RectTransform>().SetAsLastSibling();
         if (!CanvasManager.finishTrigger)

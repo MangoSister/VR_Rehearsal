@@ -40,10 +40,10 @@ public class RotationView : MonoBehaviour {
     }
     void IsRotate()
     {
-        
         if (Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
         {
-            if(CanvasManager.againTrigger == true)
+            ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
+            if (CanvasManager.againTrigger == true)
             {
                 GlobalManager.EnterPresentation();
                 CanvasManager.againTrigger = false;

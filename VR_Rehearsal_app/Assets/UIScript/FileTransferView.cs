@@ -9,6 +9,12 @@ public class FileTransferView : MonoBehaviour {
 	public GameObject warningTextUI_connection;
 
     void Start () {
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         GetComponent<RectTransform>().SetAsLastSibling();
         isFileTransferViewDone = false;
         transferNumber = 0;
