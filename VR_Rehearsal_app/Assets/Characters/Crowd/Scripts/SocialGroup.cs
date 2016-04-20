@@ -48,15 +48,20 @@ public class SocialGroup : MonoBehaviour
 
     private IEnumerator Chat_CR()
     {
-        AudioUnit unit;
-        if (AudioManager.currAudioManager.AllocateRand3dSound(SoundCollection.Whispering, transform, centerPos, out unit))
+        AudioUnit unit = null;
+        if (AudioManager.currAudioManager.earphonePlugged)
         {
-            unit.source.volume = AudioManager.currAudioManager.chatVolume * Random.Range(0.8f, 1.2f);
-            unit.source.pitch = Random.Range(0.8f, 1.2f);
-            unit.Play();
+            if (AudioManager.currAudioManager.AllocateRand3dSound(SoundCollection.Whispering, transform, centerPos, out unit))
+            {
+                unit.source.volume = AudioManager.currAudioManager.chatVolume * Random.Range(0.8f, 1.2f);
+                unit.source.pitch = Random.Range(0.8f, 1.2f);
+                unit.Play();
+            }
         }
         yield return new WaitForSeconds(CrowdSimulator.currSim.chatLength);
-        unit.StopAndRecycle();
+
+        if (AudioManager.currAudioManager.earphonePlugged)
+            unit.StopAndRecycle();
         shouldChat = false;
     }
 

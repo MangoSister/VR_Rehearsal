@@ -67,7 +67,6 @@ public class SceneController : MonoBehaviour
     public ClockTimer timer;
     public Tutorial_PptKaraoke tutManager;
 
-
     private AudioUnit _ambientUnit = null;
 
     void Start ()
@@ -87,9 +86,11 @@ public class SceneController : MonoBehaviour
         recordWrapper.Init();
 
         audioManager.Init();
-        if (recordWrapper.EarphonePlugged())
+        audioManager.earphonePlugged = recordWrapper.EarphonePlugged();
+        if (audioManager.earphonePlugged)
         {
             audioManager.AllocateRand3dSound(SoundCollection.Ambient, audioManager.room.transform, Vector3.zero, out _ambientUnit);
+            _ambientUnit.source.volume = audioManager.ambientVolume * UnityEngine.Random.Range(0.8f, 1.2f);
             _ambientUnit.source.loop = true;
             _ambientUnit.Play();
         }
@@ -128,7 +129,7 @@ public class SceneController : MonoBehaviour
         recordWrapper.StartRecording();
         if (_ambientUnit != null)
             _ambientUnit.StopFadeAndRecycle(1.0f);
-        if (recordWrapper.EarphonePlugged())
+        if (audioManager.earphonePlugged)
             audioManager.StartMiscSound();
         timer.StartCounting();
     }
@@ -140,7 +141,7 @@ public class SceneController : MonoBehaviour
         crowdSim.StopSimulation();
         heatmapTracker.StopTrack();
         recordWrapper.EndRecording();
-        if (recordWrapper.EarphonePlugged())
+        if (audioManager.earphonePlugged)
             audioManager.StopMiscSound();
 
         _packedEnv.SetActive(false);

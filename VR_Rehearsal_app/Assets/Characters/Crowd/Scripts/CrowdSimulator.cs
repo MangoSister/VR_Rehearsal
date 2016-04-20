@@ -305,8 +305,8 @@ public class CrowdSimulator : MonoBehaviour
     {
         while (true)
         {
-            socialGroups[URandom.Range(0, socialGroups.Count)].UpdateChatStatus();
             yield return new WaitForSeconds(genChatPeriod);
+            socialGroups[URandom.Range(0, socialGroups.Count)].UpdateChatStatus();
         }
     }
 
