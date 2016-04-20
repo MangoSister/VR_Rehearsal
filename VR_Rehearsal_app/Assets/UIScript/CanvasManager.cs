@@ -153,6 +153,7 @@ public class CanvasManager : MonoBehaviour {
         {
             int transferType = fileTranser.GetComponent<FileTransferView>().transferNumber;
             navigation.gameObject.SetActive(true);
+			navigation.GetComponent<NavigationView>().Initialize();
             navigation.GetComponent<NavigationView>().SetupCloud(transferType);
             FileTransferView.isFileTransferViewDone = false;
         }

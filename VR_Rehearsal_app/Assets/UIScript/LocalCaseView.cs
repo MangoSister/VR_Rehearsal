@@ -25,8 +25,9 @@ public class LocalCaseView : MonoBehaviour {
     public GameObject customView;
     int totalShowcase;
     
-
     int deleteCount = 0;
+
+    public GameObject emptyIcon;
 
     void Start () {
         Screen.orientation = ScreenOrientation.Portrait;
@@ -52,6 +53,14 @@ public class LocalCaseView : MonoBehaviour {
                 gLayout_showCase.padding.top = -580;
                 CheckLocalPPT();
             }
+        }
+        if (storedShowCase.Count == 0)
+        {
+            emptyIcon.SetActive(true);
+        }
+        else
+        {
+            emptyIcon.SetActive(false);
         }
         GetComponent<RectTransform>().SetAsLastSibling();
     }
