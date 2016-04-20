@@ -84,6 +84,10 @@ public class RecordingWrapper : MonoBehaviour
         if (File.Exists(recordingFilePath))
             File.Delete(recordingFilePath);
 
+        if (!PresentationData.in_VoiceEcho)
+            reverbStrength = 0f;
+            
+
 #if !UNITY_EDITOR && UNITY_ANDROID
         //currentActivity.Call("finish");
         //currentActivity.Call("recreate");

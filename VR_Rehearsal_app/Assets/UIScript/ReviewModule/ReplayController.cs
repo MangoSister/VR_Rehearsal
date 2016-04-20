@@ -320,8 +320,9 @@ public class ReplayController : MonoBehaviour {
         {
             //get average amplifier
             float sum = 0;
-            for (int k=j; k<j+interval; k++)
+            for (int k = j; k < j + interval; k++)
             {
+                if (k >= endFrame) break;
                 sum += Math.Abs(floatArray[k]);
             }
             float avg = sum / interval;

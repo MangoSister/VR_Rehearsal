@@ -181,6 +181,7 @@ public static class PresentationData
     public static float in_EnterTime = 0f;
     public static float in_ExpectedTime = 600f;
     public static int in_VoiceThreshold;
+    public static bool in_VoiceEcho;
 
     //Output
     public static float out_ExitTime;
