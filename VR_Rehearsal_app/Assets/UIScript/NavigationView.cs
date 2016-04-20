@@ -76,7 +76,7 @@ public class NavigationView : MonoBehaviour {
 
     //flag
     public bool letsdefault;
-	NavigationStatus _NaviStatus;
+	NavigationStatus _NaviStatus= NavigationStatus.NotProcessing;
 
 
     void Start() {
@@ -86,6 +86,7 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+
         letsdefault = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
@@ -160,6 +161,8 @@ public class NavigationView : MonoBehaviour {
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
                     _isReseting = true;
+					_NaviStatus = NavigationStatus.NotProcessing;
+
                     if (storedButton.Count != 0)
                     {
                         DeletePanels(true, "dd");
@@ -168,7 +171,7 @@ public class NavigationView : MonoBehaviour {
                     CreatePanels(resJson);
                     _isReseting = false;
 
-					_NaviStatus = NavigationStatus.NotProcessing;
+
                 });
             }
         }
@@ -213,6 +216,7 @@ public class NavigationView : MonoBehaviour {
         _userDrive.StartAuthentication(delegate (bool res)
         {
 			FinishLoading();
+			_NaviStatus = NavigationStatus.NotProcessing;
 
             if (res)
             {
@@ -224,7 +228,7 @@ public class NavigationView : MonoBehaviour {
 				Icon_AuthFailed.SetActive(true);
 			}
 
-			_NaviStatus = NavigationStatus.NotProcessing;
+
         });
 
     }
@@ -239,6 +243,7 @@ public class NavigationView : MonoBehaviour {
         _userDrive.GetSelectedFolderFileList(_folder, delegate (string resJson)
         {
 			FinishLoading();
+			_NaviStatus = NavigationStatus.NotProcessing;
 
             _isReseting = true;
             if (storedButton.Count != 0)
@@ -249,7 +254,7 @@ public class NavigationView : MonoBehaviour {
             CreatePanels(resJson);
             _isReseting = false;
 
-			_NaviStatus = NavigationStatus.NotProcessing;
+
         });
     }
 
@@ -506,13 +511,15 @@ public class NavigationView : MonoBehaviour {
 
 			_NaviStatus = NavigationStatus.Processing;
 			_userDrive.Revoke (delegate(){
+				_NaviStatus = NavigationStatus.NotProcessing;
+
 				if(_currCloudType != 0){
 					ClearPanels();
 					SetupCloud(_currCloudType);
                    
 				}
 
-				_NaviStatus = NavigationStatus.NotProcessing;
+
 			});
 		}
 	}

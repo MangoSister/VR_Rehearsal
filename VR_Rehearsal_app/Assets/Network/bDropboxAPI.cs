@@ -62,6 +62,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 
 	public override void StartAuthentication (Authentication_Callback callback){
 
+		_token = "";
 		bool res =LoadTokenBinaryFromLocal();
 		if (!res) {
 			_token = "";
