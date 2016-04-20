@@ -322,7 +322,7 @@ public class ReplayController : MonoBehaviour {
             float sum = 0;
             for (int k = j; k < j + interval; k++)
             {
-                if (k >= endFrame) break;
+                if (k >= floatArray.Length) break;
                 sum += Math.Abs(floatArray[k]);
             }
             float avg = sum / interval;
