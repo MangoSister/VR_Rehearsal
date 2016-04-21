@@ -214,9 +214,11 @@ public class ReplayController : MonoBehaviour {
 
     public void RefreshTopChart()
     {
+        if (isProcessingAudio == true) return;
+        
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
-        int YMid = 7, YRange = 103;
+        int YMid = 7, YRange = 74;
 
         //update the position marker
         //get the interval first
@@ -226,14 +228,13 @@ public class ReplayController : MonoBehaviour {
         float offset = nowTime - startTime;
         
         currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(XTop+offset*(XBottom-XTop)/CHART_INTERVAL, YMid, 0f);
-        if (isProcessingAudio == true) return;
-
+        
         if ((nowTime < chartStartTime) || (nowTime > chartStartTime + CHART_INTERVAL)) //need to update waves & pause markers
         {
             //UnityEngine.Debug.Log("need to update chartStartTime now");
             chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
 
-            //update pauses & slide transition markers
+            //update pauses
 
             //remove old markers
             var currentMarkers = new List<GameObject>();
@@ -273,7 +274,7 @@ public class ReplayController : MonoBehaviour {
 
                 //instantiate a pause marker
                 var go = Instantiate(prefabPauseArea) as GameObject;
-                go.transform.parent = groupOfPauseMarkers.transform;
+                go.transform.SetParent(groupOfPauseMarkers.transform);
 
                 go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
                 go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
@@ -281,7 +282,7 @@ public class ReplayController : MonoBehaviour {
             }
         }
 
-        //check if need to update top slides
+        //check if need to update top slide thumbnails
         if ((nowTime<slideStartTime) || (nowTime>slideEndTime)) //now playingtime is out of the slide thumbnail presented time interval
         {
             //Update slides!
@@ -484,7 +485,7 @@ public class ReplayController : MonoBehaviour {
 
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
-         //       UnityEngine.Debug.Log(floatArray.Length);
+         //     UnityEngine.Debug.Log(floatArray.Length);
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
@@ -596,11 +597,15 @@ public class ReplayController : MonoBehaviour {
                     //give it some test data
                     //out_PauseRecord = new List<KeyValuePair<float, int>>();
                     
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1200));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1350));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1400));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 3000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(35.0f, 1000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(38.0f, 1200));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(49.0f, 1350));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(55.0f, 1400));
                 } 
 
                 //instantiate markers
