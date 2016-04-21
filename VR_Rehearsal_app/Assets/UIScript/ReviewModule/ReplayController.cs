@@ -12,8 +12,9 @@ public class ReplayController : MonoBehaviour {
     private readonly LinkedList<float> recordData = new LinkedList<float>();
     private AudioSource audioSource;
     private PLAY_STATUS playStatus = PLAY_STATUS.STOP;
-    private static List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
-    private static List<KeyValuePair<float, int>> out_PauseRecord;
+    private List<KeyValuePair<float, int>> out_SlidesTransitionRecord;
+    private List<KeyValuePair<int, float>> slideTimingRecord; 
+    private List<KeyValuePair<float, int>> out_PauseRecord;
     private bool isProcessingAudio = false; //for the threaded job audio processing
     private AudioProcessingJob pcmToUnityClip;
     private float[] floatArray;
@@ -26,6 +27,7 @@ public class ReplayController : MonoBehaviour {
 
     private const int CHART_INTERVAL = 30; //30s
     private float chartStartTime = -CHART_INTERVAL-1.0f; //for the wave pattern to display at the beginning
+    private int chartLeftmostSlideNo = -6; //for the wave pattern to display at the beginning
 
     [Header("Playback Slider Control")]
     public Slider playbackSlider;
@@ -73,6 +75,8 @@ public class ReplayController : MonoBehaviour {
     public GameObject panelHeatmap;
     public GameObject panelSpeech;
 
+    [Header("Slide Thumbnails")]
+    public GameObject[] slideThumbnails;
 
     enum PLAY_STATUS
     {
@@ -275,36 +279,39 @@ public class ReplayController : MonoBehaviour {
         }
 
         //find new slide transitions
-        for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
-        {
-            float time = out_SlidesTransitionRecord[i].Key;
-            int slideNo = out_SlidesTransitionRecord[i].Value;
+        //for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
+        //{
+        //    float time = out_SlidesTransitionRecord[i].Key;
+        //    int slideNo = out_SlidesTransitionRecord[i].Value;
             
-            if (time < startTime)
-                continue;
-            if (time > startTime + CHART_INTERVAL)
-                break;
+        //    if (time < startTime)
+        //        continue;
+        //    if (time > startTime + CHART_INTERVAL)
+        //        break;
 
-            UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo+")");
+        //    UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo+")");
 
-            //get the duration
-            float dur = out_SlidesTransitionRecord[i + 1].Key - time;
+        //    //get the duration
+        //    float dur = out_SlidesTransitionRecord[i + 1].Key - time;
             
-            //get the position
-            float posX = (time - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
+        //    //get the position
+        //    float posX = (time - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
 
-            //instantiate a slide transition marker
-            var go = Instantiate(prefabTransitionMarker) as GameObject;
-            go.transform.parent = groupOfTransitionMarkers.transform;
+        //    //instantiate a slide transition marker
+        //    var go = Instantiate(prefabTransitionMarker) as GameObject;
+        //    go.transform.parent = groupOfTransitionMarkers.transform;
 
-            //update the marker
-            go.GetComponent<RectTransform>().localPosition = new Vector3(posX, YMid, 0f);
-            if (PresentationData.out_Slides!=null)
-                go.GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideNo]);
-            //go.GetComponentInChildren<ChangeSlideText>().UpdateText("Slide #" + (slideNo + 1) + " (" + (int)dur + "s)");
-            go.GetComponentInChildren<ChangeSlideText>().UpdateText((int)dur + "s");
-            go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-        }
+        //    //update the marker
+        //    go.GetComponent<RectTransform>().localPosition = new Vector3(posX, YMid, 0f);
+        //    if (PresentationData.out_Slides!=null)
+        //        go.GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideNo]);
+        //    //go.GetComponentInChildren<ChangeSlideText>().UpdateText("Slide #" + (slideNo + 1) + " (" + (int)dur + "s)");
+        //    go.GetComponentInChildren<ChangeSlideText>().UpdateText((int)dur + "s");
+        //    go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        //}
+
+        //check if need to update top slides
+
 
         //update wave shapes
         var currentWaves = new List<GameObject>();
@@ -437,6 +444,20 @@ public class ReplayController : MonoBehaviour {
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 3));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
+                }
+
+                //prepare duration data
+                slideTimingRecord = new List<KeyValuePair<int, float>>();
+                for (int i = 0; i < out_SlidesTransitionRecord.Count - 1; i++)
+                {
+                    float time = out_SlidesTransitionRecord[i].Key;
+                    int slideNo = out_SlidesTransitionRecord[i].Value;
+
+                    //UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo + ")");
+
+                    //get the duration
+                    float dur = out_SlidesTransitionRecord[i + 1].Key - time;
+                    slideTimingRecord.Add(new KeyValuePair<int, float>(slideNo, dur));
                 }
 
                 //instantiate markers
