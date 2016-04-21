@@ -107,7 +107,13 @@ public class CustomizeView : MonoBehaviour  {
 
     public void SetTimer()
     {
-        customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+        if (timer.text == "")
+        {
+            customData._expetedTime_min = 0;
+        }
+        else {
+            customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+        }
     }
 
     public void SetShowCaseName()
