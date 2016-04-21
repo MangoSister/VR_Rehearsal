@@ -19,16 +19,18 @@ public class ReplayController : MonoBehaviour {
     private AudioProcessingJob pcmToUnityClip;
     private float[] floatArray;
     private int arrayLength = 0;
+    private const int CHART_INTERVAL = 30; //30s
+    private float chartStartTime = -CHART_INTERVAL - 1.0f; //for the wave pattern to display at the beginning
+    private float slideStartTime = -1.0f, slideEndTime = -1.0f; //for the slide thumbnails to update at the beginning
+    private float frameStartTime = -1.0f, frameEndTime = -1.0f; //for the slide thumbnails to update at the beginning
+    private int startSlideIndex = -1;
+    private float lastAudioSourceTime = -1f;
 
     [Header("Heatmap Generation")]
     private HeatmapGenerator heatMapGen;
     public GameObject heatmapHolder;
     public GameObject screenshotHolder;
-
-    private const int CHART_INTERVAL = 30; //30s
-    private float chartStartTime = -CHART_INTERVAL-1.0f; //for the wave pattern to display at the beginning
-    private int chartLeftmostSlideNo = -6; //for the wave pattern to display at the beginning
-
+    
     [Header("Playback Slider Control")]
     public Slider playbackSlider;
     public bool preventTrigger = false;
@@ -77,6 +79,7 @@ public class ReplayController : MonoBehaviour {
 
     [Header("Slide Thumbnails")]
     public GameObject[] slideThumbnails;
+    private float[] startTimeForThumbnailGroup; 
 
     enum PLAY_STATUS
     {
@@ -211,107 +214,179 @@ public class ReplayController : MonoBehaviour {
 
     public void RefreshTopChart()
     {
+        if (isProcessingAudio == true) return;
+        
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
-        int YMid = 60, YRange = 190;
+        int YMid = 7, YRange = 74;
 
         //update the position marker
         //get the interval first
+        //use this variable to help smooth movement of current time marker
         float nowTime = playbackSlider.value;
         float startTime = ((int)(nowTime / (float)(CHART_INTERVAL))) * CHART_INTERVAL;
         float offset = nowTime - startTime;
         
         currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(XTop+offset*(XBottom-XTop)/CHART_INTERVAL, YMid, 0f);
-
-        if ((playbackSlider.value >= chartStartTime) && (playbackSlider.value <= chartStartTime + CHART_INTERVAL))
-            return;
-
-        //UnityEngine.Debug.Log("need to update chartStartTime now");
-        chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
-
-        if (isProcessingAudio == true) return;
-
-        //update pauses & slide transition markers
-
-        //remove old markers
-        var currentMarkers = new List<GameObject>();
-        foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
-        foreach (Transform marker in groupOfTransitionMarkers.transform) currentMarkers.Add(marker.gameObject);
-        currentMarkers.ForEach(marker => Destroy(marker));
-
-        //find new pauses
-        for (int i=0; i<out_PauseRecord.Count; i++)
+        
+        if ((nowTime < chartStartTime) || (nowTime > chartStartTime + CHART_INTERVAL)) //need to update waves & pause markers
         {
-            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f < startTime)
-                continue;
+            //UnityEngine.Debug.Log("need to update chartStartTime now");
+            chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
 
-            if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
-                break;
+            //update pauses
 
-            UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
+            //remove old markers
+            var currentMarkers = new List<GameObject>();
+            foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
+            //foreach (Transform marker in groupOfTransitionMarkers.transform) currentMarkers.Add(marker.gameObject);
+            currentMarkers.ForEach(marker => Destroy(marker));
 
-            float startX, endX;
-
-            if (out_PauseRecord[i].Key <= startTime) //start=0
-                startX = XTop;
-            else
-                startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
-
-            if (out_PauseRecord[i].Key + out_PauseRecord[i].Value/1000.0f >= startTime+CHART_INTERVAL) //end=end
-                endX = XBottom;
-            else
+            //find new pauses
+            for (int i = 0; i < out_PauseRecord.Count; i++)
             {
-                if (out_PauseRecord[i].Key<=startTime)
-                {
-                    endX = ((out_PauseRecord[i].Value / 1000.0f)-(startTime-out_PauseRecord[i].Key))*(XBottom - XTop) / CHART_INTERVAL + startX;
-                }
+                if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f < startTime)
+                    continue;
+
+                if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
+                    break;
+
+                UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
+
+                float startX, endX;
+
+                if (out_PauseRecord[i].Key <= startTime) //start=0
+                    startX = XTop;
                 else
-                    endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL*1000.0f) + startX;
+                    startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
+
+                if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f >= startTime + CHART_INTERVAL) //end=end
+                    endX = XBottom;
+                else
+                {
+                    if (out_PauseRecord[i].Key <= startTime)
+                    {
+                        endX = ((out_PauseRecord[i].Value / 1000.0f) - (startTime - out_PauseRecord[i].Key)) * (XBottom - XTop) / CHART_INTERVAL + startX;
+                    }
+                    else
+                        endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL * 1000.0f) + startX;
+                }
+
+                //instantiate a pause marker
+                var go = Instantiate(prefabPauseArea) as GameObject;
+                go.transform.SetParent(groupOfPauseMarkers.transform);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
+                go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
+                go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
             }
-
-            //instantiate a pause marker
-            var go = Instantiate(prefabPauseArea) as GameObject;
-            go.transform.parent = groupOfPauseMarkers.transform;
-
-            go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
-            go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX-startX, YRange);
-            go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         }
 
-        //find new slide transitions
-        //for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
-        //{
-        //    float time = out_SlidesTransitionRecord[i].Key;
-        //    int slideNo = out_SlidesTransitionRecord[i].Value;
-            
-        //    if (time < startTime)
-        //        continue;
-        //    if (time > startTime + CHART_INTERVAL)
-        //        break;
+        //check if need to update top slide thumbnails
+        if ((nowTime<slideStartTime) || (nowTime>slideEndTime)) //now playingtime is out of the slide thumbnail presented time interval
+        {
+            //Update slides!
+            // UnityEngine.Debug.Log("Updating slide thumbnails --- ");
+            //find the right group
+            int groupNo = 0;
+            for (groupNo=0; groupNo<startTimeForThumbnailGroup.Length; groupNo++)
+            {
+                if (groupNo < startTimeForThumbnailGroup.Length - 1)
+                {
+                    if ((nowTime >= startTimeForThumbnailGroup[groupNo]) && (nowTime < startTimeForThumbnailGroup[groupNo + 1]))
+                        break;
+                }
+                else if (nowTime >= startTimeForThumbnailGroup[groupNo])
+                    break;
+            }
 
-        //    UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo+")");
+            if (groupNo<startTimeForThumbnailGroup.Length)
+            {
+                //found the right interval
+                //UnityEngine.Debug.Log("groupNo = " + groupNo);
+                slideStartTime = startTimeForThumbnailGroup[groupNo];
+                if (groupNo < startTimeForThumbnailGroup.Length - 1)
+                    slideEndTime = startTimeForThumbnailGroup[groupNo + 1];
+                else
+                    if (PresentationData.out_ExitTime > 0)
+                        slideEndTime = PresentationData.out_ExitTime;
+                    else
+                        slideEndTime = 9999999999999.0f;
 
-        //    //get the duration
-        //    float dur = out_SlidesTransitionRecord[i + 1].Key - time;
-            
-        //    //get the position
-        //    float posX = (time - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
+                startSlideIndex = groupNo * 6;
 
-        //    //instantiate a slide transition marker
-        //    var go = Instantiate(prefabTransitionMarker) as GameObject;
-        //    go.transform.parent = groupOfTransitionMarkers.transform;
+                //updating slide thumbnail 1~6
+                for (int i=0; i<6; i++)
+                {
+                    int indexOfRecord = groupNo * 6 + i; //updating slide transition record #index
+                    if (indexOfRecord >= out_SlidesTransitionRecord.Count-1)
+                    {
+                        //set this thumbnail to blank
+                        slideThumbnails[i].SetActive(false);
+                    }
+                    else
+                    {
+                        if (PresentationData.out_Slides!=null)
+                            slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideTimingRecord[indexOfRecord].Key]); 
+                        else
+                            slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(new Texture2D(160,30)); //for testing
+                        slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText("#" + (slideTimingRecord[indexOfRecord].Key+1) + " (" + getTimeString(slideTimingRecord[indexOfRecord].Value) + ")");
 
-        //    //update the marker
-        //    go.GetComponent<RectTransform>().localPosition = new Vector3(posX, YMid, 0f);
-        //    if (PresentationData.out_Slides!=null)
-        //        go.GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideNo]);
-        //    //go.GetComponentInChildren<ChangeSlideText>().UpdateText("Slide #" + (slideNo + 1) + " (" + (int)dur + "s)");
-        //    go.GetComponentInChildren<ChangeSlideText>().UpdateText((int)dur + "s");
-        //    go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-        //}
-
-        //check if need to update top slides
-
+                        if (indexOfRecord <= out_SlidesTransitionRecord.Count - 1)
+                        {
+                            if ((out_SlidesTransitionRecord[indexOfRecord].Key <= nowTime) && (out_SlidesTransitionRecord[indexOfRecord + 1].Key > nowTime))
+                            {
+                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
+                                frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
+                                frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
+                                //Debug.Log("updated to slide #" + indexOfRecord+": "+ frameStartTime + "-" + frameEndTime);
+                            }
+                            else
+                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
+                        }
+                        else
+                        {
+                            if (out_SlidesTransitionRecord[indexOfRecord].Key < nowTime)
+                            {
+                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
+                                frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
+                                frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
+                            }
+                            else
+                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
+                        }
+                        slideThumbnails[i].SetActive(true);
+                    }
+                }
+            }
+            else
+                UnityEngine.Debug.Log("Something went wrong");
+        }
+        
+        if ((nowTime<frameStartTime) || (nowTime>=frameEndTime))//check if need to update current slide pointer
+        {
+            //UnityEngine.Debug.Log("Updating slide frames --- "+nowTime+" is out of "+frameStartTime+"-"+frameEndTime);
+            for (int i=0; i<6; i++)
+            {
+                if (startSlideIndex+i>=out_SlidesTransitionRecord.Count)
+                {
+                    break;
+                }
+                else
+                {
+                    if ((nowTime >= out_SlidesTransitionRecord[startSlideIndex + i].Key) && (nowTime < out_SlidesTransitionRecord[startSlideIndex + i].Key + slideTimingRecord[startSlideIndex + i].Value))
+                    {
+                        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
+                        frameStartTime = out_SlidesTransitionRecord[startSlideIndex + i].Key;
+                        frameEndTime = frameStartTime + slideTimingRecord[startSlideIndex + i].Value;
+                        //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
+                    }
+                    else
+                        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
+                }
+            }
+        }
+        //UnityEngine.Debug.Log(slideStartTime + " <- " + nowTime + " belongs to " + frameStartTime + "-" + frameEndTime + "? --> " + slideEndTime);
 
         //update wave shapes
         var currentWaves = new List<GameObject>();
@@ -333,13 +408,13 @@ public class ReplayController : MonoBehaviour {
                 sum += Math.Abs(floatArray[k]);
             }
             float avg = sum / interval;
-            float max = 1.0f;
+            float max = 0.3f;
             float size = avg / max * YRange;
             if (size > YRange) size = YRange;
             
             //instantiate a wave
             var go = Instantiate(prefabWave) as GameObject;
-            go.transform.parent = groupOfWaves.transform;
+            go.transform.SetParent(groupOfWaves.transform);
 
             go.GetComponent<RectTransform>().localPosition = new Vector3(XTop+ 8*index, YMid, 0f);
             go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
@@ -410,7 +485,7 @@ public class ReplayController : MonoBehaviour {
 
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
-         //       UnityEngine.Debug.Log(floatArray.Length);
+         //     UnityEngine.Debug.Log(floatArray.Length);
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
@@ -438,17 +513,25 @@ public class ReplayController : MonoBehaviour {
                 {
                     //give it some test data
                     //out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
-                    
+
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(0.0f, 0));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 2));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 3));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(70.0f, 10));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(82.0f, 11));
                 }
 
                 //prepare duration data
                 slideTimingRecord = new List<KeyValuePair<int, float>>();
-                for (int i = 0; i < out_SlidesTransitionRecord.Count - 1; i++)
+                startTimeForThumbnailGroup = new float[out_SlidesTransitionRecord.Count/6];
+                for (int i = 0; i < out_SlidesTransitionRecord.Count; i++)
                 {
                     float time = out_SlidesTransitionRecord[i].Key;
                     int slideNo = out_SlidesTransitionRecord[i].Value;
@@ -456,8 +539,18 @@ public class ReplayController : MonoBehaviour {
                     //UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo + ")");
 
                     //get the duration
-                    float dur = out_SlidesTransitionRecord[i + 1].Key - time;
+                    float dur = 0;
+                    if (i == out_SlidesTransitionRecord.Count-1)
+                    {
+                        if (PresentationData.out_ExitTime > 0)
+                            dur = PresentationData.out_ExitTime - time;
+                        else
+                            dur = 999999.0f;
+                    }
+                    else
+                        dur = out_SlidesTransitionRecord[i + 1].Key - time;
                     slideTimingRecord.Add(new KeyValuePair<int, float>(slideNo, dur));
+                    if (slideNo % 6 == 0) startTimeForThumbnailGroup[slideNo / 6] = out_SlidesTransitionRecord[i].Key;
                 }
 
                 //instantiate markers
@@ -504,11 +597,15 @@ public class ReplayController : MonoBehaviour {
                     //give it some test data
                     //out_PauseRecord = new List<KeyValuePair<float, int>>();
                     
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1));
-                    //out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 1));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1200));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1350));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1400));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 13000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(35.0f, 1000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(38.0f, 1200));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(49.0f, 1350));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(55.0f, 1400));
                 } 
 
                 //instantiate markers
@@ -539,7 +636,15 @@ public class ReplayController : MonoBehaviour {
         {
             if (audioSource.isPlaying == true)
             {
-                playbackSlider.value = audioSource.time;
+                if (audioSource.time!=lastAudioSourceTime)
+                { 
+                    playbackSlider.value = audioSource.time;
+                    lastAudioSourceTime = audioSource.time;
+                }
+                else
+                {
+                    playbackSlider.value += Time.deltaTime;
+                }
 
                 if (playbackSlider.value == playbackSlider.maxValue)
                 {
