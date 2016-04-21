@@ -4,9 +4,9 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Text.RegularExpressions;
+
 using System.Net;
-using System.Net.Security;
+
 using System.Security.Cryptography.X509Certificates;
 using SimpleJSON;
 using System.Threading;
