@@ -27,13 +27,15 @@ public class CustomizeView : MonoBehaviour  {
     public string time;
     private string _defaultTime = "5";
 
+    // Check Ech0
+    public Toggle isEcho;
     //local ppt ID
     private string _pptID;
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
     public bool defaultValue = false;
     public bool isFromCustom;
-
+    
     [Header("Venue Select")]
     public Button btnRoom1;
     public Button btnRoom2;
@@ -99,7 +101,19 @@ public class CustomizeView : MonoBehaviour  {
                 break;
         }
     }
-  
+    public void CheckEcho()
+    {
+        if (isEcho.GetComponent<Toggle>().isOn)
+        {
+            PresentationData.in_VoiceEcho = true;
+           //
+        }
+        else
+        {
+            PresentationData.in_VoiceEcho = false;
+            //
+        }
+    }
     public void CheckSliderValue()
     {
         customData._percentageOfAudience =(ushort) sliderVal.value; 
