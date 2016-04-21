@@ -27,13 +27,15 @@ public class CustomizeView : MonoBehaviour  {
     public string time;
     private string _defaultTime = "5";
 
+    // Check Ech0
+    public Toggle isEcho;
     //local ppt ID
     private string _pptID;
     // Use this for initialization
     bShowcaseManager.showcase_Data customData;
     public bool defaultValue = false;
     public bool isFromCustom;
-
+    
     [Header("Venue Select")]
     public Button btnRoom1;
     public Button btnRoom2;
@@ -68,7 +70,7 @@ public class CustomizeView : MonoBehaviour  {
         customData._showcaseName = _defaultTitle;
         timer.GetComponent<InputField>().text = _defaultTime;
         tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = true;
-
+        //echo Toggle.
         customData._expetedTime_min = (ushort)(int.Parse(_defaultTime));
     }
 
@@ -99,7 +101,19 @@ public class CustomizeView : MonoBehaviour  {
                 break;
         }
     }
-  
+    public void CheckEcho()
+    {
+        if (isEcho.GetComponent<Toggle>().isOn)
+        {
+            PresentationData.in_VoiceEcho = true;
+            //customData. echo one what i need 
+        }
+        else
+        {
+            PresentationData.in_VoiceEcho = false;
+            //
+        }
+    }
     public void CheckSliderValue()
     {
         customData._percentageOfAudience =(ushort) sliderVal.value; 
@@ -107,7 +121,13 @@ public class CustomizeView : MonoBehaviour  {
 
     public void SetTimer()
     {
-        customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+        if (timer.text == "")
+        {
+            customData._expetedTime_min = 0;
+        }
+        else {
+            customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+        }
     }
 
     public void SetShowCaseName()
