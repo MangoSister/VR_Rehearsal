@@ -601,7 +601,7 @@ public class ReplayController : MonoBehaviour {
                     out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1200));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1350));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1400));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 3000));
+                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 13000));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(35.0f, 1000));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(38.0f, 1200));
                     out_PauseRecord.Add(new KeyValuePair<float, int>(49.0f, 1350));
