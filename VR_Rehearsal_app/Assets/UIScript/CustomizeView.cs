@@ -70,7 +70,7 @@ public class CustomizeView : MonoBehaviour  {
         customData._showcaseName = _defaultTitle;
         timer.GetComponent<InputField>().text = _defaultTime;
         tgroup.GetComponent<RectTransform>().FindChild("big").GetComponent<Toggle>().isOn = true;
-
+        //echo Toggle.
         customData._expetedTime_min = (ushort)(int.Parse(_defaultTime));
     }
 
@@ -106,7 +106,7 @@ public class CustomizeView : MonoBehaviour  {
         if (isEcho.GetComponent<Toggle>().isOn)
         {
             PresentationData.in_VoiceEcho = true;
-           //
+            //customData. echo one what i need 
         }
         else
         {
