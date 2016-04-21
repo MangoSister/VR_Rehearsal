@@ -428,75 +428,65 @@ public class NavigationView : MonoBehaviour {
 
     public void DownloadButtonClicked()
     {
+
         customView.GetComponent<CustomizeView>().DefaultValueSetting();
-		/*
-          foreach(GameObject btn in storedButton)
+
+        try
         {
-            if (_extentionFormat == "jpg" || _extentionFormat == "JPG" || _extentionFormat == "png" || _extentionFormat == "PNG" || _extentionFormat == "Jpg" || _extentionFormat == "Png")
-            {
-                isOkToDown = true;
-            }
-            else
-            {
-                isOkToDown = false;
-                Debug.Log("dfd");
-            }
-            
-        }
-        if (isOkToDown == true)
-        {*/
-            try
+            if (_selectedButton)
             {
                 if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
                 {
-					if (_NaviStatus == NavigationStatus.Processing)
-						return;	
+                    if (_NaviStatus == NavigationStatus.Processing)
+                        return;
 
                     ShowLoadingPanel();
                     string str = _userDrive.GetRecentPath();
 
-					_pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty" , 30, 5);
-					_setManager.BShowcaseMgr.EditShowcase_path(_pptID,  (Application.persistentDataPath + "/" + _pptID));
+                    _pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty", 30, 5);
+                    _setManager.BShowcaseMgr.EditShowcase_path(_pptID, (Application.persistentDataPath + "/" + _pptID));
                     customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
 
-					_NaviStatus = NavigationStatus.Processing;
-                    _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID, 
-						delegate ()
-						{ 	/* completed Callback */
-							#if UNITY_EDITOR
-	                        	Debug.Log("fileDownLoad Complete");
-							#endif
-							_userDrive.JobDone();
-							_NaviStatus = NavigationStatus.NotProcessing;
-	                        StartCoroutine("CompleteDownloading");
-						}, delegate (int totalFileNum, int completedFileNum) /* process Callback */
-	                    {
-	                        progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
-						}, delegate() {/* Cancel Callback */
-								#if UNITY_EDITOR
-									Debug.Log("fileDownLoad Canceled");						
-								#endif
-								_setManager.BShowcaseMgr.DeleteShowcase(_pptID);
-								
-								_userDrive.JobDone();
-								_NaviStatus = NavigationStatus.NotProcessing;
-								loadingView.SetActive(false);
-	                    });
+                    _NaviStatus = NavigationStatus.Processing;
+                    _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID,
+                        delegate ()
+                        {   /* completed Callback */
+#if UNITY_EDITOR
+                            Debug.Log("fileDownLoad Complete");
+#endif
+                            _userDrive.JobDone();
+                            _NaviStatus = NavigationStatus.NotProcessing;
+                            StartCoroutine("CompleteDownloading");
+                        }, delegate (int totalFileNum, int completedFileNum) /* process Callback */
+                        {
+                            progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+                        }, delegate ()
+                        {/* Cancel Callback */
+#if UNITY_EDITOR
+                            Debug.Log("fileDownLoad Canceled");
+#endif
+                            _setManager.BShowcaseMgr.DeleteShowcase(_pptID);
+
+                            _userDrive.JobDone();
+                            _NaviStatus = NavigationStatus.NotProcessing;
+                            loadingView.SetActive(false);
+                        });
                 }
                 else
                 {
                     Debug.Log("you can;t download");
                 }
             }
-            catch (Exception e)
-            {
-				_userDrive.JobDone();
-				_NaviStatus = NavigationStatus.NotProcessing;
-                Debug.Log(e.ToString());
-            }
-       // }
-        
+        }
+        catch (Exception e)
+        {
+            _userDrive.JobDone();
+            _NaviStatus = NavigationStatus.NotProcessing;
+            Debug.Log(e.ToString());
+        }
+
     }
+   
 
 	public void CancelDownloadButton(){
 		_userDrive.CancelDownload ();
