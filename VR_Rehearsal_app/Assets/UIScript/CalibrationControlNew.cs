@@ -145,8 +145,7 @@ public class CalibrationControlNew : MonoBehaviour {
         else
         {
             progressBarGroup.SetActive(false);
-
-            int result = 300;
+           int result = 300;
 #if USE_ANDROID
             result = currentActivity.Call<int>("stopTestThreshold");
 #endif
@@ -189,6 +188,7 @@ public class CalibrationControlNew : MonoBehaviour {
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
+				isButtonClicked = false;
             }
         }
 
@@ -197,6 +197,7 @@ public class CalibrationControlNew : MonoBehaviour {
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
+				isButtonClicked = false;
             }
         }
 	}
