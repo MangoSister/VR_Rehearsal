@@ -71,7 +71,7 @@ public class CalibrationControlNew : MonoBehaviour {
         TestTalkingGroup.SetActive(true);
 
         state = 2;
-        isButtonClicked = false;
+		isButtonClicked = false;
     }
 
     public void startTesting()
@@ -189,7 +189,7 @@ public class CalibrationControlNew : MonoBehaviour {
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
-				
+
             }
         }
 
@@ -198,7 +198,7 @@ public class CalibrationControlNew : MonoBehaviour {
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
-				
+
             }
         }
 	}
