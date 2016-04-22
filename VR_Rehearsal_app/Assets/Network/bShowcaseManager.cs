@@ -18,13 +18,14 @@ public class bShowcaseManager  {
 		public ushort _mapIdx;
 		public string _pptFolderPath;
 		public ushort _percentageOfAudience;
+		public bool   _isEchoEffect;
 		public ushort _expetedTime_min;
 
 		public System.DateTime _updatedDate;
 	
 		public showcase_Data(string id, string name, ushort mapIdx, string pptPath, ushort percentage,ushort expectedTime){
 			 _showcaseID = id; _showcaseName = name; _mapIdx = mapIdx; _pptFolderPath = pptPath;  _percentageOfAudience = percentage;
-			_expetedTime_min = expectedTime;
+			_expetedTime_min = expectedTime; _isEchoEffect = false;
 
 			_updatedDate = System.DateTime.Now;
 		}
@@ -113,7 +114,7 @@ public class bShowcaseManager  {
 
 	}
 
-	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime ){
+	public bool EditShowcase(string caseID, string caseName, int mapIdx, string pptFolderPath, int percentage, int expTime, bool echoEffect ){
 
         bool res = LoadShowcaseBinaryFromLocal();
         if (!res) return false;
@@ -128,6 +129,7 @@ public class bShowcaseManager  {
 		tempShowcase._percentageOfAudience = (ushort)percentage;
 		tempShowcase._expetedTime_min = (ushort)expTime;
 		tempShowcase._updatedDate = System.DateTime.Now;
+		tempShowcase._isEchoEffect = echoEffect;
 
 		_showcaseTable [caseID] = tempShowcase;
 
@@ -210,6 +212,7 @@ public class bShowcaseManager  {
 						//string -> DateTime
 						string strToDateTime = r.ReadString ();
 						tempCase._updatedDate = System.Convert.ToDateTime(strToDateTime);
+						tempCase._isEchoEffect = r.ReadBoolean();
 
 						_showcaseTable.Add (tempCase._showcaseID, tempCase);
 					}
@@ -256,6 +259,7 @@ public class bShowcaseManager  {
 					w.Write(((showcase_Data)pair.Value)._pptFolderPath);
 					w.Write(((showcase_Data)pair.Value)._percentageOfAudience);
 					w.Write(((showcase_Data)pair.Value)._expetedTime_min);
+					w.Write(((showcase_Data)pair.Value)._isEchoEffect);
 					//DateTime -> string
 					w.Write(((showcase_Data)pair.Value)._updatedDate.ToString("yyyy/MM/dd HH:mm:ss"));
 				}
