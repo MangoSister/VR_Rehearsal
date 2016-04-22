@@ -180,11 +180,17 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     @Override
     protected void onPause() { /* compiled code */
-
-
         if(bIsVRrecord){
             isRecording = false;
             isKilled = true;
+
+            try {
+                recordingThread.join();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
             record.stop();
             track.stop();
             record.release();
@@ -207,6 +213,14 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
         isRecording = false;
         isKilled = true;
+
+        try {
+            recordingThread.join();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         record.stop();
         track.stop();
         record.release();
