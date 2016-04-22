@@ -17,8 +17,9 @@ public class RotationView : MonoBehaviour {
     private string _localPath;
     private string _id;
     private int _expectedTime;
+    private bool _isEcho;
 
-    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time)
+    public void SetData(string showCanseName, int sizeOfRoom, int numberOfAudience, string localPath, string id, int time, bool isEcho)
     {
         _showCaseName = showCanseName;
         _sizeOfRoom = sizeOfRoom;
@@ -26,6 +27,8 @@ public class RotationView : MonoBehaviour {
         _localPath = localPath;
         _id = id;
         _expectedTime = time;
+        _isEcho = isEcho;
+
     }
     void Start () {
         isRotationDone = false;

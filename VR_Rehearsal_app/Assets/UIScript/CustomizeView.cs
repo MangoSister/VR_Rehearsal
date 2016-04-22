@@ -106,11 +106,12 @@ public class CustomizeView : MonoBehaviour  {
         if (isEcho.GetComponent<Toggle>().isOn)
         {
             PresentationData.in_VoiceEcho = true;
-            //customData. echo one what i need 
+            customData._isEchoEffect = true;
         }
         else
         {
             PresentationData.in_VoiceEcho = false;
+            customData._isEchoEffect = false;
             //
         }
     }
@@ -136,7 +137,7 @@ public class CustomizeView : MonoBehaviour  {
     }
     public void CustomCompleteClicked()
     {
-        _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min);
+        _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min,customData._isEchoEffect);
         if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
         {
             foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)
@@ -148,7 +149,7 @@ public class CustomizeView : MonoBehaviour  {
             }
             navi.GetComponent<NavigationView>().storedButton.Clear();
         }
-        rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min);
+        rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min,customData._isEchoEffect);
         isCustomizeDone = true; //this will trigger the scene to move forward to calibration
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
         Debug.Log(customData._mapIdx);
@@ -175,10 +176,12 @@ public class CustomizeView : MonoBehaviour  {
         if (isEcho.GetComponent<Toggle>().isOn)
         {
             PresentationData.in_VoiceEcho = true;
+            customData._isEchoEffect = true;
         }
         else
         {
             PresentationData.in_VoiceEcho = false;
+            customData._isEchoEffect = false;
         }
         switch (oldSizeOfRoom)
         {
