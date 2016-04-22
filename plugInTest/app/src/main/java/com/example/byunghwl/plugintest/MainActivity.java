@@ -151,6 +151,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             if (isKilled) {
                 isKilled = false;
                 initialize_recordNplayback(filepath);
+                setReverbStrength(this.reverbStrength);
             }
         }
 
