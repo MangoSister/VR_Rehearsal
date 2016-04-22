@@ -9,8 +9,8 @@ public abstract class AudienceAnimHandlerAbstract : MonoBehaviour
     public readonly static int _paramIdSubState = Animator.StringToHash("subState");
     public readonly static int _paramIdMirror = Animator.StringToHash("mirror");
 
-    public static Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.1f;
-    public static float eyeIconScale = 0.05f;
+    public static Vector3 eyeIconOffset = Vector3.forward * 0.2f + Vector3.up * 0.45f;
+    public static float eyeIconScale = 0.3f;
     public static float eyeIconFreq = 1f;
     public static GameObject eyeIconPrefab;
 
