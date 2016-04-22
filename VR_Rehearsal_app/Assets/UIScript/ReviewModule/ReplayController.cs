@@ -23,7 +23,7 @@ public class ReplayController : MonoBehaviour {
     private float chartStartTime = -CHART_INTERVAL - 1.0f; //for the wave pattern to display at the beginning
     private float slideStartTime = -1.0f, slideEndTime = -1.0f; //for the slide thumbnails to update at the beginning
     private float frameStartTime = -1.0f, frameEndTime = -1.0f; //for the slide thumbnails to update at the beginning
-    private int startSlideIndex = -1;
+    private int startSlideIndex = 0;
     private float lastAudioSourceTime = -1f;
 
     [Header("Heatmap Generation")]
@@ -374,6 +374,7 @@ public class ReplayController : MonoBehaviour {
                 }
                 else
                 {
+                    UnityEngine.Debug.Log("debug - record #" + (startSlideIndex + i) + " under processing (out of " + out_SlidesTransitionRecord.Count + " | " + slideTimingRecord.Count + ")");
                     if ((nowTime >= out_SlidesTransitionRecord[startSlideIndex + i].Key) && (nowTime < out_SlidesTransitionRecord[startSlideIndex + i].Key + slideTimingRecord[startSlideIndex + i].Value))
                     {
                         slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
@@ -530,27 +531,39 @@ public class ReplayController : MonoBehaviour {
 
                 //prepare duration data
                 slideTimingRecord = new List<KeyValuePair<int, float>>();
-                startTimeForThumbnailGroup = new float[out_SlidesTransitionRecord.Count/6];
-                for (int i = 0; i < out_SlidesTransitionRecord.Count; i++)
+
+                for (int j = 0; j < out_SlidesTransitionRecord.Count; j++ )
+                {
+                    UnityEngine.Debug.Log(out_SlidesTransitionRecord[j].Key + " + " + out_SlidesTransitionRecord[j].Value);
+                }
+
+                UnityEngine.Debug.Log("brain power!! " + out_SlidesTransitionRecord.Count + " = " + (out_SlidesTransitionRecord.Count/6) + ")");
+                startTimeForThumbnailGroup = new float[out_SlidesTransitionRecord.Count / 6+1];
+                for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
                 {
                     float time = out_SlidesTransitionRecord[i].Key;
                     int slideNo = out_SlidesTransitionRecord[i].Value;
 
-                    //UnityEngine.Debug.Log("transition is picked: " + time + " (#" + slideNo + ")");
-
                     //get the duration
                     float dur = 0;
-                    if (i == out_SlidesTransitionRecord.Count-1)
-                    {
-                        if (PresentationData.out_ExitTime > 0)
-                            dur = PresentationData.out_ExitTime - time;
-                        else
-                            dur = 999999.0f;
-                    }
-                    else
-                        dur = out_SlidesTransitionRecord[i + 1].Key - time;
+                    //if (i == out_SlidesTransitionRecord.Count-1)
+                    //{
+                    //    if (PresentationData.out_ExitTime > 0)
+                    //        dur = PresentationData.out_ExitTime - time;
+                    //    else
+                    //        dur = 999999.0f;
+                    //}
+                    //else
+                    //
+                    dur = out_SlidesTransitionRecord[i + 1].Key - time;
                     slideTimingRecord.Add(new KeyValuePair<int, float>(slideNo, dur));
-                    if (slideNo % 6 == 0) startTimeForThumbnailGroup[slideNo / 6] = out_SlidesTransitionRecord[i].Key;
+                    if (i % 6 == 0)
+                    {
+                        Debug.Log("*"+i+"* Group #" + (i / 6) + " starts on " + out_SlidesTransitionRecord[i].Key);
+                        startTimeForThumbnailGroup[i / 6] = out_SlidesTransitionRecord[i].Key;
+                    }
+
+                    UnityEngine.Debug.Log("transition is picked: " + dur + " (#" + slideNo + ")");
                 }
 
                 //instantiate markers
