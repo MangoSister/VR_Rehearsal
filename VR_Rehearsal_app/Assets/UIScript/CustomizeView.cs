@@ -175,12 +175,10 @@ public class CustomizeView : MonoBehaviour  {
         if (isEcho.GetComponent<Toggle>().isOn)
         {
             PresentationData.in_VoiceEcho = true;
-            //customData. echo one what i need 
         }
         else
         {
             PresentationData.in_VoiceEcho = false;
-            //
         }
         switch (oldSizeOfRoom)
         {
