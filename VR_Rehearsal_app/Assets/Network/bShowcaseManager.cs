@@ -259,10 +259,12 @@ public class bShowcaseManager  {
 					w.Write(((showcase_Data)pair.Value)._pptFolderPath);
 					w.Write(((showcase_Data)pair.Value)._percentageOfAudience);
 					w.Write(((showcase_Data)pair.Value)._expetedTime_min);
-					w.Write(((showcase_Data)pair.Value)._isEchoEffect);
+					
 					//DateTime -> string
 					w.Write(((showcase_Data)pair.Value)._updatedDate.ToString("yyyy/MM/dd HH:mm:ss"));
-				}
+                    //Echo
+                    w.Write(((showcase_Data)pair.Value)._isEchoEffect);
+                }
 					
 				//4. End
 				w.Write(_fileHeaderValidChecker);
