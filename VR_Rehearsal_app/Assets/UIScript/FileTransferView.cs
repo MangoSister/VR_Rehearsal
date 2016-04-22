@@ -7,8 +7,11 @@ public class FileTransferView : MonoBehaviour {
     public static bool isFileTransferViewDone;
     public int transferNumber = 0; //( 1 : dropbox, 2 : googleDrive, 3: USB)
 	public GameObject warningTextUI_connection;
+    public GameObject instructionPanel;
+    public Button xButon;
 
     void Start () {
+        instructionPanel.SetActive(false);
         Screen.orientation = ScreenOrientation.Portrait;
         Screen.autorotateToLandscapeLeft = false;
         Screen.autorotateToLandscapeRight = false;
@@ -92,4 +95,20 @@ public class FileTransferView : MonoBehaviour {
 		yield return new WaitForSeconds (duration);
 		warningTextUI_connection.SetActive (false);
 	}
+
+    public void QuestionButtonClick()
+    {
+        instructionPanel.SetActive(true);
+    }
+    public void XbuttonClick()
+    {
+        if (instructionPanel.activeSelf)
+        {
+            instructionPanel.SetActive(false);
+        }
+        else
+        {
+            xButon.GetComponent<Button>().interactable = false;
+        }
+    }
 }
