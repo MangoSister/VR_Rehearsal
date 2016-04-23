@@ -31,6 +31,7 @@ public class RotationView : MonoBehaviour {
 
     }
     void Start () {
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         isRotationDone = false;
         verPanel.SetActive(true);
 	}
