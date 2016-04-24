@@ -8,6 +8,7 @@ public class ProgressBar : MonoBehaviour
 	public  Transform loadingBar;
 	public  Transform textIndicator;
 	public  Transform textLoading;
+    public GameObject doneImg;
 
 	int currentAmount;
 	int totalAmount;
@@ -21,22 +22,24 @@ public class ProgressBar : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-	
-	}
+        doneImg.SetActive(false);
+    }
 
 	void Update ()
 	{
         
 		if (currentAmount < totalAmount) {
-			currentAmount += (int)(speed * Time.deltaTime);
+            doneImg.SetActive(false);
+            currentAmount += (int)(speed * Time.deltaTime);
 			textIndicator.GetComponent<Text> ().text = ((int)currentAmount * (100 / totalAmount)).ToString () + "%";
 			textLoading.gameObject.SetActive (true);
 		} else {
 			textLoading.gameObject.SetActive (false);
+            doneImg.SetActive(true);
 			textIndicator.GetComponent<Text> ().text = "Done!";
 			isStart = false;
-		}
-	}
+        }
+    }
 
 	public void StartProgress (int part, int max)
 	{
