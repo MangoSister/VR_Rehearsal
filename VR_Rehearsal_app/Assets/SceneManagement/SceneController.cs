@@ -55,6 +55,7 @@ public class SceneController : MonoBehaviour
 
     public GameObject presenter;
     public Transform presenterHead;
+    public GameObject tutorialPage;
     public GameObject exitNotice;
 
     private GameObject _packedEnv;
@@ -131,6 +132,7 @@ public class SceneController : MonoBehaviour
             _ambientUnit.StopFadeAndRecycle(1.0f);
         if (audioManager.earphonePlugged)
             audioManager.StartMiscSound();
+        tutorialPage.SetActive(false);
         timer.StartCounting();
     }
 
