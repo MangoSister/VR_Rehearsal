@@ -24,6 +24,8 @@ public class CalibrationControlNew : MonoBehaviour {
     //for calling unity android activity
     private AndroidJavaClass unity;
     private AndroidJavaObject currentActivity;
+    public GameObject instructionPanel;
+    public GameObject xButon;
 
     [Header("Change States")]
     public GameObject TestMicrophoneGroup;
@@ -42,9 +44,8 @@ public class CalibrationControlNew : MonoBehaviour {
     public GameObject btnStartTalkTest;
     public GameObject progressBarGroup;
 
-
     //test scene -> silent test -> talking test -> test scene
-
+ 
     public void GoToSilent() { //called after test scene
 #if USE_ANDROID
         int _useless = currentActivity.Call<int>("stopTestThreshold");
@@ -127,7 +128,7 @@ public class CalibrationControlNew : MonoBehaviour {
         isCalibrationDone = false;
         state = -1;
         threshold = 300;
-
+        instructionPanel.SetActive(false);
 #if USE_ANDROID
         unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
@@ -202,4 +203,21 @@ public class CalibrationControlNew : MonoBehaviour {
             }
         }
 	}
+
+    public void OnQuestionButtonClick()
+    {
+        instructionPanel.SetActive(true);
+    }
+
+    public void OnXButtonClick()
+    {
+        if (instructionPanel.activeSelf)
+        {
+            instructionPanel.SetActive(false);
+        }
+        else
+        {
+            xButon.GetComponent<Button>().interactable = false;
+        }
+    }
 }

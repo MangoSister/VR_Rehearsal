@@ -7,8 +7,12 @@ public class FileTransferView : MonoBehaviour {
     public static bool isFileTransferViewDone;
     public int transferNumber = 0; //( 1 : dropbox, 2 : googleDrive, 3: USB)
 	public GameObject warningTextUI_connection;
-
+    public GameObject ok_connection;
+    public GameObject instructionPanel;
+    public Button xButon;
+    public GameObject warningText;
     void Start () {
+        instructionPanel.SetActive(false);
         Screen.orientation = ScreenOrientation.Portrait;
         Screen.autorotateToLandscapeLeft = false;
         Screen.autorotateToLandscapeRight = false;
@@ -20,6 +24,7 @@ public class FileTransferView : MonoBehaviour {
         transferNumber = 0;
 
 		warningTextUI_connection.SetActive (false);
+        warningText.SetActive(false);
     }
 
 	private bool CheckForInternetConnection(){
@@ -51,7 +56,9 @@ public class FileTransferView : MonoBehaviour {
         
 		bool res = CheckForInternetConnection ();
 		if (!res) {
+            ok_connection.SetActive(false);
 			warningTextUI_connection.SetActive (true);
+            warningText.SetActive(true);
 			StartCoroutine(DelayForWarningMessage(1.0f));
 			#if UNITY_EDITOR
 			Debug.Log("Check Internet connection");
@@ -65,11 +72,12 @@ public class FileTransferView : MonoBehaviour {
      }
     public void GoogleButtonClicked()
     {
-
 		bool res = CheckForInternetConnection ();
 		if (!res) {
-			warningTextUI_connection.SetActive (true);
-			StartCoroutine(DelayForWarningMessage(1.0f));
+            ok_connection.SetActive(false);
+            warningTextUI_connection.SetActive (true);
+            warningText.SetActive(true);
+            StartCoroutine(DelayForWarningMessage(1.0f));
 			#if UNITY_EDITOR
 			Debug.Log("Check Internet connection");
 			#endif
@@ -82,7 +90,6 @@ public class FileTransferView : MonoBehaviour {
     }
     public void USBButtonClicked()
     {
-
         transferNumber = 3;
         gameObject.SetActive(false);
         isFileTransferViewDone = true;
@@ -91,5 +98,23 @@ public class FileTransferView : MonoBehaviour {
 	IEnumerator DelayForWarningMessage(float duration){
 		yield return new WaitForSeconds (duration);
 		warningTextUI_connection.SetActive (false);
-	}
+        warningText.SetActive(false);
+        ok_connection.SetActive(true);
+    }
+
+    public void QuestionButtonClick()
+    {
+        instructionPanel.SetActive(true);
+    }
+    public void XbuttonClick()
+    {
+        if (instructionPanel.activeSelf)
+        {
+            instructionPanel.SetActive(false);
+        }
+        else
+        {
+            xButon.GetComponent<Button>().interactable = false;
+        }
+    }
 }
