@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 6800629cdd7be7745826a7343cf9ef5f
-timeCreated: 1459210077
+guid: 69d8238ccea22b5448dd6456445dc93b
+timeCreated: 1461350791
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
@@ -9,7 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Cylinder
+    4300000: Plane_001
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -36,7 +36,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.1
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1

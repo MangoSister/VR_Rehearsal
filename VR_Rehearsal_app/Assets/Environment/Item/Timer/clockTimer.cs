@@ -4,8 +4,6 @@ using System.Collections;
 public class ClockTimer : MonoBehaviour
 {
     public TextMesh textMesh;
-    public Transform infoTransform;
-    public Transform timerTransform;
     public string startInfo;
     public string endInfo;
     public float _maxSecond = 0;
@@ -26,16 +24,10 @@ public class ClockTimer : MonoBehaviour
     {
         textMesh.text = startInfo;
         enabled = false;
-        textMesh.transform.parent = infoTransform;
-        textMesh.transform.localPosition = Vector3.zero;
-        textMesh.transform.localRotation = Quaternion.identity;
     }
 
     public void StartCounting()
     {
-        textMesh.transform.parent = timerTransform;
-        textMesh.transform.localPosition = Vector3.zero;
-        textMesh.transform.localRotation = Quaternion.identity;
         StartCoroutine(Timing_CR());
     }
 
