@@ -264,7 +264,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         volumeTestSampleCount = 0;
         volumeTestSum = 0;
 
-        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         (recordingThread = new Thread()
         {
@@ -448,7 +448,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         try { outputStream = new FileOutputStream(filepath, true); } //append if file exist
         catch (FileNotFoundException e) {e.printStackTrace();}
 
-        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         //isRecording = true;
 
