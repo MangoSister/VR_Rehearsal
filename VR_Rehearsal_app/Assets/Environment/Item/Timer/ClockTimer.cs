@@ -4,9 +4,8 @@ using System.Collections;
 public class ClockTimer : MonoBehaviour
 {
     public TextMesh textMesh;
-    public string startInfo;
-    public string endInfo;
     public float _maxSecond = 0;
+    public float extraSecond = 600;
     private float _currSecond = 0f;
 
     public void SetMaxTime(int time)
@@ -22,7 +21,6 @@ public class ClockTimer : MonoBehaviour
 
     private void Awake()
     {
-        textMesh.text = startInfo;
         enabled = false;
     }
 
@@ -40,7 +38,7 @@ public class ClockTimer : MonoBehaviour
     {
         while (true)
         {
-            if (_currSecond < 0)
+            if (_currSecond <= 0)
                 break;
             yield return new WaitForSeconds(1f);
             _currSecond--;
@@ -51,6 +49,18 @@ public class ClockTimer : MonoBehaviour
                 textMesh.color = Color.red;
         }
 
-        textMesh.text = endInfo;
+        _currSecond = extraSecond;
+        while (true)
+        {
+            if (_currSecond < 0)
+                break;
+            yield return new WaitForSeconds(1f);
+            _currSecond--;
+            int minutes = (int)_currSecond / 60;
+            int seconds = (int)_currSecond % 60;
+            textMesh.text = string.Format("Exit Scene in: \n {0:00}:{1:00}", minutes, seconds);
+        }
+
+        SceneController.currRoom.inputManager.ForceEndPractice();
     }
 }
