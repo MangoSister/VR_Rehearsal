@@ -257,14 +257,14 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
     public void startTestThreshold () {
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.STREAM_MUSIC);
-        am.setSpeakerphoneOn(false);
+        //am.setSpeakerphoneOn(false);
         isKilled = false;
 
         Log.i("MainActivity", "Start volume testing");
         volumeTestSampleCount = 0;
         volumeTestSum = 0;
 
-        //this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         (recordingThread = new Thread()
         {
@@ -426,6 +426,16 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         initialize_recordNplayback(filename);
     }
 
+
+    public void ChangeVolumeControl()
+    {
+        am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        am.setMode(AudioManager.STREAM_MUSIC);
+
+        Log.i("MainActivity", "Tried to set volume control.");
+    }
+
+
    // public void startRecording(String filename){
    public void initialize_recordNplayback(String filename){
         bIsVRrecord = true;
@@ -436,7 +446,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         VADRecord = new ArrayList();
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.STREAM_MUSIC);
-        am.setSpeakerphoneOn(false);
+        //am.setSpeakerphoneOn(false);
         filepath = filename;
         if (filepath.length()==0){
             filepath = Environment.getExternalStorageDirectory().getPath() +"/record.pcm";
@@ -448,7 +458,7 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         try { outputStream = new FileOutputStream(filepath, true); } //append if file exist
         catch (FileNotFoundException e) {e.printStackTrace();}
 
-        //this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         //isRecording = true;
 
