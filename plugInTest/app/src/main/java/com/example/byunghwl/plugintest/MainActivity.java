@@ -429,10 +429,9 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     public void ChangeVolumeControl()
     {
-        am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        am.setMode(AudioManager.STREAM_MUSIC);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        Log.i("MainActivity", "Tried to set volume control.");
+        Log.i("MainActivity", "Tried to set volume control TO STREAM MUSIC.");
     }
 
 
