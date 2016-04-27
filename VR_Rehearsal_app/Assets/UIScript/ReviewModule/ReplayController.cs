@@ -26,6 +26,10 @@ public class ReplayController : MonoBehaviour {
     private int startSlideIndex = 0;
     private float lastAudioSourceTime = -1f;
 
+    //for volume control
+    private AndroidJavaClass unity;
+    private AndroidJavaObject currentActivity;
+
     [Header("Heatmap Generation")]
     private HeatmapGenerator heatMapGen;
     public GameObject heatmapHolder;
@@ -442,6 +446,13 @@ public class ReplayController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         Debug.Log("Enter Eval Scene");
+        //set volume control
+#if USE_ANDROID
+        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+        currentActivity.Call("ChangeVolumeControl");
+        Debug.Log("Tried to active volume button control");
+#endif
         //setup heatmap
         heatMapGen = this.GetComponent<HeatmapGenerator>();
         Texture2D tempTex;
