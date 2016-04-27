@@ -26,6 +26,7 @@ public class CalibrationControlNew : MonoBehaviour {
     private AndroidJavaObject currentActivity;
     public GameObject instructionPanel;
     public GameObject xButon;
+    public GameObject questiontext;
 
     [Header("Change States")]
     public GameObject TestMicrophoneGroup;
@@ -59,6 +60,9 @@ public class CalibrationControlNew : MonoBehaviour {
 
         state = 1;
         isButtonClicked = false;
+        xButon.SetActive(false);
+        questiontext.SetActive(false);
+
     }
 
     public void GoToTalking() { //called after test scene

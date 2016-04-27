@@ -54,6 +54,7 @@ public class CustomizeView : MonoBehaviour  {
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
+        
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
       //  isCustomizeDoneFromLocal = false;
