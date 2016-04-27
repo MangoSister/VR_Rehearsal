@@ -13,6 +13,7 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 
 import java.io.FileInputStream;
@@ -50,6 +51,15 @@ class VoiceActivityRecord {
 public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private int FREQUENCY = 44100;
+
+
+    //Memory Check function 4/26/2016
+    @TargetApi(18)  public static long GetAvailableMemory(String path ){
+        long availableSizeInBytes = new StatFs(path).getAvailableBytes();
+        Log.i("bhMemoryLog", "Availabe Memory at the given path :" + availableSizeInBytes );
+        return availableSizeInBytes;
+    }
+
 
     //Google Drive Activity Added 3/24/2016
     //-------------------------------------------------------------------------
