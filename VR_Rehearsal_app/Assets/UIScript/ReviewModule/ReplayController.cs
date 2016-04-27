@@ -429,9 +429,19 @@ public class ReplayController : MonoBehaviour {
             //UnityEngine.Debug.Log("Line #" + index + "=" + size);
         }
     }
-    
+
+    private void Awake()
+    {
+        Screen.orientation = ScreenOrientation.Portrait;
+        Screen.autorotateToLandscapeLeft = false;
+        Screen.autorotateToLandscapeRight = false;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+    }
+
 	// Use this for initialization
 	void Start () {
+        Debug.Log("Enter Eval Scene");
         //setup heatmap
         heatMapGen = this.GetComponent<HeatmapGenerator>();
         Texture2D tempTex;
