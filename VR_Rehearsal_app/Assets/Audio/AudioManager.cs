@@ -153,7 +153,7 @@ public class AudioManager : MonoBehaviour
 
         List<AudioUnit> allocated = new List<AudioUnit>();
         foreach (AudioUnit unit in _unitPool)
-            if (unit.isAllocated)
+            if (unit != null && unit.isAllocated)
                 allocated.Add(unit);
 
         foreach (AudioUnit unit in allocated)

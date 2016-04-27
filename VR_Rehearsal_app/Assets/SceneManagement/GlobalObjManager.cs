@@ -91,6 +91,7 @@ public static class GlobalManager
 
         if (SceneManager.GetActiveScene().name == _PREP_SCENE_NAME)
         {
+            ApplicationChrome.statusBarState = ApplicationChrome.States.Hidden;
             Screen.orientation = ScreenOrientation.LandscapeLeft;
             Screen.autorotateToLandscapeLeft = false;
             Screen.autorotateToLandscapeRight = false;
