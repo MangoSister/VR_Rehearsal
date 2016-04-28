@@ -4,21 +4,13 @@ using SimpleJSON;
 
 public class test : MonoBehaviour {
 
-	bShowcaseManager showcaseMgr;
-	bhClowdDriveAPI clowdAPI;
-	public GameObject pf;
-	string str;
-	bool flag;
 
 	// Use this for initialization
 	void Start () {
-		
-		showcaseMgr = new bShowcaseManager ();
-		//showcaseMgr.Start ();
-		//showcaseMgr.AddShowcase ("jake1", 1, "coll/coll", 30);
-		//showcaseMgr.AddShowcase ("jake2", 1, "coll/coll", 30);
-		//showcaseMgr.AddShowcase ("jake3", 1, "coll/coll", 30);
-		///showcaseMgr.End ();
+		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+		AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+		long temp = currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
+		Debug.Log ("Available Memory Size :" + temp);
 	}
 	
 	// Update is called once per frame

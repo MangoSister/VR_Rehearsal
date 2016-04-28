@@ -172,7 +172,8 @@ public class CalibrationControlNew : MonoBehaviour {
 	void Update () {
 	    if (state == 0)
         {
-            
+            xButon.SetActive(true);
+            questiontext.SetActive(true);
 #if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
 
@@ -191,6 +192,8 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 1)
         {
+            xButon.SetActive(false);
+            questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
@@ -200,6 +203,8 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 2)
         {
+            xButon.SetActive(false);
+            questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
