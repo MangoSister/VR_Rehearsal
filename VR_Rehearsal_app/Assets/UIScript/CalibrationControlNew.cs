@@ -27,6 +27,7 @@ public class CalibrationControlNew : MonoBehaviour {
     public GameObject instructionPanel;
     public GameObject xButon;
     public GameObject questiontext;
+    public GameObject questionButton;
 
     [Header("Change States")]
     public GameObject TestMicrophoneGroup;
@@ -174,6 +175,7 @@ public class CalibrationControlNew : MonoBehaviour {
         {
             xButon.SetActive(true);
             questiontext.SetActive(true);
+            questionButton.SetActive(true);
 #if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
 
@@ -192,8 +194,10 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 1)
         {
-            xButon.SetActive(false);
-            questiontext.SetActive(false);
+            instructionPanel.SetActive(false);
+            questionButton.SetActive(false);
+            //xButon.SetActive(false);
+            //questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
@@ -203,8 +207,10 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 2)
         {
-            xButon.SetActive(false);
-            questiontext.SetActive(false);
+            instructionPanel.SetActive(false);
+            questionButton.SetActive(false);
+            //xButon.SetActive(false);
+            // questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();

@@ -131,14 +131,22 @@ public class CustomizeView : MonoBehaviour  {
             customData._expetedTime_min = (ushort)(int.Parse("0")); ;
         }
         else {
-			/* This is for checking memory availablity*/
-			bool res = CheckAvailableMemory ();
+        #if UNITY_EDITOR
+            customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+        #elif UNITY_ANDROID
+            /* This is for checking memory availablity*/
+            bool res = CheckAvailableMemory ();
 			if (res) { /*Enough free memory*/
 				customData._expetedTime_min = (ushort)(int.Parse (timer.text));
-			} else { /*No enough Memory */
-				/*code below from here*/
-			
 			}
+           
+            else { /*No enough Memory */
+                     /*code below from here*/
+                    
+			 }              
+#endif
+
+
         }
     }
     IEnumerator WarningSign()
