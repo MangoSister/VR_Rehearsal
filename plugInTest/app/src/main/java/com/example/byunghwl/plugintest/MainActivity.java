@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,6 +53,73 @@ class VoiceActivityRecord {
 public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     private int FREQUENCY = 44100;
+
+    //volume button checking
+    @Override
+    public boolean onKeyUp(int keyCode, android.view.KeyEvent event) { /* compiled code */
+        boolean res;
+        if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_UP  ){
+
+            AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            boolean isheadphonePlugged = checkHeadsetPlugged();
+
+            if(!isheadphonePlugged){
+                audioManager.setSpeakerphoneOn(true);
+            }
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+            Log.i("bhVolumeCtrl", "upperKey Pressed");
+            res = true;
+        }else if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_DOWN ){
+            AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            boolean isheadphonePlugged = checkHeadsetPlugged();
+
+            if(!isheadphonePlugged){
+                audioManager.setSpeakerphoneOn(true);
+            }
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+            Log.i("bhVolumeCtrl", "upperKey Pressed");
+            res = true;
+
+        } else{
+            res = super.onKeyUp(keyCode, event);
+        }
+
+        return res;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) { /* compiled code */
+        boolean res;
+        if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_UP  ){
+
+            AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            boolean isheadphonePlugged = checkHeadsetPlugged();
+
+            if(!isheadphonePlugged){
+                audioManager.setSpeakerphoneOn(true);
+            }
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+            Log.i("bhVolumeCtrl", "upperKey Pressed");
+            res = true;
+            
+        }else if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_DOWN ){
+            AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            boolean isheadphonePlugged = checkHeadsetPlugged();
+
+            if(!isheadphonePlugged){
+                audioManager.setSpeakerphoneOn(true);
+            }
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+            Log.i("bhVolumeCtrl", "upperKey Pressed");
+            res = true;
+
+        } else{
+            res = super.onKeyUp(keyCode, event);
+        }
+
+        return res;
+    }
+
 
 
     //Memory Check function 4/26/2016
