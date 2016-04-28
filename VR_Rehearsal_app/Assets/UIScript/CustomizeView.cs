@@ -240,7 +240,7 @@ public class CustomizeView : MonoBehaviour  {
         defaultValue = false;
     }
 
-	public void  CheckAvailableMemory(){
+	public bool  CheckAvailableMemory(){
 		long currentAvailableMemorySize = _currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
 		int resTime = customData._expetedTime_min + 10; 
 		if ((resTime * 5400000) > currentAvailableMemorySize) {
