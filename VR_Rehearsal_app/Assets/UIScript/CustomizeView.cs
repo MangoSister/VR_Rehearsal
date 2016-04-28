@@ -36,6 +36,10 @@ public class CustomizeView : MonoBehaviour  {
     bShowcaseManager.showcase_Data customData;
     public bool defaultValue = false;
     public bool isFromCustom;
+
+    //checkMemory Warnging Sign
+    public GameObject memoryWarningPanel;
+    bool enoughMemory;
     
     [Header("Venue Select")]
     public Button btnRoom1;
@@ -59,14 +63,14 @@ public class CustomizeView : MonoBehaviour  {
         warningText.SetActive(false);
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
+        enoughMemory = true;
+        #if UNITY_EDITOR
 
-		#if UNITY_EDITOR
 
-
-		#elif UNITY_ANDROID
+#elif UNITY_ANDROID
 			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
 			_currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
-		#endif
+#endif
     }
     public void DefaultValueSetting()
     {
@@ -116,7 +120,6 @@ public class CustomizeView : MonoBehaviour  {
         {
             PresentationData.in_VoiceEcho = false;
             customData._isEchoEffect = false;
-            //
         }
     }
     public void CheckSliderValue()
@@ -133,15 +136,18 @@ public class CustomizeView : MonoBehaviour  {
         else {
         #if UNITY_EDITOR
             customData._expetedTime_min = (ushort)(int.Parse(timer.text));
-        #elif UNITY_ANDROID
+#elif UNITY_ANDROID
             /* This is for checking memory availablity*/
             bool res = CheckAvailableMemory ();
 			if (res) { /*Enough free memory*/
 				customData._expetedTime_min = (ushort)(int.Parse (timer.text));
+                enoughMemory = true;
 			}
            
             else { /*No enough Memory */
                      /*code below from here*/
+                     enoughMemory = false;
+                    memoryWarningPanel.SetActive(true);
                     
 			 }              
 #endif
@@ -161,7 +167,7 @@ public class CustomizeView : MonoBehaviour  {
     }
     public void CustomCompleteClicked()
     {
-        if (customData._expetedTime_min < 20)
+        if (customData._expetedTime_min < 20 && enoughMemory == true)
         {
             _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min, customData._isEchoEffect);
             if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
@@ -256,5 +262,12 @@ public class CustomizeView : MonoBehaviour  {
 		}
 		return true;
 	}
+
+    public void WarningOkButtonClick()
+    {
+        memoryWarningPanel.SetActive(false);
+    }
+
+
 
 }

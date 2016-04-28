@@ -81,7 +81,10 @@ public class NavigationView : MonoBehaviour {
 	NavigationStatus _NaviStatus= NavigationStatus.NotProcessing;
 
 	//recent Json List
-	JSONNode _recentParseResult; 
+	JSONNode _recentParseResult;
+
+    //MemoryCheck
+    public GameObject warningMemoryPanel;
 
     void Start() {
         Screen.orientation = ScreenOrientation.Portrait;
@@ -621,8 +624,11 @@ public class NavigationView : MonoBehaviour {
 	}
 
 	void ShowExceedMemory(){
-
-
+        warningMemoryPanel.SetActive(true);
 	}
+    public void MemoryWarningOkButtonClick()
+    {
+        warningMemoryPanel.SetActive(false);
+    }
 
 }
