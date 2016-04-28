@@ -128,20 +128,15 @@ public static class GlobalManager
 
         if (SceneManager.GetActiveScene().name == _PRESENT_SCENE_NAME)
         {
-            Screen.orientation = ScreenOrientation.Portrait;
-            Screen.autorotateToLandscapeLeft = false;
-            Screen.autorotateToLandscapeRight = false;
-            Screen.autorotateToPortrait = false;
-            Screen.autorotateToPortraitUpsideDown = false;
-
-
+            Debug.Log("Exit VR Scene");
             SceneManager.LoadScene(_EVAL_SCENE_NAME);
         }
     }
-
+   
     //Use me to enter preparation scene (normal 2d mobile scene)!!
     public static void LaunchPreparationScene()
     {
+        
         if (SceneManager.GetActiveScene().name != _PREP_SCENE_NAME)
             SceneManager.LoadScene(_PREP_SCENE_NAME);
             //Application.LoadLevel(_PREP_SCENE_NAME);
