@@ -23,31 +23,43 @@ public class ProgressBar : MonoBehaviour
 	void Start ()
 	{
         doneImg.SetActive(false);
+		isStart = false;
     }
 
 	void Update ()
 	{
-        
-		if (currentAmount < totalAmount) {
-            doneImg.SetActive(false);
-            currentAmount += (int)(speed * Time.deltaTime);
-			textIndicator.GetComponent<Text> ().text = ((int)currentAmount * (100 / totalAmount)).ToString () + "%";
-			textLoading.gameObject.SetActive (true);
-		} else {
-			textLoading.gameObject.SetActive (false);
-            doneImg.SetActive(true);
-			textIndicator.GetComponent<Text> ().text = "Done!";
-			isStart = false;
-        }
+		if (isStart) {
+
+			if (currentAmount < totalAmount) {
+				doneImg.SetActive (false);
+				currentAmount += (int)(speed * Time.deltaTime);
+				textIndicator.GetComponent<Text> ().text = ((int)currentAmount * (100 / totalAmount)).ToString () + "%";
+				textLoading.gameObject.SetActive (true);
+			} else {
+				textLoading.gameObject.SetActive (false);
+				doneImg.SetActive (true);
+				textIndicator.GetComponent<Text> ().text = "Done!";
+				isStart = false;
+			}
+
+		} 
+
     }
+	public void ResetProgress(){
+		doneImg.SetActive(false);
+		textIndicator.GetComponent<Text> ().text=  "0 %"; 
+	}
 
 	public void StartProgress (int part, int max)
 	{
+
+		isStart = true;
 		currentAmount = part;
 		totalAmount = max;
 		now = part;
 		p = (float)part;
 		t = (float)totalAmount;
+		textIndicator.GetComponent<Text> ().text=  "0 %"; 
 		loadingBar.GetComponent<Image> ().fillAmount = p / t;
 
 	}
