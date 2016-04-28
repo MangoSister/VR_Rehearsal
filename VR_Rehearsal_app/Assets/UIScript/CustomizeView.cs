@@ -47,6 +47,7 @@ public class CustomizeView : MonoBehaviour  {
     public Sprite room2Unchecked;
     public Sprite room3Checked;
     public Sprite room3Unchecked;
+	AndroidJavaObject _currentActivity;
 
      void Start () {
         Screen.orientation = ScreenOrientation.Portrait;
@@ -58,6 +59,14 @@ public class CustomizeView : MonoBehaviour  {
         warningText.SetActive(false);
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
+
+		#if UNITY_EDITOR
+
+
+		#elif UNITY_ANDROID
+			AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+			_currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+		#endif
     }
     public void DefaultValueSetting()
     {
@@ -122,7 +131,14 @@ public class CustomizeView : MonoBehaviour  {
             customData._expetedTime_min = 0;
         }
         else {
-            customData._expetedTime_min = (ushort)(int.Parse(timer.text));
+			/* This is for checking memory availablity*/
+			bool res = CheckAvailableMemory ();
+			if (res) { /*Enough free memory*/
+				customData._expetedTime_min = (ushort)(int.Parse (timer.text));
+			} else { /*No enough Memory */
+				/*code below from here*/
+			
+			}
         }
     }
     IEnumerator WarningSign()
@@ -212,4 +228,14 @@ public class CustomizeView : MonoBehaviour  {
         isCustomizeDoneFromLocal = true;
         defaultValue = false;
     }
+
+	public void  CheckAvailableMemory(){
+		long currentAvailableMemorySize = _currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
+		int resTime = customData._expetedTime_min + 10; 
+		if ((resTime * 5400000) > currentAvailableMemorySize) {
+			return false;
+		}
+		return true;
+	}
+
 }
