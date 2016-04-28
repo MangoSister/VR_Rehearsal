@@ -235,7 +235,7 @@ public class ReplayController : MonoBehaviour {
         
         if ((nowTime < chartStartTime) || (nowTime > chartStartTime + CHART_INTERVAL)) //need to update waves & pause markers
         {
-            //UnityEngine.Debug.Log("need to update chartStartTime now");
+            //UnityEngine.Debug.Log("need to update wave and pause");
             chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
 
             //update pauses
@@ -284,12 +284,49 @@ public class ReplayController : MonoBehaviour {
                 go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
                 go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
             }
+
+            //update wave shapes
+            var currentWaves = new List<GameObject>();
+            foreach (Transform marker in groupOfWaves.transform) currentWaves.Add(marker.gameObject);
+            currentWaves.ForEach(marker => Destroy(marker));
+
+            int startFrame = (int)(startTime * FREQUENCY);
+            int endFrame = startFrame + CHART_INTERVAL * FREQUENCY;
+            int interval = 8 * (endFrame - startFrame) / (XBottom - XTop);
+
+            int index = 0;
+            for (int j = startFrame; j < endFrame; j += interval)
+            {
+                //get average amplifier
+                float sum = 0;
+                for (int k = j; k < j + interval; k++)
+                {
+                    if (k >= floatArray.Length) break;
+                    sum += Math.Abs(floatArray[k]);
+                }
+                float avg = sum / interval;
+                float max = 0.3f;
+                float size = avg / max * YRange;
+                if (size > YRange) size = YRange;
+
+                //instantiate a wave
+                var go = Instantiate(prefabWave) as GameObject;
+                go.transform.SetParent(groupOfWaves.transform);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+                go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
+                go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+
+                index++;
+
+                //UnityEngine.Debug.Log("Line #" + index + "=" + size);
+            }
         }
 
         //check if need to update top slide thumbnails
         if ((nowTime<slideStartTime) || (nowTime>slideEndTime)) //now playingtime is out of the slide thumbnail presented time interval
         {
-            //Update slides!
+            //UnityEngine.Debug.Log("need to update slide");
             // UnityEngine.Debug.Log("Updating slide thumbnails --- ");
             //find the right group
             int groupNo = 0;
@@ -302,7 +339,9 @@ public class ReplayController : MonoBehaviour {
                         break;
                 }
                 else if (nowTime >= startTimeForThumbnailGroup[groupNo])
+                {
                     break;
+                }
             }
 
             if (groupNo<startTimeForThumbnailGroup.Length)
@@ -331,7 +370,7 @@ public class ReplayController : MonoBehaviour {
                     }
                     else
                     {
-                        if (PresentationData.out_Slides!=null)
+                        if ((PresentationData.out_Slides != null) && (PresentationData.out_Slides.Count>0))
                             slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideTimingRecord[indexOfRecord].Key]); 
                         else
                             slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(new Texture2D(160,30)); //for testing
@@ -370,8 +409,9 @@ public class ReplayController : MonoBehaviour {
         
         if ((nowTime<frameStartTime) || (nowTime>=frameEndTime))//check if need to update current slide pointer
         {
+            //UnityEngine.Debug.Log("need to update slide frame");
             //UnityEngine.Debug.Log("Updating slide frames --- "+nowTime+" is out of "+frameStartTime+"-"+frameEndTime);
-            //Debug.Log("StartSlideIndex=" + startSlideIndex);
+            //Debug.Log("StartSlideIndex=" + startSlideIndex + ", slideTimingRecord.Count=" + slideTimingRecord.Count);
             for (int i=0; i<6; i++)
             {
                 if (startSlideIndex + i >= slideTimingRecord.Count)
@@ -395,54 +435,17 @@ public class ReplayController : MonoBehaviour {
             }
         }
         //UnityEngine.Debug.Log(slideStartTime + " <- " + nowTime + " belongs to " + frameStartTime + "-" + frameEndTime + "? --> " + slideEndTime);
-
-        //update wave shapes
-        var currentWaves = new List<GameObject>();
-        foreach (Transform marker in groupOfWaves.transform) currentWaves.Add(marker.gameObject);
-        currentWaves.ForEach(marker => Destroy(marker));
-        
-        int startFrame = (int)(startTime*FREQUENCY);
-        int endFrame = startFrame + CHART_INTERVAL*FREQUENCY;
-        int interval = 8*(endFrame-startFrame)/(XBottom-XTop); 
-
-        int index = 0;
-        for (int j=startFrame; j<endFrame; j+=interval)
-        {
-            //get average amplifier
-            float sum = 0;
-            for (int k = j; k < j + interval; k++)
-            {
-                if (k >= floatArray.Length) break;
-                sum += Math.Abs(floatArray[k]);
-            }
-            float avg = sum / interval;
-            float max = 0.3f;
-            float size = avg / max * YRange;
-            if (size > YRange) size = YRange;
-            
-            //instantiate a wave
-            var go = Instantiate(prefabWave) as GameObject;
-            go.transform.SetParent(groupOfWaves.transform);
-
-            go.GetComponent<RectTransform>().localPosition = new Vector3(XTop+ 8*index, YMid, 0f);
-            go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
-            go.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
-
-            index++;
-
-            //UnityEngine.Debug.Log("Line #" + index + "=" + size);
-        }
     }
     
 	// Use this for initialization
 	void Start () {
         //set volume control
-#if USE_ANDROID
-        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-        currentActivity.Call("ChangeVolumeControl");
-        Debug.Log("Tried to active volume button control");
-#endif
+//#if UNITY_ANDROID 		
+//        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+//        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+//        currentActivity.Call("ChangeVolumeControl");
+//        Debug.Log("Tried to active volume button control");
+//#endif
         //setup heatmap
         heatMapGen = this.GetComponent<HeatmapGenerator>();
         Texture2D tempTex;
@@ -535,7 +538,7 @@ public class ReplayController : MonoBehaviour {
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 3));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6)); //the last shoot
                     //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
                     //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
                     //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
@@ -552,7 +555,8 @@ public class ReplayController : MonoBehaviour {
                 }
 
                 //UnityEngine.Debug.Log("brain power!! " + out_SlidesTransitionRecord.Count + " = " + (out_SlidesTransitionRecord.Count-1/6) + ")");
-                startTimeForThumbnailGroup = new float[(out_SlidesTransitionRecord.Count-1)/ 6+1];
+                startTimeForThumbnailGroup = new float[(out_SlidesTransitionRecord.Count-2)/ 6+1];
+                //UnityEngine.Debug.Log("startTimeForThumbnailGroup has " + (out_SlidesTransitionRecord.Count - 2) / 6 + "+1 records");
                 for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
                 {
                     float time = out_SlidesTransitionRecord[i].Key;
@@ -653,15 +657,17 @@ public class ReplayController : MonoBehaviour {
         {
             if (audioSource.isPlaying == true)
             {
-                if (audioSource.time!=lastAudioSourceTime)
-                { 
-                    playbackSlider.value = audioSource.time;
-                    lastAudioSourceTime = audioSource.time;
-                }
-                else
-                {
-                    playbackSlider.value += Time.deltaTime;
-                }
+                playbackSlider.value = audioSource.time;
+                
+                //if (audioSource.time!=lastAudioSourceTime)
+                //{ 
+                //    
+                //    lastAudioSourceTime = audioSource.time;
+                //}
+                //else
+                //{
+                //    playbackSlider.value += Time.deltaTime;
+                //}
 
                 if (playbackSlider.value == playbackSlider.maxValue)
                 {
