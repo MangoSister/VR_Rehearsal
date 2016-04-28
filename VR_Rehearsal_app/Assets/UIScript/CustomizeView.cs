@@ -119,7 +119,7 @@ public class CustomizeView : MonoBehaviour  {
     {
         if (timer.text == "")
         {
-            customData._expetedTime_min = 0;
+            customData._expetedTime_min = (ushort)(int.Parse("0")); ;
         }
         else {
             customData._expetedTime_min = (ushort)(int.Parse(timer.text));
@@ -158,6 +158,17 @@ public class CustomizeView : MonoBehaviour  {
             gameObject.SetActive(false);
         }
         else
+        {
+            StartCoroutine("WarningSign");
+        }
+    }
+    public void WarningTime()
+    {
+        if (timer.text == "")
+        {
+            int _timer = 0;
+        }
+        else if(int.Parse(timer.text) > 20)
         {
             StartCoroutine("WarningSign");
         }
