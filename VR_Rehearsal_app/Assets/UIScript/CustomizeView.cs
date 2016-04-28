@@ -9,6 +9,7 @@ public class CustomizeView : MonoBehaviour  {
     private SetupManager _setManager;
     public GameObject rotationView;
     public GameObject navi;
+    public GameObject warningText;
 
     //Set Name of Showcase
     public InputField showCaseTitle;
@@ -54,16 +55,9 @@ public class CustomizeView : MonoBehaviour  {
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
-        
+        warningText.SetActive(false);
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
-      //  isCustomizeDoneFromLocal = false;
-        /*Default Value for Customize 
-        show case titl = Title
-        timer = 5
-        room = RPIS
-        */
-
     }
     public void DefaultValueSetting()
     {
@@ -131,30 +125,42 @@ public class CustomizeView : MonoBehaviour  {
             customData._expetedTime_min = (ushort)(int.Parse(timer.text));
         }
     }
-
+    IEnumerator WarningSign()
+    {
+        warningText.SetActive(true);
+        yield return new WaitForSeconds(2);
+        warningText.SetActive(false);
+    }
     public void SetShowCaseName()
     {
         customData._showcaseName = showCaseTitle.text;
     }
     public void CustomCompleteClicked()
     {
-        _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min,customData._isEchoEffect);
-        if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
+        if (customData._expetedTime_min < 20)
         {
-            foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)
+            _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min, customData._isEchoEffect);
+            if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
             {
-                if (child.name == "PPT_Practice(Clone)")
+                foreach (RectTransform child in navi.GetComponent<NavigationView>().contentRect)
                 {
-                    GameObject.Destroy(child.gameObject);
+                    if (child.name == "PPT_Practice(Clone)")
+                    {
+                        GameObject.Destroy(child.gameObject);
+                    }
                 }
+                navi.GetComponent<NavigationView>().storedButton.Clear();
             }
-            navi.GetComponent<NavigationView>().storedButton.Clear();
+            rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min, customData._isEchoEffect);
+            isCustomizeDone = true; //this will trigger the scene to move forward to calibration
+            GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
+            Debug.Log(customData._mapIdx);
+            gameObject.SetActive(false);
         }
-        rotationView.GetComponent<RotationView>().SetData(customData._showcaseName, customData._mapIdx, customData._percentageOfAudience, Application.persistentDataPath + "/" + _pptID, _pptID, customData._expetedTime_min,customData._isEchoEffect);
-        isCustomizeDone = true; //this will trigger the scene to move forward to calibration
-        GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(true);
-        Debug.Log(customData._mapIdx);
-        gameObject.SetActive(false);
+        else
+        {
+            StartCoroutine("WarningSign");
+        }
     }
     public void SetPPTID(string id)
     {
