@@ -440,13 +440,14 @@ public class ReplayController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //set volume control
-//#if UNITY_ANDROID 		
-//        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-//        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-//        currentActivity.Call("ChangeVolumeControl");
-//        Debug.Log("Tried to active volume button control");
-//#endif
+        //#if UNITY_ANDROID 		
+        //        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        //        currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+        //        currentActivity.Call("ChangeVolumeControl");
+        //        Debug.Log("Tried to active volume button control");
+        //#endif
         //setup heatmap
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         heatMapGen = this.GetComponent<HeatmapGenerator>();
         Texture2D tempTex;
         float maxTime;

@@ -182,9 +182,6 @@ public class CanvasManager : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.Escape) && customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal == true)
         {
-            Debug.Log("here?");
-
-
              customize.gameObject.SetActive(false);
              localShowCase.gameObject.SetActive(true);
              customize.GetComponent<CustomizeView>().isCustomizeDoneFromLocal = false;
