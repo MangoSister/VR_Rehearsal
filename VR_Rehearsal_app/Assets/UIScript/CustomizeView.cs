@@ -168,7 +168,7 @@ public class CustomizeView : MonoBehaviour  {
     }
     public void CustomCompleteClicked()
     {
-        if (customData._expetedTime_min < 20 && enoughMemory == true)
+        if (customData._expetedTime_min <= 20 && enoughMemory == true)
         {
             _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min, customData._isEchoEffect);
             if (navi.GetComponent<NavigationView>().storedButton.Count > 0)
@@ -200,7 +200,7 @@ public class CustomizeView : MonoBehaviour  {
         {
             int _timer = 0;
         }
-        else if(int.Parse(timer.text) > 20)
+        else if(int.Parse(timer.text) >20)
         {
             StartCoroutine("WarningSign");
         }
