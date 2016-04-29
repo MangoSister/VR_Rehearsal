@@ -223,7 +223,7 @@ public class ReplayController : MonoBehaviour {
         if (isProcessingAudio == true) return;
         
         //const for now. need detection algorithm
-        int XTop = -133, XBottom = 630;
+        int XTop = -132, XBottom = 620;
         int YMid = 7, YRange = 74;        
 
         //update the position marker
@@ -304,7 +304,7 @@ public class ReplayController : MonoBehaviour {
                         go2.transform.SetParent(groupOfPauseMarkers.transform);
 
                         go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
-                        go2.GetComponent<RectTransform>().sizeDelta = new Vector2(10, YRange);
+                        go2.GetComponent<RectTransform>().sizeDelta = new Vector2(8, YRange);
                         go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
                     
                     break;
