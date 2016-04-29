@@ -129,6 +129,7 @@ public class CustomizeView : MonoBehaviour  {
 
     public void SetTimer()
     {
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
         if (timer.text == "")
         {
             customData._expetedTime_min = (ushort)(int.Parse("0")); ;

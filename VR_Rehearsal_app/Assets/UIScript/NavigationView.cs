@@ -475,11 +475,10 @@ public class NavigationView : MonoBehaviour {
 		}
 
 		FinishLoading();
-
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		Debug.Log("Total File Size:" + totalFileSize);
 		DownloadButtonClicked ();
-		#elif UNITY_ANDROID
+#elif UNITY_ANDROID
 		
 		long currentAvailableMemorySize = _currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
 		Debug.Log("Available Memory:" + currentAvailableMemorySize);
@@ -492,11 +491,11 @@ public class NavigationView : MonoBehaviour {
 		}else{
 			DownloadButtonClicked ();
 		}
-		#endif
+#endif
 
-	
 
-	}
+
+    }
 
     public void DownloadButtonClicked()
     {
@@ -629,6 +628,7 @@ public class NavigationView : MonoBehaviour {
     public void MemoryWarningOkButtonClick()
     {
         warningMemoryPanel.SetActive(false);
+        _NaviStatus = NavigationStatus.NotProcessing;
     }
 
 }

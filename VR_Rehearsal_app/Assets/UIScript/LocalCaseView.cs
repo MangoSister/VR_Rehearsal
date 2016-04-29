@@ -75,7 +75,7 @@ public class LocalCaseView : MonoBehaviour {
     void CheckLocalPPT()
     {
         DeleteShowCase();
-        
+        isLocalCaseDone = true;
         bShowcaseManager.showcase_Data[] caseDatas = _setManager.BShowcaseMgr.GetAllShowcases();
         if (caseDatas == null)
         {

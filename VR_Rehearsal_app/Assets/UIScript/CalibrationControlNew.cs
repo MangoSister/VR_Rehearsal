@@ -28,6 +28,8 @@ public class CalibrationControlNew : MonoBehaviour {
     public GameObject xButon;
     public GameObject questiontext;
     public GameObject questionButton;
+    public GameObject localview;
+    public GameObject customeView;
 
     [Header("Change States")]
     public GameObject TestMicrophoneGroup;
@@ -170,8 +172,9 @@ public class CalibrationControlNew : MonoBehaviour {
     }
 
     // Update is called once per frame
-	void Update () {
-	    if (state == 0)
+    void Update()
+    {
+        if (state == 0)
         {
             xButon.SetActive(true);
             questiontext.SetActive(true);
@@ -217,7 +220,21 @@ public class CalibrationControlNew : MonoBehaviour {
 
             }
         }
-	}
+
+        if (Input.GetKey(KeyCode.Escape))
+        {    
+            if (LocalCaseView.isCustomizeButtonClicked)
+            {
+                this.gameObject.transform.parent.gameObject.SetActive(false);
+                localview.SetActive(true);
+            }
+            else if (LocalCaseView.isLocalCaseDone)
+            {
+                this.gameObject.transform.parent.gameObject.SetActive(false);
+                localview.SetActive(true);
+            }
+        }  
+    }
 
     public void OnQuestionButtonClick()
     {
