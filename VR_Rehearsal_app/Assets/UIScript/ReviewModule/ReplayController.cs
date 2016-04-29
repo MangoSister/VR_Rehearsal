@@ -18,6 +18,7 @@ public class ReplayController : MonoBehaviour {
     private bool isProcessingAudio = false; //for the threaded job audio processing
     private AudioProcessingJob pcmToUnityClip;
     private float[] floatArray;
+    private float floatArrayMaximum = 0.0f;
     private int arrayLength = 0;
     private const int CHART_INTERVAL = 30; //30s
     private float chartStartTime = -CHART_INTERVAL - 1.0f; //for the wave pattern to display at the beginning
@@ -222,7 +223,7 @@ public class ReplayController : MonoBehaviour {
         
         //const for now. need detection algorithm
         int XTop = -133, XBottom = 630;
-        int YMid = 7, YRange = 74;
+        int YMid = 7, YRange = 74;        
 
         //update the position marker
         //get the interval first
@@ -239,60 +240,58 @@ public class ReplayController : MonoBehaviour {
             chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
 
             //update pauses
-
-            //remove old markers
             var currentMarkers = new List<GameObject>();
             foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
-            //foreach (Transform marker in groupOfTransitionMarkers.transform) currentMarkers.Add(marker.gameObject); //no longer used
             currentMarkers.ForEach(marker => Destroy(marker));
+            
+            ////find new pauses
+            //for (int i = 0; i < out_PauseRecord.Count; i++)
+            //{
+            //    if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f < startTime)
+            //        continue;
 
-            //find new pauses
-            for (int i = 0; i < out_PauseRecord.Count; i++)
-            {
-                if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f < startTime)
-                    continue;
+            //    if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
+            //        break;
 
-                if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
-                    break;
+            //    //UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
 
-                //UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
+            //    float startX, endX;
 
-                float startX, endX;
+            //    if (out_PauseRecord[i].Key <= startTime) //start=0
+            //        startX = XTop;
+            //    else
+            //        startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
 
-                if (out_PauseRecord[i].Key <= startTime) //start=0
-                    startX = XTop;
-                else
-                    startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
+            //    if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f >= startTime + CHART_INTERVAL) //end=end
+            //        endX = XBottom;
+            //    else
+            //    {
+            //        if (out_PauseRecord[i].Key <= startTime)
+            //        {
+            //            endX = ((out_PauseRecord[i].Value / 1000.0f) - (startTime - out_PauseRecord[i].Key)) * (XBottom - XTop) / CHART_INTERVAL + startX;
+            //        }
+            //        else
+            //            endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL * 1000.0f) + startX;
+            //    }
 
-                if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f >= startTime + CHART_INTERVAL) //end=end
-                    endX = XBottom;
-                else
-                {
-                    if (out_PauseRecord[i].Key <= startTime)
-                    {
-                        endX = ((out_PauseRecord[i].Value / 1000.0f) - (startTime - out_PauseRecord[i].Key)) * (XBottom - XTop) / CHART_INTERVAL + startX;
-                    }
-                    else
-                        endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL * 1000.0f) + startX;
-                }
+            //    //instantiate a pause marker
+            //    var go = Instantiate(prefabPauseArea) as GameObject;
+            //    go.transform.SetParent(groupOfPauseMarkers.transform);
 
-                //instantiate a pause marker
-                var go = Instantiate(prefabPauseArea) as GameObject;
-                go.transform.SetParent(groupOfPauseMarkers.transform);
-
-                go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
-                go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
-                go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-            }
+            //    go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
+            //    go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
+            //    go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+            //}
 
             //update wave shapes
             var currentWaves = new List<GameObject>();
             foreach (Transform marker in groupOfWaves.transform) currentWaves.Add(marker.gameObject);
+            foreach (Transform marker in groupOfPauseMarkers.transform) currentWaves.Add(marker.gameObject);
             currentWaves.ForEach(marker => Destroy(marker));
 
             int startFrame = (int)(startTime * FREQUENCY);
             int endFrame = startFrame + CHART_INTERVAL * FREQUENCY;
-            int interval = 8 * (endFrame - startFrame) / (XBottom - XTop);
+            int interval = 8 * CHART_INTERVAL * FREQUENCY / (XBottom - XTop);
 
             int index = 0;
             for (int j = startFrame; j < endFrame; j += interval)
@@ -308,6 +307,17 @@ public class ReplayController : MonoBehaviour {
                 float max = 0.3f;
                 float size = avg / max * YRange;
                 if (size > YRange) size = YRange;
+
+                if (avg/floatArrayMaximum < 0.1f)
+                {
+                    //draw pause
+                    var go2 = Instantiate(prefabPauseArea) as GameObject;
+                    go2.transform.SetParent(groupOfPauseMarkers.transform);
+
+                    go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+                    go2.GetComponent<RectTransform>().sizeDelta = new Vector2(10, YRange);
+                    go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+                }
 
                 //instantiate a wave
                 var go = Instantiate(prefabWave) as GameObject;
@@ -503,7 +513,25 @@ public class ReplayController : MonoBehaviour {
 
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
-         //     UnityEngine.Debug.Log(floatArray.Length);
+                floatArrayMaximum = pcmToUnityClip.getMaximum();
+                UnityEngine.Debug.Log("maximum is " + floatArrayMaximum);
+                //UnityEngine.Debug.Log(floatArray.Length);
+
+                int interval = 8 * CHART_INTERVAL * FREQUENCY / 763;
+                floatArrayMaximum = 0.0f;
+
+                for (int j = 0; j < floatArray.Length; j += interval)
+                {
+                    float sum = 0;
+
+                    for (int k = j; k < j + interval; k++)
+                    {
+                        if (k >= floatArray.Length) break;
+                        sum += Math.Abs(floatArray[k]);
+                    }
+
+                    if (floatArrayMaximum < sum / interval) floatArrayMaximum = sum / interval;
+                }
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
@@ -589,8 +617,12 @@ public class ReplayController : MonoBehaviour {
                     }
                 }*/
 
-                out_PauseRecord = new List<KeyValuePair<float, int>>();
+                /* out_PauseRecord = new List<KeyValuePair<float, int>>();
                 
+                /// No longer using this
+                /// 
+                ///
+
                 if ((PresentationData.out_FluencyRecord != null) && (PresentationData.out_FluencyRecord.Count >= 0))
                 {
                     //long pause threshold is set to 1.5s
@@ -691,6 +723,7 @@ public class AudioProcessingJob : ThreadedAudioJob
     private string filePath;
     private const int FREQUENCY = 44100;
     private float[] floatArray;
+    private float floatArrayMaximum = 0.0f;
     public int progress = 0;
     public int endvalue = 0;
 
@@ -702,6 +735,11 @@ public class AudioProcessingJob : ThreadedAudioJob
     public float[] getArray()
     {
         return floatArray;
+    }
+
+    public float getMaximum()
+    {
+        return floatArrayMaximum;
     }
 
     protected override void ThreadFunction()
@@ -730,7 +768,7 @@ public class AudioProcessingJob : ThreadedAudioJob
         endvalue = byteArray.Length / 2;
         floatArray = new float[byteArray.Length / 2 + 1];
         int i;
-        short max = 0;
+        floatArrayMaximum = 0.0f;
         for (i = 0; i < byteArray.Length; i = i + 2)
         {
             //1 short = 2 bytes = 16 bit & in little endian
@@ -747,10 +785,11 @@ public class AudioProcessingJob : ThreadedAudioJob
             }
 
             short valueS = BitConverter.ToInt16(bytebuffer, 0);
-            if (valueS > max) max = valueS;
-
+            
             //translate to -1.0~1.0f
             float valueF = ((float)valueS) / 32768.0f;
+            if (valueF > floatArrayMaximum)
+                floatArrayMaximum = valueF;
             floatArray[i / 2] = valueF;
             if (i % 100000 == 0) progress = i/2;
         }
