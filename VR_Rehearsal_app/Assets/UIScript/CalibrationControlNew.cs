@@ -27,6 +27,9 @@ public class CalibrationControlNew : MonoBehaviour {
     public GameObject instructionPanel;
     public GameObject xButon;
     public GameObject questiontext;
+    public GameObject questionButton;
+    public GameObject localview;
+    public GameObject customeView;
 
     [Header("Change States")]
     public GameObject TestMicrophoneGroup;
@@ -169,10 +172,13 @@ public class CalibrationControlNew : MonoBehaviour {
     }
 
     // Update is called once per frame
-	void Update () {
-	    if (state == 0)
+    void Update()
+    {
+        if (state == 0)
         {
-            
+            xButon.SetActive(true);
+            questiontext.SetActive(true);
+            questionButton.SetActive(true);
 #if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
 
@@ -191,6 +197,10 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 1)
         {
+            instructionPanel.SetActive(false);
+            questionButton.SetActive(false);
+            //xButon.SetActive(false);
+            //questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
@@ -200,13 +210,31 @@ public class CalibrationControlNew : MonoBehaviour {
 
         if (state == 2)
         {
+            instructionPanel.SetActive(false);
+            questionButton.SetActive(false);
+            //xButon.SetActive(false);
+            // questiontext.SetActive(false);
             if (isButtonClicked == true)
             {
                 IncreaseTimer();
 
             }
         }
-	}
+
+        if (Input.GetKey(KeyCode.Escape))
+        {    
+            if (LocalCaseView.isCustomizeButtonClicked)
+            {
+                this.gameObject.transform.parent.gameObject.SetActive(false);
+                localview.SetActive(true);
+            }
+            else if (LocalCaseView.isLocalCaseDone)
+            {
+                this.gameObject.transform.parent.gameObject.SetActive(false);
+                localview.SetActive(true);
+            }
+        }  
+    }
 
     public void OnQuestionButtonClick()
     {

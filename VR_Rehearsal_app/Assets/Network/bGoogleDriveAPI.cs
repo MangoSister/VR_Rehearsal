@@ -166,10 +166,11 @@ public class bGoogleDriveAPI : MonoBehaviour {
 				removedLastWhiteSpace += _selectedFolderName [i];
 			}*/
 
-			bool res = _filesDictionary.ContainsKey (_selectedFolderName);
+			//bool res = _filesDictionary.ContainsKey (_selectedFolderName);
 			if (_filesDictionary != null &&_filesDictionary.ContainsKey(_selectedFolderName)) {
 				id = _filesDictionary [_selectedFolderName].ID;
 			}
+
 			recentFolderName = _selectedFolderName;
 
 			bool isDuplicated = false;
@@ -185,6 +186,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 
 		}else{
+			
 			recentFolderID = id;
 			recentFolderName = _selectedFolderName;
 			//parentFolderID = "";
@@ -226,11 +228,17 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		}));
 	}
 
-    public string GetRecentPath()
-    {
+    public string GetRecentPath(){
 		if (recentFolderID == "") 
-			return "";
-		else
+			recentFolderName = "";
+		else {
+			foreach(KeyValuePair<string,GoogleDrive.File> file in _filesDictionary){
+				if(file.Value.ID == recentFolderID){
+					recentFolderName = file.Key;
+				}
+			}
+		}
+
         return recentFolderName;
     }
 
@@ -302,9 +310,12 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			if (file.Value.MimeType == "application/vnd.google-apps.folder") {
                 jsonStr += "{\n \".tag\":\"folder\",\n    \"name\":\"" + file.Key + "\",\n },\n ";
 			} else {
-                jsonStr += "{\n \".tag\":\"file\",\n    \"name\":\"" + file.Key + "\",\n },\n ";
+				jsonStr += "{\n \".tag\":\"file\",\n  \"name\":\"" + file.Key + "\",\n  \"size\":\"" + file.Value.FileSize + "\",\n },\n ";
             }
+
+
 		}
+	
 
 		jsonStr += " ],\n }";
 		return jsonStr;
@@ -352,10 +363,13 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		_isFileDownloadDone = false;
 		_isSingleFileDownloadDone = false;
 
+
+
 		string targetId = "";
 		if (loadFolderName != "") {
 			if (_filesDictionary != null &&_filesDictionary.ContainsKey(loadFolderName)) {
 				targetId = _filesDictionary [loadFolderName].ID;
+
 			}
 		}
 			

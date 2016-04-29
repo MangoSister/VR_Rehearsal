@@ -63,6 +63,8 @@ public class NavigationView : MonoBehaviour {
 	private int _timer;
 	private string _extentionFormat;
 
+	AndroidJavaObject _currentActivity;
+
 	//Authentication Check
 	AuthCheck _authCheck = AuthCheck.failed;
 	int _currCloudType = 0;
@@ -78,6 +80,11 @@ public class NavigationView : MonoBehaviour {
     public bool letsdefault;
 	NavigationStatus _NaviStatus= NavigationStatus.NotProcessing;
 
+	//recent Json List
+	JSONNode _recentParseResult;
+
+    //MemoryCheck
+    public GameObject warningMemoryPanel;
 
     void Start() {
         Screen.orientation = ScreenOrientation.Portrait;
@@ -85,7 +92,7 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
 
         letsdefault = false;
         originalRect = contentRect.offsetMin.y;
@@ -95,7 +102,14 @@ public class NavigationView : MonoBehaviour {
         _bType = bType;
 		_NaviStatus = NavigationStatus.NotProcessing;
 		ResetIcons ();
-	
+
+		#if UNITY_EDITOR
+
+		
+		#elif UNITY_ANDROID
+		AndroidJavaClass unity = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+		_currentActivity = unity.GetStatic<AndroidJavaObject> ("currentActivity");
+		#endif
     }
 	//Reset icons to be default mode
 	void ResetIcons(){
@@ -307,6 +321,7 @@ public class NavigationView : MonoBehaviour {
     {
         
         JSONNode parseResult = JSON.Parse(fileList);
+		_recentParseResult = parseResult;
         GridLayoutGroup gLayout = canvasScroll.GetComponent<GridLayoutGroup>();
         float cellSize = gLayout.cellSize.y;
         float spacing = gLayout.spacing.y;
@@ -426,57 +441,108 @@ public class NavigationView : MonoBehaviour {
         }
     }
 
+	public void DownloadButtonClick_Pre(){
+
+
+		customView.GetComponent<CustomizeView>().DefaultValueSetting();
+			
+		if (!_selectedButton && !(_selectedButton.GetComponent<ButtonType>().buttonType == "folder") && !(_NaviStatus == NavigationStatus.Processing) )
+			return;
+			
+		StartLoading ();
+		string str = _userDrive.GetRecentPath();
+		_NaviStatus = NavigationStatus.Processing;
+			
+	
+				
+		JSONNode parseResult = _recentParseResult;
+
+		long totalFileSize = 0;
+		for (int index = 0; index < parseResult["entries"].Count; index++){
+			if (parseResult["entries"][index][".tag"].Value == "folder") {
+				continue;
+	
+			}else{
+				string _extentionFormat = GetFileExtentionFormat( parseResult["entries"][index]["name"].Value);
+				
+				if (_extentionFormat == "jpg" || _extentionFormat == "JPG" || _extentionFormat == "png" || _extentionFormat == "PNG" || _extentionFormat == "Jpg" || _extentionFormat == "Png")
+				{
+					//Debug.Log(parseResult["entries"][index]["size"].Value);
+					totalFileSize += Convert.ToInt64(parseResult["entries"][index]["size"].Value);
+				}
+
+			}
+		}
+
+		FinishLoading();
+#if UNITY_EDITOR
+		Debug.Log("Total File Size:" + totalFileSize);
+		DownloadButtonClicked ();
+#elif UNITY_ANDROID
+		
+		long currentAvailableMemorySize = _currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
+		Debug.Log("Available Memory:" + currentAvailableMemorySize);
+
+		if(totalFileSize > currentAvailableMemorySize){
+			/* ##Exceed File Memory for saving slides*/
+			Debug.Log("File Exceed");
+			ShowExceedMemory();
+
+		}else{
+			DownloadButtonClicked ();
+		}
+#endif
+
+
+
+    }
+
     public void DownloadButtonClicked()
     {
-
-        customView.GetComponent<CustomizeView>().DefaultValueSetting();
+        //customView.GetComponent<CustomizeView>().DefaultValueSetting();
 
         try
         {
-            if (_selectedButton)
-            {
-                if (_selectedButton.GetComponent<ButtonType>().buttonType == "folder")
-                {
-                    if (_NaviStatus == NavigationStatus.Processing)
-                        return;
+            string str = _userDrive.GetRecentPath();
 
-                    ShowLoadingPanel();
-                    string str = _userDrive.GetRecentPath();
+            _pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty", 30, 5);
+            _setManager.BShowcaseMgr.EditShowcase_path(_pptID, (Application.persistentDataPath + "/" + _pptID));
+            customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
 
-                    _pptID = _setManager.BShowcaseMgr.AddShowcase("_empty", 0, "/_empty", 30, 5);
-                    _setManager.BShowcaseMgr.EditShowcase_path(_pptID, (Application.persistentDataPath + "/" + _pptID));
-                    customView.GetComponent<CustomizeView>().SetPPTID(_pptID);
-
-                    _NaviStatus = NavigationStatus.Processing;
+			bool isProgressbarStart = false; 
                     _userDrive.DonwloadAllFilesInFolder(str, Application.persistentDataPath + "/" + _pptID,
                         delegate ()
                         {   /* completed Callback */
-#if UNITY_EDITOR
+							#if UNITY_EDITOR
                             Debug.Log("fileDownLoad Complete");
-#endif
+							#endif
                             _userDrive.JobDone();
                             _NaviStatus = NavigationStatus.NotProcessing;
                             StartCoroutine("CompleteDownloading");
                         }, delegate (int totalFileNum, int completedFileNum) /* process Callback */
                         {
-                            progressCircle.GetComponent<ProgressBar>().StartProgress(completedFileNum, totalFileNum);
+							ProgressBar progressBar =  progressCircle.GetComponent<ProgressBar>();
+							
+							if(completedFileNum == 0 && isProgressbarStart == false){
+								isProgressbarStart = true;
+								ShowLoadingPanel();
+								progressBar.ResetProgress();	
+							}
+							progressBar.StartProgress(completedFileNum, totalFileNum);
                         }, delegate ()
                         {/* Cancel Callback */
-#if UNITY_EDITOR
+							#if UNITY_EDITOR
                             Debug.Log("fileDownLoad Canceled");
-#endif
+							#endif
                             _setManager.BShowcaseMgr.DeleteShowcase(_pptID);
-
+							
                             _userDrive.JobDone();
                             _NaviStatus = NavigationStatus.NotProcessing;
                             loadingView.SetActive(false);
                         });
-                }
-                else
-                {
-                    Debug.Log("you can;t download");
-                }
-            }
+                
+                
+            
         }
         catch (Exception e)
         {
@@ -484,7 +550,6 @@ public class NavigationView : MonoBehaviour {
             _NaviStatus = NavigationStatus.NotProcessing;
             Debug.Log(e.ToString());
         }
-
     }
    
 
@@ -556,5 +621,14 @@ public class NavigationView : MonoBehaviour {
 		}
 
 	}
+
+	void ShowExceedMemory(){
+        warningMemoryPanel.SetActive(true);
+	}
+    public void MemoryWarningOkButtonClick()
+    {
+        warningMemoryPanel.SetActive(false);
+        _NaviStatus = NavigationStatus.NotProcessing;
+    }
 
 }
