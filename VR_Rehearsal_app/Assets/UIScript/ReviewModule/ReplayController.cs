@@ -447,15 +447,6 @@ public class ReplayController : MonoBehaviour {
         //UnityEngine.Debug.Log(slideStartTime + " <- " + nowTime + " belongs to " + frameStartTime + "-" + frameEndTime + "? --> " + slideEndTime);
     }
 
-    private void Awake()
-    {
-        Screen.orientation = ScreenOrientation.Portrait;
-        Screen.autorotateToLandscapeLeft = false;
-        Screen.autorotateToLandscapeRight = false;
-        Screen.autorotateToPortrait = false;
-        Screen.autorotateToPortraitUpsideDown = false;
-    }
-
 	// Use this for initialization
 	void Start () {
         Debug.Log("Enter Eval Scene");
