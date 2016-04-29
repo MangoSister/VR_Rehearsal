@@ -483,7 +483,7 @@ public class NavigationView : MonoBehaviour {
 		long currentAvailableMemorySize = _currentActivity.CallStatic<long> ("GetAvailableMemory", Application.persistentDataPath);
 		Debug.Log("Available Memory:" + currentAvailableMemorySize);
 
-		if(totalFileSize > currentAvailableMemorySize * 0.0000001*8 *485){
+		if(totalFileSize > currentAvailableMemorySize){
 			/* ##Exceed File Memory for saving slides*/
 			Debug.Log("File Exceed");
 			ShowExceedMemory();
