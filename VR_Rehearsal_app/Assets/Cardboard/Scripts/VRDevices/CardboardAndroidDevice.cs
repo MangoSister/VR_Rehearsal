@@ -56,27 +56,27 @@ public class CardboardAndroidDevice : BaseCardboardDevice {
   }
 
   public override void SetUILayerEnabled(bool enabled) {
-    CallObjectMethod(activityListener, "setUILayerEnabled", enabled);
+    //CallObjectMethod(activityListener, "setUILayerEnabled", enabled);
   }
 
   public override void SetVRModeEnabled(bool enabled) {
-    CallObjectMethod(activityListener, "setVRModeEnabled", enabled);
+   //CallObjectMethod(activityListener, "setVRModeEnabled", enabled);
   }
 
   public override void SetSettingsButtonEnabled(bool enabled) {
-    CallObjectMethod(activityListener, "setSettingsButtonEnabled", enabled);
+    //CallObjectMethod(activityListener, "setSettingsButtonEnabled", enabled);
   }
 
   public override void SetAlignmentMarkerEnabled(bool enabled) {
-    CallObjectMethod(activityListener, "setAlignmentMarkerEnabled", enabled);
+   // CallObjectMethod(activityListener, "setAlignmentMarkerEnabled", enabled);
   }
 
   public override void SetVRBackButtonEnabled(bool enabled) {
-    CallObjectMethod(activityListener, "setVRBackButtonEnabled", enabled);
+    //CallObjectMethod(activityListener, "setVRBackButtonEnabled", enabled);
   }
 
   public override void SetShowVrBackButtonOnlyInVR(bool only) {
-    CallObjectMethod(activityListener, "setShowVrBackButtonOnlyInVR", only);
+   // CallObjectMethod(activityListener, "setShowVrBackButtonOnlyInVR", only);
   }
 
   public override void SetTapIsTrigger(bool enabled) {
@@ -88,7 +88,7 @@ public class CardboardAndroidDevice : BaseCardboardDevice {
   }
 
   public override void ShowSettingsDialog() {
-    CallObjectMethod(activityListener, "launchConfigureActivity");
+    //CallObjectMethod(activityListener, "launchConfigureActivity");
   }
 
   protected override void ProcessEvents() {

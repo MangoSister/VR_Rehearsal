@@ -3,6 +3,7 @@ package com.example.byunghwl.plugintest;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.content.Context;
@@ -63,21 +64,27 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             boolean isheadphonePlugged = checkHeadsetPlugged();
 
-            if(!isheadphonePlugged){
+            if(!isheadphonePlugged && !bIsVRrecord){
                 audioManager.setSpeakerphoneOn(true);
+            }else{
+                audioManager.setSpeakerphoneOn(false);
             }
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
             Log.i("bhVolumeCtrl", "upperKey Pressed");
+            Log.i("bhVolumeCtrl", "headphonePlugged-" + isheadphonePlugged);
             res = true;
         }else if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_DOWN ){
             AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             boolean isheadphonePlugged = checkHeadsetPlugged();
 
-            if(!isheadphonePlugged){
+            if(!isheadphonePlugged && !bIsVRrecord){
                 audioManager.setSpeakerphoneOn(true);
+            }else{
+                audioManager.setSpeakerphoneOn(false);
             }
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-            Log.i("bhVolumeCtrl", "upperKey Pressed");
+            Log.i("bhVolumeCtrl", "DownrKey Pressed");
+            Log.i("bhVolumeCtrl", "headphonePlugged-" + isheadphonePlugged);
             res = true;
 
         } else{
@@ -95,22 +102,28 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
             AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             boolean isheadphonePlugged = checkHeadsetPlugged();
 
-            if(!isheadphonePlugged){
+            if(!isheadphonePlugged && !bIsVRrecord){
                 audioManager.setSpeakerphoneOn(true);
+            }else{
+                audioManager.setSpeakerphoneOn(false);
             }
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
             Log.i("bhVolumeCtrl", "upperKey Pressed");
+            Log.i("bhVolumeCtrl", "headphonePlugged-" + isheadphonePlugged);
             res = true;
-            
+
         }else if(keyCode ==  android.view.KeyEvent.KEYCODE_VOLUME_DOWN ){
             AudioManager audioManager =  (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             boolean isheadphonePlugged = checkHeadsetPlugged();
 
-            if(!isheadphonePlugged){
+            if(!isheadphonePlugged && !bIsVRrecord){
                 audioManager.setSpeakerphoneOn(true);
+            }else{
+                audioManager.setSpeakerphoneOn(false);
             }
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
             Log.i("bhVolumeCtrl", "upperKey Pressed");
+            Log.i("bhVolumeCtrl", "headphonePlugged-" + isheadphonePlugged);
             res = true;
 
         } else{
@@ -201,13 +214,18 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
 
     /*Microphon Checking*/
     public boolean checkHeadsetPlugged(){
+        /*
         AudioManager am1 = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         boolean res = false;
         if(am1.isWiredHeadsetOn()){
             res = true;
-        }
+        }*/
 
-        return res;
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        Intent iStatus = currContext.registerReceiver(null, iFilter);
+        boolean isConnected = iStatus.getIntExtra("state", 0) == 1;
+
+        return isConnected;
     }
     /*
         Consider Super class order
@@ -524,7 +542,8 @@ public class MainActivity extends com.google.unity.GoogleUnityActivity  {
         VADRecord = new ArrayList();
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.STREAM_MUSIC);
-        //am.setSpeakerphoneOn(false);
+        am.setSpeakerphoneOn(false);
+
         filepath = filename;
         if (filepath.length()==0){
             filepath = Environment.getExternalStorageDirectory().getPath() +"/record.pcm";
