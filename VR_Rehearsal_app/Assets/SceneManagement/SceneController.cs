@@ -154,17 +154,23 @@ public class SceneController : MonoBehaviour
 
     public void ExitEnv()
     {
+        StartCoroutine(ExitEnv_CR());
+    }
+
+    private IEnumerator ExitEnv_CR()
+    {
+        yield return new WaitForSeconds(0.5f);
         GlobalManager.EndPresentation
-            (
-                heatmapTracker.verticalFOVDeg,
-                heatmapTracker.aspect,
-                heatmapTracker.output,
-                heatmapTracker.scn,
-                inputManager.outputTransitionRecord,
-                slidesPlayer._slides,
-                recordWrapper.recordingFilePath,
-                recordWrapper.outputFluencyRecord
-            );
+        (
+            heatmapTracker.verticalFOVDeg,
+            heatmapTracker.aspect,
+            heatmapTracker.output,
+            heatmapTracker.scn,
+            inputManager.outputTransitionRecord,
+            slidesPlayer._slides,
+            recordWrapper.recordingFilePath,
+            recordWrapper.outputFluencyRecord
+        );
     }
 
 #if UNITY_EDITOR

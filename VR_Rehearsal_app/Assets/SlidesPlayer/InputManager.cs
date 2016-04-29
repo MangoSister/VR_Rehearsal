@@ -191,7 +191,7 @@ public class InputManager : MonoBehaviour
             stage = PracticeStage.After;
             _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
             if (OnPracticeEnd != null)
-                OnPracticeEnd(); 
+                OnPracticeEnd();
             exitRenderer.enabled = false;
             yield return new WaitForSeconds(2f);
             _startDetect = false;
@@ -200,6 +200,27 @@ public class InputManager : MonoBehaviour
         {
             _startDetect = false;
             exitRenderer.enabled = false;
+        }
+    }
+
+    public void ForceEndPractice()
+    {
+        StartCoroutine(ForcePracticeEnd_CR());
+    }
+
+    private IEnumerator ForcePracticeEnd_CR()
+    {
+        if (stage == PracticeStage.Practicing)
+        {
+            _startDetect = true;
+            stage = PracticeStage.After;
+            _transitionRecord.Add(new KeyValuePair<float, int>(Time.time - PresentationData.in_EnterTime, player.CurrIdx));
+            if (OnPracticeEnd != null)
+                OnPracticeEnd();
+            exitRenderer.enabled = false;
+
+            yield return new WaitForSeconds(2f);
+            _startDetect = false;
         }
     }
 }

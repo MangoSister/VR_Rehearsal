@@ -92,7 +92,7 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
 
         letsdefault = false;
         originalRect = contentRect.offsetMin.y;

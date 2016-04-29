@@ -446,9 +446,10 @@ public class ReplayController : MonoBehaviour {
         }
         //UnityEngine.Debug.Log(slideStartTime + " <- " + nowTime + " belongs to " + frameStartTime + "-" + frameEndTime + "? --> " + slideEndTime);
     }
-    
+
 	// Use this for initialization
 	void Start () {
+        Debug.Log("Enter Eval Scene");
         //set volume control
         //#if UNITY_ANDROID 		
         //        unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");

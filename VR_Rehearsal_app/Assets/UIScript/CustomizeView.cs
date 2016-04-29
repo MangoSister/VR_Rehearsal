@@ -188,7 +188,8 @@ public class CustomizeView : MonoBehaviour  {
             Debug.Log(customData._mapIdx);
             gameObject.SetActive(false);
         }
-        else
+      
+        else if(customData._expetedTime_min >20)
         {
             StartCoroutine("WarningSign");
         }
