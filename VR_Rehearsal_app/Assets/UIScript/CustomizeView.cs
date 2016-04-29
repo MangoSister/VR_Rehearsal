@@ -189,7 +189,7 @@ public class CustomizeView : MonoBehaviour  {
             gameObject.SetActive(false);
         }
       
-        else if(customData._expetedTime_min >20)
+        else if(customData._expetedTime_min >=20)
         {
             StartCoroutine("WarningSign");
         }
@@ -200,7 +200,7 @@ public class CustomizeView : MonoBehaviour  {
         {
             int _timer = 0;
         }
-        else if(int.Parse(timer.text) > 20)
+        else if(int.Parse(timer.text) >= 20)
         {
             StartCoroutine("WarningSign");
         }
