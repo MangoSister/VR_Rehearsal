@@ -68,6 +68,7 @@ public class ReplayController : MonoBehaviour {
     public GameObject groupOfTransitionMarkers;
     public GameObject groupOfWaves;
     public GameObject prefabPauseArea;
+    public GameObject prefabEndArea;
     public GameObject prefabWave;
     public GameObject prefabTransitionMarker;
     private Sprite[] slidesTexture;
@@ -296,6 +297,18 @@ public class ReplayController : MonoBehaviour {
             int index = 0;
             for (int j = startFrame; j < endFrame; j += interval)
             {
+                if (j > floatArray.Length)
+                {
+                    //draw pause
+                        var go2 = Instantiate(prefabPauseArea) as GameObject;
+                        go2.transform.SetParent(groupOfPauseMarkers.transform);
+
+                        go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+                        go2.GetComponent<RectTransform>().sizeDelta = new Vector2(10, YRange);
+                        go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+                    
+                    break;
+                }
                 //get average amplifier
                 float sum = 0;
                 for (int k = j; k < j + interval; k++)
@@ -516,7 +529,7 @@ public class ReplayController : MonoBehaviour {
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
                 floatArrayMaximum = pcmToUnityClip.getMaximum();
-                UnityEngine.Debug.Log("maximum is " + floatArrayMaximum);
+                //UnityEngine.Debug.Log("maximum is " + floatArrayMaximum);
                 //UnityEngine.Debug.Log(floatArray.Length);
 
                 int interval = 8 * CHART_INTERVAL * FREQUENCY / 763;
