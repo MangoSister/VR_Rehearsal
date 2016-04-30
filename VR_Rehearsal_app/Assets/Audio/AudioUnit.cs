@@ -38,9 +38,9 @@ public class AudioUnit : MonoBehaviour
         if (!isAllocated)
             return false;
 
+        source.loop = false;
         source.Play();
-        if (!source.loop)
-            StartCoroutine(MaintainAndRecycle(source.clip.length, fadeTime));
+        StartCoroutine(MaintainAndRecycle(source.clip.length, fadeTime));
         return true;
     }
 

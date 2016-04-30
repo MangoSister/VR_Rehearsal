@@ -118,6 +118,7 @@ public class SlidesPlayer : MonoBehaviour
                 byte[] data = File.ReadAllBytes(name);
                 _slides.Add(new Texture2D(1, 1));
                 _slides[_slides.Count - 1].LoadImage(data);
+                _slides[_slides.Count - 1].anisoLevel = 4;
             }
             return true;
         }

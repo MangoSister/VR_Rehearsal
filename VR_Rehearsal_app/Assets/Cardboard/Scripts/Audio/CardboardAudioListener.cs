@@ -19,6 +19,7 @@ using System.Collections;
 /// features.
 ///
 /// There should be only one instance of this which is attached to the AudioListener's game object.
+[RequireComponent(typeof(AudioListener))]
 [AddComponentMenu("Cardboard/Audio/CardboardAudioListener")]
 public class CardboardAudioListener : MonoBehaviour {
   /// Global gain in decibels to be applied to the processed output.
@@ -27,19 +28,16 @@ public class CardboardAudioListener : MonoBehaviour {
   /// Global scale of the real world with respect to the Unity environment.
   public float worldScale = 1.0f;
 
-  /// Global layer mask to be used in occlusion detection.
-  public LayerMask occlusionMask = -1;
-
   /// Audio rendering quality of the system.
   [SerializeField]
-  private CardboardAudio.Quality quality = CardboardAudio.Quality.High;
+  private CardboardAudio.Quality quality = CardboardAudio.Quality.Medium;
 
   void Awake () {
     CardboardAudio.Initialize(this, quality);
   }
 
   void OnEnable () {
-    CardboardAudio.UpdateAudioListener(globalGainDb, occlusionMask, worldScale);
+    CardboardAudio.UpdateAudioListener(globalGainDb, worldScale);
   }
 
   void OnDestroy () {
@@ -47,6 +45,10 @@ public class CardboardAudioListener : MonoBehaviour {
   }
 
   void Update () {
-    CardboardAudio.UpdateAudioListener(globalGainDb, occlusionMask, worldScale);
+    CardboardAudio.UpdateAudioListener(globalGainDb, worldScale);
+  }
+
+  void OnAudioFilterRead (float[] data, int channels) {
+    CardboardAudio.ProcessAudioListener(data, data.Length);
   }
 }
