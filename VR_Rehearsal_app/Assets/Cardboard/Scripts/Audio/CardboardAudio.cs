@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !(UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_IOS)
+// Cardboard native audio spatializer plugin is only supported by Unity 5.2+.
+// If you get script compile errors in this file, comment out the line below.
+#define USE_SPATIALIZER_PLUGIN
+#endif
+
 using UnityEngine;
 using System;
 using System.Collections;
@@ -24,9 +30,9 @@ using System.Runtime.InteropServices;
 public static class CardboardAudio {
   /// Audio system rendering quality.
   public enum Quality {
-    Stereo = 0,  /// Stereo-only rendering
-    Low = 1,  /// Low quality binaural rendering (first-order HRTF)
-    High = 2  /// High quality binaural rendering (third-order HRTF)
+    Low = 0,  /// Stereo-only rendering
+    Medium = 1,  /// Binaural rendering (first-order HRTF)
+    High = 2  /// Binaural rendering (third-order HRTF)
   }
 
   /// System sampling rate.
@@ -51,22 +57,29 @@ public static class CardboardAudio {
   /// @note This should only be called from the main Unity thread.
   public static void Initialize (CardboardAudioListener listener, Quality quality) {
     if (!initialized) {
-#if !UNITY_EDITOR && UNITY_ANDROID
-      SetApplicationState();
-#endif
       // Initialize the audio system.
+#if UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+      sampleRate = AudioSettings.outputSampleRate;
+      numChannels = (int)AudioSettings.speakerMode;
+      int numBuffers = -1;
+      AudioSettings.GetDSPBufferSize(out framesPerBuffer, out numBuffers);
+#else
       AudioConfiguration config = AudioSettings.GetConfiguration();
       sampleRate = config.sampleRate;
       numChannels = (int)config.speakerMode;
       framesPerBuffer = config.dspBufferSize;
+#endif
       if (numChannels != (int)AudioSpeakerMode.Stereo) {
         Debug.LogError("Only 'Stereo' speaker mode is supported by Cardboard.");
         return;
       }
       Initialize(quality, sampleRate, numChannels, framesPerBuffer);
       listenerTransform = listener.transform;
-
       initialized = true;
+
+      Debug.Log("Cardboard audio system is initialized (Quality: " + quality + ", Sample Rate: " +
+                sampleRate + ", Channels: " + numChannels + ", Frames Per Buffer: " +
+                framesPerBuffer + ").");
     } else if (listener.transform != listenerTransform) {
       Debug.LogError("Only one CardboardAudioListener component is allowed in the scene.");
       CardboardAudioListener.Destroy(listener);
@@ -83,15 +96,23 @@ public static class CardboardAudio {
       sampleRate = -1;
       numChannels = -1;
       framesPerBuffer = -1;
+
+      Debug.Log("Cardboard audio system is shutdown.");
+    }
+  }
+
+  /// Processes the next |data| buffer of the audio system.
+  /// @note This should only be called from the audio thread.
+  public static void ProcessAudioListener (float[] data, int length) {
+    if (initialized) {
+      ProcessListener(data, length);
     }
   }
 
   /// Updates the audio listener.
   /// @note This should only be called from the main Unity thread.
-  public static void UpdateAudioListener (float globalGainDb, LayerMask occlusionMask,
-                                          float worldScale) {
+  public static void UpdateAudioListener (float globalGainDb, float worldScale) {
     if (initialized) {
-      occlusionMaskValue = occlusionMask.value;
       worldScaleInverse = 1.0f / worldScale;
       float globalGain = ConvertAmplitudeFromDb(globalGainDb);
       Vector3 position = listenerTransform.position;
@@ -122,31 +143,38 @@ public static class CardboardAudio {
     }
   }
 
+#if !USE_SPATIALIZER_PLUGIN
+  /// Processes the next |data| buffer of the audio source with given |id|.
+  /// @note This should only be called from the audio thread.
+  public static void ProcessAudioSource (int id, float[] data, int length) {
+    if (initialized) {
+      ProcessSource(id, length, data, data);
+    }
+  }
+#endif
+
   /// Updates the audio source with given |id| and its properties.
   /// @note This should only be called from the main Unity thread.
-  public static void UpdateAudioSource (int id, Transform transform, bool bypassRoomEffects,
-                                        float gainDb, float spread, AudioRolloffMode rolloffMode,
-                                        float minDistance, float maxDistance, float alpha,
-                                        float sharpness, float occlusion) {
+  public static void UpdateAudioSource (int id, Transform transform, float gainDb,
+                                        AudioRolloffMode rolloffMode, float minDistance,
+                                        float maxDistance, float alpha, float sharpness,
+                                        float occlusion) {
     if (initialized) {
       float gain = ConvertAmplitudeFromDb(gainDb);
       Vector3 position = transform.position;
       Quaternion rotation = transform.rotation;
+      float scale = worldScaleInverse * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y,
+                                                  transform.lossyScale.z);
       ConvertAudioTransformFromUnity(ref position, ref rotation);
-      float spreadRad = Mathf.Deg2Rad * spread;
       // Pass the source properties to the audio system.
-      SetSourceBypassRoomEffects(id, bypassRoomEffects);
       SetSourceDirectivity(id, alpha, sharpness);
       SetSourceGain(id, gain);
       SetSourceOcclusionIntensity(id, occlusion);
       if (rolloffMode != AudioRolloffMode.Custom) {
-        float maxDistanceScaled = worldScaleInverse * maxDistance;
-        float minDistanceScaled = worldScaleInverse * minDistance;
-        SetSourceDistanceAttenuationMethod(id, rolloffMode, minDistanceScaled, maxDistanceScaled);
+        SetSourceDistanceAttenuationMethod(id, rolloffMode, minDistance, maxDistance);
       }
-      SetSourceSpread(id, spreadRad);
       SetSourceTransform(id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z,
-                         rotation.w);
+                         rotation.w, scale);
     }
   }
 
@@ -196,8 +224,8 @@ public static class CardboardAudio {
     if (initialized) {
       Vector3 listenerPosition = listenerTransform.position;
       Vector3 sourceFromListener = sourceTransform.position - listenerPosition;
-      RaycastHit[] hits = Physics.RaycastAll(listenerPosition, sourceFromListener,
-                                             sourceFromListener.magnitude, occlusionMaskValue);
+      RaycastHit[] hits =
+          Physics.RaycastAll(listenerPosition, sourceFromListener, sourceFromListener.magnitude);
       foreach (RaycastHit hit in hits) {
         if (hit.transform != listenerTransform && hit.transform != sourceTransform) {
           occlusion += 1.0f;
@@ -256,6 +284,9 @@ public static class CardboardAudio {
   /// Source occlusion detection rate in seconds.
   public const float occlusionDetectionInterval = 0.2f;
 
+  /// Occlusion interpolation amount approximately per second.
+  public const float occlusionLerpSpeed = 6.0f;
+
   /// Number of surfaces in a room.
   public const int numRoomSurfaces = 6;
 
@@ -278,30 +309,21 @@ public static class CardboardAudio {
   // Listener transform.
   private static Transform listenerTransform = null;
 
-  // Occlusion layer mask.
-  private static int occlusionMaskValue = -1;
-
   // 3D pose instance to be used in transform space conversion.
   private static MutablePose3D pose = new MutablePose3D();
 
   // Inverted world scale.
   private static float worldScaleInverse = 1.0f;
 
-#if !UNITY_EDITOR && UNITY_ANDROID
-  private const string CardboardAudioClass = "com.google.vr.audio.unity.CardboardAudio";
-
-  private static void SetApplicationState() {
-    using (var cardboardAudioClass = BaseAndroidDevice.GetClass(CardboardAudioClass)) {
-      BaseAndroidDevice.CallStaticMethod(cardboardAudioClass, "setUnityApplicationState");
-    }
-  }
-#endif
-
 #if UNITY_IOS
   private const string pluginName = "__Internal";
 #else
   private const string pluginName = "audiopluginvrunity";
 #endif
+
+  // Listener handlers.
+  [DllImport(pluginName)]
+  private static extern void ProcessListener ([In, Out] float[] data, int bufferSize);
 
   [DllImport(pluginName)]
   private static extern void SetListenerGain (float gain);
@@ -317,8 +339,11 @@ public static class CardboardAudio {
   [DllImport(pluginName)]
   private static extern void DestroySource (int sourceId);
 
+#if !USE_SPATIALIZER_PLUGIN
   [DllImport(pluginName)]
-  private static extern void SetSourceBypassRoomEffects (int sourceId, bool bypassRoomEffects);
+  private static extern void ProcessSource (int sourceId, int bufferSize, [In, Out] float[] input,
+                                            [In, Out] float[] output);
+#endif
 
   [DllImport(pluginName)]
   private static extern void SetSourceDirectivity (int sourceId, float alpha, float order);
@@ -336,11 +361,9 @@ public static class CardboardAudio {
   private static extern void SetSourceOcclusionIntensity (int sourceId, float intensity);
 
   [DllImport(pluginName)]
-  private static extern void SetSourceSpread (int sourceId, float spreadRad);
-
-  [DllImport(pluginName)]
   private static extern void SetSourceTransform (int sourceId, float px, float py, float pz,
-                                                 float qx, float qy, float qz, float qw);
+                                                 float qx, float qy, float qz, float qw,
+                                                 float scale);
 
   // Room handlers.
   [DllImport(pluginName)]

@@ -64,8 +64,8 @@ GameObject:
   - 124: {fileID: 12400004}
   - 92: {fileID: 9246874}
   - 81: {fileID: 8100000}
+  - 114: {fileID: 11427708}
   - 114: {fileID: 11400006}
-  - 114: {fileID: 11400008}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -302,7 +302,7 @@ MonoBehaviour:
   screenParallax: 0
   stereoPaddingX: 0
   stereoPaddingY: 0
---- !u!114 &11400008
+--- !u!114 &11427708
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -315,7 +315,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalGainDb: 0
   worldScale: 1
-  quality: 2
+  quality: 1
 --- !u!124 &12400000
 Behaviour:
   m_ObjectHideFlags: 1
