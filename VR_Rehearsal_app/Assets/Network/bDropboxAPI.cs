@@ -203,7 +203,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 				_isGetToken = true;
 
 				if (_token == "Authfailed") {
-					_authen_callback (false);
+					_authen_callback (false,0);
 				} else {
 					bool res = SaveTokenBinaryInLocal();
 					#if UNITY_EDITOR
@@ -211,7 +211,7 @@ public class bDropboxAPI : bhClowdDriveAPI{
 						Debug.LogError("Error: Token Binary saving failed");
 					#endif
 
-					_authen_callback (true);
+					_authen_callback (true,0);
 				}
 			} 
 
