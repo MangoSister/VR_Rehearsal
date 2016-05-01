@@ -503,11 +503,31 @@ public class ReplayController : MonoBehaviour {
         pcmToUnityClip.Start();
         isProcessingAudio = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
+    private void CustomApplicationQuit()
+    {
+#if UNITY_EDITOR
+        Application.Quit();
+#elif UNITY_ANDROID
+         using (AndroidJavaClass javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        {
+            AndroidJavaObject unityActivity = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
+            unityActivity.Call<bool>("moveTaskToBack", true);
+        }
+#endif
+    }
+    // Update is called once per frame
+    void Update () {
         preventTrigger = true;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) && this.gameObject.activeSelf)
+            {
+                Debug.Log("DOne!!");
 
+                CustomApplicationQuit();
+            }
+
+        }
         if (isProcessingAudio == true)
         {
             if (pcmToUnityClip.IsDone == false) //show progress
