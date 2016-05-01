@@ -445,9 +445,11 @@ public class NavigationView : MonoBehaviour {
 
 
 		customView.GetComponent<CustomizeView>().DefaultValueSetting();
-			
+	   
+        /* banned root folder 
 		if (!_selectedButton && !(_selectedButton.GetComponent<ButtonType>().buttonType == "folder") && !(_NaviStatus == NavigationStatus.Processing) )
 			return;
+       */
 			
 		StartLoading ();
 		string str = _userDrive.GetRecentPath();
