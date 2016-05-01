@@ -86,6 +86,8 @@ public class NavigationView : MonoBehaviour {
     //MemoryCheck
     public GameObject warningMemoryPanel;
 
+    // Credential Error
+    public GameObject credentialError;
     void Start() {
         Screen.orientation = ScreenOrientation.Portrait;
         Screen.autorotateToLandscapeLeft = false;
@@ -93,7 +95,7 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
-
+        credentialError.SetActive(false);
         letsdefault = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
@@ -162,14 +164,14 @@ public class NavigationView : MonoBehaviour {
             ButtonListener();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
-        {	
-
-			if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
+        {
+            if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
 				return;
 
 			_NaviStatus = NavigationStatus.Processing;
-			/*navigation back- go to parent paht*/
-			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
+            credentialError.SetActive(false);
+            /*navigation back- go to parent paht*/
+            if (_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
 				
 
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
@@ -236,9 +238,13 @@ public class NavigationView : MonoBehaviour {
             {	
 				if(resCode == 1){
 						Debug.Log("Credential Error");
-				}else{
+                    credentialError.gameObject.SetActive(true);
+                            // close the application and retry again.
+                }
+                else{
+                    credentialError.SetActive(false);
 
-					_userDrive.GetFileListFromPath("/", CreatePanels);
+                    _userDrive.GetFileListFromPath("/", CreatePanels);
 				}
 				_authCheck = AuthCheck.Succeed;
 				_timerForAuth = 0;
