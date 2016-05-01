@@ -96,6 +96,7 @@ public class RotationView : MonoBehaviour {
 
         else if (Input.GetKeyDown(KeyCode.R))
         {
+            Debug.Log("rotate = " + _sizeOfRoom);
             if (CanvasManager.againTrigger)
             {
                 GlobalManager.EnterPresentation();
