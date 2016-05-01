@@ -227,16 +227,21 @@ public class NavigationView : MonoBehaviour {
 		StartLoading ();
 
 		_NaviStatus = NavigationStatus.Processing;
-        _userDrive.StartAuthentication(delegate (bool res)
+		_userDrive.StartAuthentication(delegate (bool res, int resCode)
         {
 			FinishLoading();
 			_NaviStatus = NavigationStatus.NotProcessing;
 
             if (res)
-            {
+            {	
+				if(resCode == 1){
+						Debug.Log("Credential Error");
+				}else{
+
+					_userDrive.GetFileListFromPath("/", CreatePanels);
+				}
 				_authCheck = AuthCheck.Succeed;
 				_timerForAuth = 0;
-                _userDrive.GetFileListFromPath("/", CreatePanels);
 			}else{
 				_authCheck = AuthCheck.failed;
 				Icon_AuthFailed.SetActive(true);

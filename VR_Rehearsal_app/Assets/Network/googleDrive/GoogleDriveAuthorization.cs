@@ -321,20 +321,25 @@ partial class GoogleDrive
 		}
 #endif
 		// Get AppData folder.
-		var getAppData = GetFile("appdata");
+		var getAppData = ListAllFiles();
 		while (getAppData.MoveNext())
 			yield return null;
+
 
 		if (getAppData.Current is AsyncSuccess)
 		{
 			AppData = (getAppData.Current as AsyncSuccess).Result as File;
+			Debug.Log ("googleDrive::Get Files!!1" + getAppData.Current);
+			yield return new Exception(7819, "Invalid credential.");
+			yield break;
 		}
 		else
 		{
-			Debug.LogWarning("Cannot get the AppData folder: " + 
-				getAppData.Current);
+			Debug.LogWarning("Cannot get the folders: " + getAppData.Current);
+			yield return new Exception(7819, "Invalid credential.");
+			yield break;
 		}
-
+				
 		yield return new AsyncSuccess();
 	}
 
