@@ -330,8 +330,7 @@ partial class GoogleDrive
 		{
 			AppData = (getAppData.Current as AsyncSuccess).Result as File;
 			Debug.Log ("googleDrive::Get Files!!1" + getAppData.Current);
-			yield return new Exception(7819, "Invalid credential.");
-			yield break;
+
 		}
 		else
 		{

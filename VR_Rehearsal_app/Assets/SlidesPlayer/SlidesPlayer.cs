@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class SlidesPlayer : MonoBehaviour
 {
@@ -112,8 +113,43 @@ public class SlidesPlayer : MonoBehaviour
             System.Array.Copy(imgNames_jpg, 0, imgNames, imgNames_png.Length, imgNames_jpg.Length);
             System.Array.Copy(imgNames_bmp, 0, imgNames, imgNames_jpg.Length + imgNames_png.Length, imgNames_bmp.Length);
 #endif
-            _slides = new List<Texture2D>();
-            foreach (string name in imgNames)
+           
+			//****slides need a sorting *****-comment by Byunghwan Lee May 2 2016
+
+			//Classification process for sorting pages
+			List<string> fileList_pptFormat = new List<string>();
+			List<string> fileList_unknownFormat = new List<string>();
+
+			for(int i = 0; i < imgNames.Length; ++i){
+				string tempRes = imgNames[i].Replace( path + "\\", "");
+				if (tempRes.Contains ("Slide")) {
+					fileList_pptFormat.Add (imgNames [i]);
+				} else {
+					fileList_unknownFormat.Add (imgNames [i]);
+				}
+			}
+				
+			//when exported Properly by Powerpoint;
+			fileList_pptFormat.Sort( delegate(string x, string y){
+				string result_1 = x.Replace( path + "\\", "");
+				string result_2 = result_1.Replace("Slide", "");
+				string[] result_3 = result_2.Split(new char[] {'.'});
+				int x_index = System.Convert.ToInt32(result_3[0]);
+
+				result_1 = y.Replace( path+ "\\", "");
+				result_2 = result_1.Replace("Slide", "");
+				result_3 = result_2.Split(new char[] {'.'});
+				int y_index = System.Convert.ToInt32(result_3[0]);
+
+				return x_index.CompareTo(y_index);
+			});
+
+			//Merging pptFormat slides and unknown Format
+			fileList_pptFormat.AddRange (fileList_unknownFormat);
+		
+			_slides = new List<Texture2D>();
+
+			foreach (string name in fileList_pptFormat)
             {
                 byte[] data = File.ReadAllBytes(name);
                 _slides.Add(new Texture2D(1, 1));
