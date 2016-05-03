@@ -115,6 +115,7 @@ public class CanvasManager : MonoBehaviour {
         ShowCustomViewFromLocalCaseView();
         ShowCustomViewToLocalView();
         DirectDemoButtonClick();
+        CredentialError();
 
 
     }
@@ -147,6 +148,17 @@ public void ShowLocalFromReview()
             fileTranser.gameObject.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
             localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked = false;
+        }
+    }
+    public void CredentialError()
+    {
+        if (NavigationView.isCredentialError)
+        {
+            navigation.gameObject.SetActive(false);
+            FileTransferView.isFileTransferViewDone = false;
+            fileTranser.gameObject.SetActive(true);
+            NavigationView.isCredentialError = false;
+
         }
     }
     public void ShowNavigationView()

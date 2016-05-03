@@ -88,6 +88,8 @@ public class NavigationView : MonoBehaviour {
 
     // Credential Error
     public GameObject credentialError;
+    bool credError;
+    public static bool isCredentialError;
     void Start() {
         Screen.orientation = ScreenOrientation.Portrait;
         Screen.autorotateToLandscapeLeft = false;
@@ -96,7 +98,9 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToPortraitUpsideDown = false;
         ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
         credentialError.SetActive(false);
+        credError = false;
         letsdefault = false;
+        isCredentialError = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -141,6 +145,7 @@ public class NavigationView : MonoBehaviour {
 		_isCopy = false;
 
 		credentialError.SetActive(false);
+        credError = false;
 		FinishLoading ();
 	}
 	
@@ -166,15 +171,21 @@ public class NavigationView : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            Debug.Log(credError);
             if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
 				return;
+            Debug.Log("1");
+            _NaviStatus = NavigationStatus.Processing;
+            //credentialError.SetActive(false);
 
-			_NaviStatus = NavigationStatus.Processing;
-            credentialError.SetActive(false);
             /*navigation back- go to parent paht*/
-            if (_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
-				
+            if (credError)
+            {
+                credentialError.SetActive(false);
+                isCredentialError = true;
 
+            }
+            else if (_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
                     _isReseting = true;
@@ -187,11 +198,10 @@ public class NavigationView : MonoBehaviour {
                     _userDrive.JobDone();
                     CreatePanels(resJson);
                     _isReseting = false;
-
-
                 });
             }
-        }
+            
+       }
     }
     public string RecentPath()
     {
@@ -238,8 +248,9 @@ public class NavigationView : MonoBehaviour {
             if (res)
             {	
 				if(resCode == 1){
-						Debug.Log("Credential Error");
+					Debug.Log("Credential Error");
                     credentialError.gameObject.SetActive(true);
+                    credError = true;
                             // close the application and retry again.
                 }
                 else{

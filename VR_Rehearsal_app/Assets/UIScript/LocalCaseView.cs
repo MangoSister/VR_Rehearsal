@@ -80,7 +80,7 @@ public class LocalCaseView : MonoBehaviour {
 
         }
 
-        if (storedShowCase.Count <2)
+        if (storedShowCase.Count <1)
         {
             demoButton.SetActive(true);
         }
