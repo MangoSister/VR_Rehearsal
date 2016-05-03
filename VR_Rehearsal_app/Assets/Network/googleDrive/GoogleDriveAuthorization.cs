@@ -322,8 +322,15 @@ partial class GoogleDrive
 #endif
 
 		 
+
+#if !UNITY_EDITOR && UNITY_ANDROID
+	
+
+#endif
+
 		Debug.Log ("Before checking::" + AccessToken);
 		Debug.Log (UserAccount);
+
 		// Get AppData folder.
 		var getAppData = ListAllFiles();
 		while (getAppData.MoveNext())
