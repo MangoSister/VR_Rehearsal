@@ -140,6 +140,7 @@ public class NavigationView : MonoBehaviour {
 		_isReseting = false;
 		_isCopy = false;
 
+		credentialError.SetActive(false);
 		FinishLoading ();
 	}
 	
@@ -149,7 +150,7 @@ public class NavigationView : MonoBehaviour {
 		if(_authCheck == AuthCheck.failed){
 			_timerForAuth += Time.deltaTime;
 
-			if (_timerForAuth > 15.0f) {
+			if (_timerForAuth > 20.0f) {
 				Icon_AuthFailed.SetActive (true);
 			}
 		}
@@ -242,8 +243,6 @@ public class NavigationView : MonoBehaviour {
                             // close the application and retry again.
                 }
                 else{
-                    credentialError.SetActive(false);
-
                     _userDrive.GetFileListFromPath("/", CreatePanels);
 				}
 				_authCheck = AuthCheck.Succeed;

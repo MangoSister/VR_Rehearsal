@@ -120,27 +120,47 @@ public class SlidesPlayer : MonoBehaviour
 			List<string> fileList_pptFormat = new List<string>();
 			List<string> fileList_unknownFormat = new List<string>();
 
+#if !UNITY_EDITOR && UNITY_ANDROID
+			string processPathStr= path + "/";
+#else
+			string processPathStr= path + "\\";
+#endif
+
 			for(int i = 0; i < imgNames.Length; ++i){
-				string tempRes = imgNames[i].Replace( path + "\\", "");
+				string tempRes = imgNames[i].Replace( processPathStr, "");
 				if (tempRes.Contains ("Slide")) {
 					fileList_pptFormat.Add (imgNames [i]);
 				} else {
 					fileList_unknownFormat.Add (imgNames [i]);
 				}
 			}
-				
+		
 			//when exported Properly by Powerpoint;
 			fileList_pptFormat.Sort( delegate(string x, string y){
-				string result_1 = x.Replace( path + "\\", "");
-				string result_2 = result_1.Replace("Slide", "");
-				string[] result_3 = result_2.Split(new char[] {'.'});
-				int x_index = System.Convert.ToInt32(result_3[0]);
+				string result_1;
+				string result_2;
+				string[] result_3;
+				int x_index = 0;
+				int y_index = 0;
 
-				result_1 = y.Replace( path+ "\\", "");
-				result_2 = result_1.Replace("Slide", "");
-				result_3 = result_2.Split(new char[] {'.'});
-				int y_index = System.Convert.ToInt32(result_3[0]);
+				try{
+					 result_1 = x.Replace(processPathStr, "");
+					 result_2 = result_1.Replace("Slide", "");
+					 result_3 = result_2.Split(new char[] {'.'});
+					 x_index = System.Convert.ToInt32(result_3[0]);
+				}catch(System.FormatException e){
+					Debug.Log("format Exception");
+				}
 
+				try{
+					result_1 = y.Replace( processPathStr, "");
+					result_2 = result_1.Replace("Slide", "");
+					result_3 = result_2.Split(new char[] {'.'});
+					y_index = System.Convert.ToInt32(result_3[0]);
+				}catch(System.FormatException e){
+					Debug.Log("format Exception");
+				}
+					
 				return x_index.CompareTo(y_index);
 			});
 

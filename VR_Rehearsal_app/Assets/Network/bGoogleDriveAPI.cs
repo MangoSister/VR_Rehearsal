@@ -296,10 +296,8 @@ public class bGoogleDriveAPI : MonoBehaviour {
 			string res = temp.ToString();
 		
 			if(res == "GoogleDrive+Exception: Invalid credential."){
-				StartAuthentication_internal (callback, ++trialNumber);
-				if (trialNumber > 5) {
-					callback (true,1);
-				}
+					callback (true, 1);
+				
 			}else{
 				callback (false,0);
 			}
