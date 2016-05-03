@@ -254,6 +254,7 @@ public class NavigationView : MonoBehaviour {
                             // close the application and retry again.
                 }
                 else{
+                    credentialError.gameObject.SetActive(false);
                     _userDrive.GetFileListFromPath("/", CreatePanels);
 				}
 				_authCheck = AuthCheck.Succeed;
