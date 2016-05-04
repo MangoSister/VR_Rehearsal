@@ -59,7 +59,8 @@ public class CustomizeView : MonoBehaviour  {
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.Hidden;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
         warningText.SetActive(false);
         GameObject.Find("CanvasGroup").GetComponent<CanvasManager>().SetisFromCustom(false);
         isCustomizeDone = false;
@@ -168,6 +169,7 @@ public class CustomizeView : MonoBehaviour  {
     }
     public void CustomCompleteClicked()
     {
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
         if (customData._expetedTime_min <= 20 && enoughMemory == true)
         {
             _setManager.BShowcaseMgr.EditShowcase(_pptID, customData._showcaseName, customData._mapIdx, Application.persistentDataPath + "/" + _pptID, customData._percentageOfAudience, customData._expetedTime_min, customData._isEchoEffect);

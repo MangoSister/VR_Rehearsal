@@ -96,7 +96,10 @@ public class NavigationView : MonoBehaviour {
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
+        // ApplicationChrome.statusBarState = ApplicationChrome.States.TranslucentOverContent;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
+
         credentialError.SetActive(false);
         credError = false;
         letsdefault = false;
@@ -350,7 +353,7 @@ public class NavigationView : MonoBehaviour {
         float totalSizeofRect = (cellSize) * parseResult["entries"].Count;
 
 		CheckFileList (parseResult);
-
+       
         //  contentRect.offsetMax = new Vector2(contentRect.offsetMin.x, 0.0f);
         if (parseResult["entries"].Count < 7)
         {

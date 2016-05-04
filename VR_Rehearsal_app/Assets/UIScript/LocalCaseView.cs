@@ -33,6 +33,8 @@ public class LocalCaseView : MonoBehaviour {
 
     void Start () {
         Screen.orientation = ScreenOrientation.Portrait;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
         Screen.autorotateToLandscapeLeft = false;
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
@@ -126,13 +128,13 @@ public class LocalCaseView : MonoBehaviour {
         {
             if (caseDatas.Length < 7)
             {
-                gLayout_showCase.padding.top = -580;
+                gLayout_showCase.padding.top = -560;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
                 showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, originalRect);
             }
             else
             {
-                gLayout_showCase.padding.top = -68;
+                gLayout_showCase.padding.top = -72;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
                 showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, finalRect);
             }

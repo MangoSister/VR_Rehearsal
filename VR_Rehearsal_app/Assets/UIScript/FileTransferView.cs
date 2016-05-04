@@ -18,7 +18,8 @@ public class FileTransferView : MonoBehaviour {
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
         GetComponent<RectTransform>().SetAsLastSibling();
         isFileTransferViewDone = false;
         transferNumber = 0;
