@@ -21,11 +21,14 @@ public class ReplayController : MonoBehaviour {
     private float floatArrayMaximum = 0.0f;
     private int arrayLength = 0;
     private const int CHART_INTERVAL = 30; //30s
-    private float chartStartTime = -CHART_INTERVAL - 1.0f; //for the wave pattern to display at the beginning
-    private float slideStartTime = -1.0f, slideEndTime = -1.0f; //for the slide thumbnails to update at the beginning
-    private float frameStartTime = -1.0f, frameEndTime = -1.0f; //for the slide thumbnails to update at the beginning
+    //private float chartStartTime = -CHART_INTERVAL - 1.0f; //for the wave pattern to display at the beginning
+    private float slideStartTime = -1.0f, slideEndTime = -1.0f; //for the slide thumbnails group to update at the beginning
+    private float frameStartTime = -1.0f, frameEndTime = -1.0f; //for the current slide thumbnails to update at the beginning
+    private int nowGroupNo = 0;
     private int startSlideIndex = 0;
     private float lastAudioSourceTime = -1f;
+    private GameObject[] waves;
+
 
     //for volume control
     private AndroidJavaClass unity;
@@ -48,12 +51,6 @@ public class ReplayController : MonoBehaviour {
     public Text softTime;
     public Text endTime;
 
-    //public bool isTransitionDisplay = true;
-    //public bool isPauseDisplay = true;
-    //public GameObject groupTransitionMarker;
-    //public GameObject prefabTransitionMarker;
-    //public GameObject groupPauseMarker;
-    //public GameObject prefabPauseMarker;
     [Header("For Debugging")]
     public Text testText;
     [Header("Loading")]
@@ -85,7 +82,10 @@ public class ReplayController : MonoBehaviour {
 
     [Header("Slide Thumbnails")]
     public GameObject[] slideThumbnails;
-    private float[] startTimeForThumbnailGroup; 
+    private float[] startTimeForThumbnailGroup;
+    public GameObject PageDotGroup;
+    public GameObject pfbPageDot;
+    public Image currentSlide;
 
     enum PLAY_STATUS
     {
@@ -148,18 +148,22 @@ public class ReplayController : MonoBehaviour {
         string timestring = "";
 
         //get minute
-        if (time >= 600.0f)
-            timestring = (int)(time / 60.0f) + ":" ;
-        else if (time > 60.0f)
-            timestring = "0" + (int)(time / 60.0f) + ":";
-        else
-            timestring = "00:";
+        //if (time >= 600.0f)
+            //timestring = (int)(time / 60.0f) + ":" ;
+        //    timestring = (int)(time / 60.0f) + "\'";
+        //else if (time > 60.0f)
+        if (time > 60.0f)
+            //timestring = "0" + (int)(time / 60.0f) + ":";
+            //timestring = "0" + (int)(time / 60.0f) + "\'";
+            timestring = (int)(time / 60.0f) + "\'";
+        //else
+        //    timestring = "00:";
 
         //get second
-        if (((int)(time) % 60) >= 10)
-            timestring += ((int)(time) % 60).ToString();// + "." + (int)((time - (int)(time)) * 100.0f);
-        else
-            timestring += "0" + ((int)(time) % 60);// + "." + (int)((time - (int)(time)) * 100.0f);
+        //if (((int)(time) % 60) >= 10)
+            timestring += ((int)(time) % 60).ToString()+"\"";// + "." + (int)((time - (int)(time)) * 100.0f);
+        //else
+        //    timestring += "0" + ((int)(time) % 60) + "\"";// + "." + (int)((time - (int)(time)) * 100.0f);
 
         return timestring;
     }
@@ -222,135 +226,83 @@ public class ReplayController : MonoBehaviour {
     {
         if (isProcessingAudio == true) return;
         
-        //const for now. need detection algorithm
-        int XTop = -132, XBottom = 620;
-        int YMid = 7, YRange = 74;        
-
-        //update the position marker
-        //get the interval first
-        //use this variable to help smooth movement of current time marker
         float nowTime = playbackSlider.value;
-        float startTime = ((int)(nowTime / (float)(CHART_INTERVAL))) * CHART_INTERVAL;
-        float offset = nowTime - startTime;
         
-        currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(XTop+offset*(XBottom-XTop)/CHART_INTERVAL, YMid, 0f);
-        
-        if ((nowTime < chartStartTime) || (nowTime > chartStartTime + CHART_INTERVAL)) //need to update waves & pause markers
-        {
-            //UnityEngine.Debug.Log("need to update wave and pause");
-            chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
+        ////check if need to update slide thumbnails
+        //if ((nowTime < slideStartTime) || (nowTime >= slideEndTime)) //need to update waves & pause markers
+        //{
+        //    //UnityEngine.Debug.Log("need to update wave and pause");
+        //    chartStartTime = (int)(startTime / CHART_INTERVAL) * CHART_INTERVAL;
 
-            //update pauses
-            var currentMarkers = new List<GameObject>();
-            foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
-            currentMarkers.ForEach(marker => Destroy(marker));
-            
-            ////find new pauses
-            //for (int i = 0; i < out_PauseRecord.Count; i++)
-            //{
-            //    if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f < startTime)
-            //        continue;
+        //    //update pauses
+        //    var currentMarkers = new List<GameObject>();
+        //    foreach (Transform marker in groupOfPauseMarkers.transform) currentMarkers.Add(marker.gameObject);
+        //    currentMarkers.ForEach(marker => Destroy(marker));
 
-            //    if (out_PauseRecord[i].Key >= startTime + CHART_INTERVAL)
-            //        break;
+        //    //update wave shapes
+        //    var currentWaves = new List<GameObject>();
+        //    foreach (Transform marker in groupOfWaves.transform) currentWaves.Add(marker.gameObject);
+        //    foreach (Transform marker in groupOfPauseMarkers.transform) currentWaves.Add(marker.gameObject);
+        //    currentWaves.ForEach(marker => Destroy(marker));
 
-            //    //UnityEngine.Debug.Log("pause is picked: " + out_PauseRecord[i].Key + " (" + (out_PauseRecord[i].Value / 1000.0f) + "s)");
+        //    int startFrame = (int)(startTime * FREQUENCY);
+        //    int endFrame = startFrame + CHART_INTERVAL * FREQUENCY;
+        //    int interval = 8 * CHART_INTERVAL * FREQUENCY / (XBottom - XTop);
 
-            //    float startX, endX;
+        //    int index = 0;
+        //    for (int j = startFrame; j < endFrame; j += interval)
+        //    {
+        //        if (j > floatArray.Length)
+        //        {
+        //            //draw pause
+        //                var go2 = Instantiate(prefabPauseArea) as GameObject;
+        //                go2.transform.SetParent(groupOfPauseMarkers.transform);
 
-            //    if (out_PauseRecord[i].Key <= startTime) //start=0
-            //        startX = XTop;
-            //    else
-            //        startX = (out_PauseRecord[i].Key - startTime) * (XBottom - XTop) / CHART_INTERVAL + XTop;
-
-            //    if (out_PauseRecord[i].Key + out_PauseRecord[i].Value / 1000.0f >= startTime + CHART_INTERVAL) //end=end
-            //        endX = XBottom;
-            //    else
-            //    {
-            //        if (out_PauseRecord[i].Key <= startTime)
-            //        {
-            //            endX = ((out_PauseRecord[i].Value / 1000.0f) - (startTime - out_PauseRecord[i].Key)) * (XBottom - XTop) / CHART_INTERVAL + startX;
-            //        }
-            //        else
-            //            endX = out_PauseRecord[i].Value * (XBottom - XTop) / (CHART_INTERVAL * 1000.0f) + startX;
-            //    }
-
-            //    //instantiate a pause marker
-            //    var go = Instantiate(prefabPauseArea) as GameObject;
-            //    go.transform.SetParent(groupOfPauseMarkers.transform);
-
-            //    go.GetComponent<RectTransform>().localPosition = new Vector3(startX, YMid, 0f);
-            //    go.GetComponent<RectTransform>().sizeDelta = new Vector2(endX - startX, YRange);
-            //    go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-            //}
-
-            //update wave shapes
-            var currentWaves = new List<GameObject>();
-            foreach (Transform marker in groupOfWaves.transform) currentWaves.Add(marker.gameObject);
-            foreach (Transform marker in groupOfPauseMarkers.transform) currentWaves.Add(marker.gameObject);
-            currentWaves.ForEach(marker => Destroy(marker));
-
-            int startFrame = (int)(startTime * FREQUENCY);
-            int endFrame = startFrame + CHART_INTERVAL * FREQUENCY;
-            int interval = 8 * CHART_INTERVAL * FREQUENCY / (XBottom - XTop);
-
-            int index = 0;
-            for (int j = startFrame; j < endFrame; j += interval)
-            {
-                if (j > floatArray.Length)
-                {
-                    //draw pause
-                        var go2 = Instantiate(prefabPauseArea) as GameObject;
-                        go2.transform.SetParent(groupOfPauseMarkers.transform);
-
-                        go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
-                        go2.GetComponent<RectTransform>().sizeDelta = new Vector2(8, YRange);
-                        go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        //                go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+        //                go2.GetComponent<RectTransform>().sizeDelta = new Vector2(8, YRange);
+        //                go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
                     
-                    break;
-                }
-                //get average amplifier
-                float sum = 0;
-                for (int k = j; k < j + interval; k++)
-                {
-                    if (k >= floatArray.Length) break;
-                    sum += Math.Abs(floatArray[k]);
-                }
-                float avg = sum / interval;
-                float max = 0.3f;
-                float size = avg / max * YRange;
-                if (size > YRange) size = YRange;
+        //            break;
+        //        }
+        //        //get average amplifier
+        //        float sum = 0;
+        //        for (int k = j; k < j + interval; k++)
+        //        {
+        //            if (k >= floatArray.Length) break;
+        //            sum += Math.Abs(floatArray[k]);
+        //        }
+        //        float avg = sum / interval;
+        //        float max = 0.3f;
+        //        float size = avg / max * YRange;
+        //        if (size > YRange) size = YRange;
 
-                if (avg/floatArrayMaximum < 0.1f)
-                {
-                    //draw pause
-                    var go2 = Instantiate(prefabPauseArea) as GameObject;
-                    go2.transform.SetParent(groupOfPauseMarkers.transform);
+        //        if (avg/floatArrayMaximum < 0.1f)
+        //        {
+        //            //draw pause
+        //            var go2 = Instantiate(prefabPauseArea) as GameObject;
+        //            go2.transform.SetParent(groupOfPauseMarkers.transform);
 
-                    go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
-                    go2.GetComponent<RectTransform>().sizeDelta = new Vector2(10, YRange);
-                    go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-                }
+        //            go2.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+        //            go2.GetComponent<RectTransform>().sizeDelta = new Vector2(10, YRange);
+        //            go2.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        //        }
 
-                //instantiate a wave
-                var go = Instantiate(prefabWave) as GameObject;
-                go.transform.SetParent(groupOfWaves.transform);
+        //        //instantiate a wave
+        //        var go = Instantiate(prefabWave) as GameObject;
+        //        go.transform.SetParent(groupOfWaves.transform);
 
-                go.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
-                go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
-                go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        //        go.GetComponent<RectTransform>().localPosition = new Vector3(XTop + 8 * index, YMid, 0f);
+        //        go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, 10);
+        //        go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
 
-                index++;
+        //        index++;
 
-                //UnityEngine.Debug.Log("Line #" + index + "=" + size);
-            }
-        }
+        //    }
+        //}
 
         //check if need to update top slide thumbnails
         if ((nowTime<slideStartTime) || (nowTime>slideEndTime)) //now playingtime is out of the slide thumbnail presented time interval
         {
-            //UnityEngine.Debug.Log("need to update slide");
-            // UnityEngine.Debug.Log("Updating slide thumbnails --- ");
             //find the right group
             int groupNo = 0;
             for (groupNo=0; groupNo<startTimeForThumbnailGroup.Length; groupNo++)
@@ -367,6 +319,39 @@ public class ReplayController : MonoBehaviour {
                 }
             }
 
+            //page dots
+            var oldDots = new List<GameObject>();
+            foreach (Transform marker in PageDotGroup.transform) oldDots.Add(marker.gameObject);
+            oldDots.ForEach(marker => Destroy(marker));
+
+            if (startTimeForThumbnailGroup.Length == 1) //there's only one page
+            {
+                var go = Instantiate(pfbPageDot) as GameObject;
+                go.transform.SetParent(PageDotGroup.transform);
+
+                go.GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
+                go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+            }
+            else
+            {
+                float space = 20.0f;
+                float startPos = (startTimeForThumbnailGroup.Length - 1) * space * 0.5f;
+
+                for (int i=0; i<startTimeForThumbnailGroup.Length; i++)
+                {
+                    var go = Instantiate(pfbPageDot) as GameObject;
+                    go.transform.SetParent(PageDotGroup.transform);
+
+                    go.GetComponent<RectTransform>().localPosition = new Vector3(0, startPos - i * space, 0);
+                    go.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+                    if (i == groupNo)
+                        go.GetComponent<ChangeState>().SwitchStateTo(1);
+                    else
+                        go.GetComponent<ChangeState>().SwitchStateTo(0);
+                }
+            }
+
+            //update slides
             if (groupNo<startTimeForThumbnailGroup.Length)
             {
                 //found the right interval
@@ -393,35 +378,41 @@ public class ReplayController : MonoBehaviour {
                     }
                     else
                     {
-                        if ((PresentationData.out_Slides != null) && (PresentationData.out_Slides.Count>0))
-                            slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(PresentationData.out_Slides[slideTimingRecord[indexOfRecord].Key]); 
+                        Texture2D slideTexture = null;
+                        if ((PresentationData.out_Slides != null) && (PresentationData.out_Slides.Count > 0))
+                            slideTexture = PresentationData.out_Slides[slideTimingRecord[indexOfRecord].Key];
                         else
-                            slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(new Texture2D(160,30)); //for testing
-                        slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText("#" + (slideTimingRecord[indexOfRecord].Key+1) + " (" + getTimeString(slideTimingRecord[indexOfRecord].Value) + ")");
+                            slideTexture = new Texture2D(160, 30);
+                        slideThumbnails[i].GetComponentInChildren<ChangeSlideImage>().UpdateImage(slideTexture);
+                            
+                        //slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText("#" + (slideTimingRecord[indexOfRecord].Key+1) + " (" + getTimeString(slideTimingRecord[indexOfRecord].Value) + ")");
+                        slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText(getTimeString(slideTimingRecord[indexOfRecord].Value));
 
-                        if (indexOfRecord <= out_SlidesTransitionRecord.Count - 1)
-                        {
-                            if ((out_SlidesTransitionRecord[indexOfRecord].Key <= nowTime) && (out_SlidesTransitionRecord[indexOfRecord + 1].Key > nowTime))
-                            {
-                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
-                                frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
-                                frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
-                                //Debug.Log("updated to slide #" + indexOfRecord+": "+ frameStartTime + "-" + frameEndTime);
-                            }
-                            else
-                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
-                        }
-                        else
-                        {
-                            if (out_SlidesTransitionRecord[indexOfRecord].Key < nowTime)
-                            {
-                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
-                                frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
-                                frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
-                            }
-                            else
-                                slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
-                        }
+                        //if (indexOfRecord <= out_SlidesTransitionRecord.Count - 1)
+                        //{
+                        //    if ((out_SlidesTransitionRecord[indexOfRecord].Key <= nowTime) && (out_SlidesTransitionRecord[indexOfRecord + 1].Key > nowTime))
+                        //    {
+                        //        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
+                        //        frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
+                        //        frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
+                        //        currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f)); 
+                        //        //Debug.Log("updated to slide #" + indexOfRecord+": "+ frameStartTime + "-" + frameEndTime);
+                        //    }
+                        //    else
+                        //        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
+                        //}
+                        //else
+                        //{
+                        //    if (out_SlidesTransitionRecord[indexOfRecord].Key < nowTime)
+                        //    {
+                        //        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
+                        //        frameStartTime = out_SlidesTransitionRecord[indexOfRecord].Key;
+                        //        frameEndTime = frameStartTime + slideTimingRecord[indexOfRecord].Value;
+                        //        currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f)); 
+                        //    }
+                        //    else
+                        //        slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
+                        //}
                         slideThumbnails[i].SetActive(true);
                     }
                 }
@@ -450,14 +441,81 @@ public class ReplayController : MonoBehaviour {
                         slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(true);
                         frameStartTime = out_SlidesTransitionRecord[startSlideIndex + i].Key;
                         frameEndTime = frameStartTime + slideTimingRecord[startSlideIndex + i].Value;
+                        Texture2D slideTexture = null;
+                        if ((PresentationData.out_Slides != null) && (PresentationData.out_Slides.Count > 0))
+                            slideTexture = PresentationData.out_Slides[slideTimingRecord[startSlideIndex + i].Key];
+                        else
+                            slideTexture = new Texture2D(160, 30);
+
+                        currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f)); 
                         //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
                     }
                     else
                         slideThumbnails[i].GetComponentInChildren<ThumbnailFrameController>().SetFrameVisible(false);
                 }
             }
+
+            //update the wave curve
+            groupOfWaves.SetActive(false);
+            groupOfPauseMarkers.SetActive(false);
+
+            int noOfWaves = 82;
+            float widthOfWaves = 4f;
+
+            if (waves == null) //first time
+            {
+                waves = new GameObject[noOfWaves+1];
+                float leftMost = -90.5f;
+
+                for (int i=0; i<noOfWaves; i++)
+                {
+                    var go = Instantiate(prefabWave) as GameObject;
+                    go.transform.SetParent(groupOfWaves.transform);
+                    go.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves-0.05f) * i, 59.4f, 0f);
+                    go.GetComponent<RectTransform>().sizeDelta = new Vector2(widthOfWaves, 47.5f);
+                    go.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
+                    go.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
+                    waves[i] = go;
+                }
+
+                //add last
+                var lastgo = Instantiate(prefabWave) as GameObject;
+                lastgo.transform.SetParent(groupOfWaves.transform);
+                lastgo.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves - 0.05f) * noOfWaves, 59.4f, 0f);
+                lastgo.GetComponent<RectTransform>().sizeDelta = new Vector2(widthOfWaves, 47.5f);
+                lastgo.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
+                waves[noOfWaves] = lastgo;
+            }
+
+            //update size
+
+            int startFrame = (int)(frameStartTime * FREQUENCY);
+            int endFrame = (int)(frameEndTime * FREQUENCY);
+            int interval = (int)((frameEndTime - frameStartTime) * FREQUENCY / noOfWaves);
+
+            for (int i = 0; i <= noOfWaves; i++ )
+            {
+                int count=0;
+                float sum = 0;
+                for (int j = startFrame+i*interval; j<endFrame; j++)
+                {
+                    if (j > floatArray.Length - 1)
+                        break;
+                    count++;
+                    sum += Math.Abs(floatArray[j]);
+                }
+
+                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (((float)sum)/(count*floatArrayMaximum))*1.5f, 1f);
+            }
+
+            groupOfWaves.SetActive(true);
+            groupOfPauseMarkers.SetActive(true);
         }
         //UnityEngine.Debug.Log(slideStartTime + " <- " + nowTime + " belongs to " + frameStartTime + "-" + frameEndTime + "? --> " + slideEndTime);
+
+        //now update current played position marker
+        float positionMarkerLeftMost = -378.9f, positionMarkerRightMost = 379.2f;
+        currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(0, positionMarkerLeftMost - (nowTime - frameStartTime) * (positionMarkerLeftMost - positionMarkerRightMost) / (frameEndTime - frameStartTime), 0);
     }
 
 	// Use this for initialization
@@ -602,11 +660,11 @@ public class ReplayController : MonoBehaviour {
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
                     out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6)); //the last shoot
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(70.0f, 10));
-                    //out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(82.0f, 11));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(70.0f, 10));
+                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(82.0f, 11));
                 }
 
                 //prepare duration data
