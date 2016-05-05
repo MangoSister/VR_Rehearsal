@@ -132,6 +132,8 @@ public class CalibrationControlNew : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
         isCalibrationDone = false;
         state = -1;
         threshold = 300;
