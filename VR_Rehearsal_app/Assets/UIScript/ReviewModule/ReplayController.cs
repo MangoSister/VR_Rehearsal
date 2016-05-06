@@ -18,6 +18,7 @@ public class ReplayController : MonoBehaviour {
     private bool isProcessingAudio = false; //for the threaded job audio processing
     private AudioProcessingJob pcmToUnityClip;
     private float[] floatArray;
+    private float[] floatWaveData; //for pooling wave data, optimization
     private float floatArrayMaximum = 0.0f;
     private int arrayLength = 0;
     private const int CHART_INTERVAL = 30; //30s
@@ -87,6 +88,9 @@ public class ReplayController : MonoBehaviour {
     public GameObject pfbPageDot;
     public Image currentSlide;
 
+    [Header("Mike Christel\'s comment")]
+    public GameObject ExitButtonGroup;
+
     enum PLAY_STATUS
     {
         STOP = 0,
@@ -113,6 +117,7 @@ public class ReplayController : MonoBehaviour {
         btnChangeToSpeech.image.sprite = speechOn;
         panelHeatmap.SetActive(false);
         panelSpeech.SetActive(true);
+        ExitButtonGroup.SetActive(true);
     }
 
     //public Text t1, t2, t3, t4;
@@ -354,6 +359,8 @@ public class ReplayController : MonoBehaviour {
             //update slides
             if (groupNo<startTimeForThumbnailGroup.Length)
             {
+                nowGroupNo = groupNo;
+                UnityEngine.Debug.Log("now " + nowGroupNo);
                 //found the right interval
                 //UnityEngine.Debug.Log("groupNo = " + groupNo);
                 slideStartTime = startTimeForThumbnailGroup[groupNo];
@@ -426,6 +433,8 @@ public class ReplayController : MonoBehaviour {
             //UnityEngine.Debug.Log("need to update slide frame");
             //UnityEngine.Debug.Log("Updating slide frames --- "+nowTime+" is out of "+frameStartTime+"-"+frameEndTime);
             //Debug.Log("StartSlideIndex=" + startSlideIndex + ", slideTimingRecord.Count=" + slideTimingRecord.Count);
+            int nowPageNo = 0;
+            
             for (int i=0; i<6; i++)
             {
                 if (startSlideIndex + i >= slideTimingRecord.Count)
@@ -447,7 +456,9 @@ public class ReplayController : MonoBehaviour {
                         else
                             slideTexture = new Texture2D(160, 30);
 
-                        currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f)); 
+                        currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f));
+                        nowPageNo = i;
+                        UnityEngine.Debug.Log("now " + nowGroupNo + "-" + nowPageNo);
                         //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
                     }
                     else
@@ -467,7 +478,7 @@ public class ReplayController : MonoBehaviour {
                 waves = new GameObject[noOfWaves+1];
                 float leftMost = -90.5f;
 
-                for (int i=0; i<noOfWaves; i++)
+                for (int i=0; i<=noOfWaves; i++)
                 {
                     var go = Instantiate(prefabWave) as GameObject;
                     go.transform.SetParent(groupOfWaves.transform);
@@ -477,36 +488,33 @@ public class ReplayController : MonoBehaviour {
                     go.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
                     waves[i] = go;
                 }
-
-                //add last
-                var lastgo = Instantiate(prefabWave) as GameObject;
-                lastgo.transform.SetParent(groupOfWaves.transform);
-                lastgo.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves - 0.05f) * noOfWaves, 59.4f, 0f);
-                lastgo.GetComponent<RectTransform>().sizeDelta = new Vector2(widthOfWaves, 47.5f);
-                lastgo.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
-                waves[noOfWaves] = lastgo;
             }
 
             //update size
-
-            int startFrame = (int)(frameStartTime * FREQUENCY);
-            int endFrame = (int)(frameEndTime * FREQUENCY);
-            int interval = (int)((frameEndTime - frameStartTime) * FREQUENCY / noOfWaves);
-
-            for (int i = 0; i <= noOfWaves; i++ )
+            for (int i = 0; i <= noOfWaves; i++)
             {
-                int count=0;
-                float sum = 0;
-                for (int j = startFrame+i*interval; j<endFrame; j++)
-                {
-                    if (j > floatArray.Length - 1)
-                        break;
-                    count++;
-                    sum += Math.Abs(floatArray[j]);
-                }
-
-                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (((float)sum)/(count*floatArrayMaximum))*1.5f, 1f);
+                //UnityEngine.Debug.Log("Draw wave #" + (6 * nowGroupNo + nowPageNo+i) + " (=" + floatWaveData[6 * nowGroupNo + nowPageNo] + ")");
+                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (((float)floatWaveData[(6*nowGroupNo+nowPageNo)*noOfWaves+i]) / floatArrayMaximum) * 1.5f, 1f);
             }
+
+            //int startFrame = (int)(frameStartTime * FREQUENCY);
+            //int endFrame = (int)(frameEndTime * FREQUENCY);
+            //int interval = (int)((frameEndTime - frameStartTime) * FREQUENCY / noOfWaves);
+
+            //for (int i = 0; i <= noOfWaves; i++ )
+            //{
+            //    int count=0;
+            //    float sum = 0;
+            //    for (int j = startFrame+i*interval; j<endFrame; j++)
+            //    {
+            //        if (j > floatArray.Length - 1)
+            //            break;
+            //        count++;
+            //        sum += Math.Abs(floatArray[j]);
+            //    }
+
+            //    waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (((float)sum)/(count*floatArrayMaximum))*1.5f, 1f);
+            //}
 
             groupOfWaves.SetActive(true);
             groupOfPauseMarkers.SetActive(true);
@@ -558,6 +566,58 @@ public class ReplayController : MonoBehaviour {
             pcmToUnityClip.setUpFile(@"C:\Users\xunchis\record.pcm");
             //pcmToUnityClip.setUpFile(@"C:\Users\jaekyunk\Desktop\VR_Rehearsal\VR_Rehearsal_app\record.pcm");
 
+        //set up slide transition data
+        out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+
+        if ((PresentationData.out_SlidesTransitionRecord != null) && (PresentationData.out_SlidesTransitionRecord.Count >= 0))
+            out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
+        else
+        {
+            //give it some test data
+            out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(0.0f, 0));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 2));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 3));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6)); //the last shoot
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(70.0f, 10));
+            out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(82.0f, 11));
+        }
+
+        //prepare duration data
+        slideTimingRecord = new List<KeyValuePair<int, float>>();
+
+        //for (int j = 0; j < out_SlidesTransitionRecord.Count; j++ )
+        //{
+        //    UnityEngine.Debug.Log(out_SlidesTransitionRecord[j].Key + " + " + out_SlidesTransitionRecord[j].Value);
+        //}
+
+        //UnityEngine.Debug.Log("brain power!! " + out_SlidesTransitionRecord.Count + " = " + (out_SlidesTransitionRecord.Count-1/6) + ")");
+        startTimeForThumbnailGroup = new float[(out_SlidesTransitionRecord.Count-2)/ 6+1];
+        //UnityEngine.Debug.Log("startTimeForThumbnailGroup has " + (out_SlidesTransitionRecord.Count - 2) / 6 + "+1 records");
+        for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
+        {
+            float time = out_SlidesTransitionRecord[i].Key;
+            int slideNo = out_SlidesTransitionRecord[i].Value;
+
+           //get the duration
+            float dur = out_SlidesTransitionRecord[i + 1].Key - time;
+            slideTimingRecord.Add(new KeyValuePair<int, float>(slideNo, dur));
+            if (i % 6 == 0)
+            {
+                //Debug.Log("*"+i+"* Group #" + (i / 6) + " starts on " + out_SlidesTransitionRecord[i].Key);
+                startTimeForThumbnailGroup[i / 6] = out_SlidesTransitionRecord[i].Key;
+            }
+
+            //UnityEngine.Debug.Log("transition is picked: " + dur + " (#" + slideNo + ")");
+        }
+        pcmToUnityClip.setUpSlideTransitionData(slideTimingRecord);
+        
         pcmToUnityClip.Start();
         isProcessingAudio = true;
 	}
@@ -597,6 +657,7 @@ public class ReplayController : MonoBehaviour {
                     float widthRate = 1-(((float)pcmToUnityClip.progress) / ((float)arrayLength));
                     loadingBar.GetComponent<RectTransform>().sizeDelta = new Vector2((int)(widthRate * 800.0f), 10);
                     //UnityEngine.Debug.Log(pcmToUnityClip.progress + "/" + arrayLength);
+                    //UnityEngine.Debug.Log(pcmToUnityClip.progressWave);
                 }
             }
             else //prepare data, show slider
@@ -606,9 +667,11 @@ public class ReplayController : MonoBehaviour {
 
                 isProcessingAudio = false;
                 floatArray = pcmToUnityClip.getArray();
+                floatWaveData = pcmToUnityClip.getWaveData();
                 floatArrayMaximum = pcmToUnityClip.getMaximum();
                 //UnityEngine.Debug.Log("maximum is " + floatArrayMaximum);
                 //UnityEngine.Debug.Log(floatArray.Length);
+                UnityEngine.Debug.Log(floatWaveData.Length);
 
                 int interval = 8 * CHART_INTERVAL * FREQUENCY / 763;
                 floatArrayMaximum = 0.0f;
@@ -644,133 +707,6 @@ public class ReplayController : MonoBehaviour {
                 playbackSlider.value = 0;
                 preventTrigger = false;
 
-                out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
-
-                if ((PresentationData.out_SlidesTransitionRecord != null) && (PresentationData.out_SlidesTransitionRecord.Count >= 0))
-                    out_SlidesTransitionRecord = PresentationData.out_SlidesTransitionRecord;
-                else
-                {
-                    //give it some test data
-                    //out_SlidesTransitionRecord = new List<KeyValuePair<float, int>>();
-
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(0.0f, 0));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(1.0f, 1));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(5.0f, 2));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(10.0f, 3));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(15.0f, 4));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(20.0f, 5));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(22.0f, 6)); //the last shoot
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(26.0f, 7));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(35.0f, 8));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(55.0f, 9));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(70.0f, 10));
-                    out_SlidesTransitionRecord.Add(new KeyValuePair<float, int>(82.0f, 11));
-                }
-
-                //prepare duration data
-                slideTimingRecord = new List<KeyValuePair<int, float>>();
-
-                for (int j = 0; j < out_SlidesTransitionRecord.Count; j++ )
-                {
-                    //UnityEngine.Debug.Log(out_SlidesTransitionRecord[j].Key + " + " + out_SlidesTransitionRecord[j].Value);
-                }
-
-                //UnityEngine.Debug.Log("brain power!! " + out_SlidesTransitionRecord.Count + " = " + (out_SlidesTransitionRecord.Count-1/6) + ")");
-                startTimeForThumbnailGroup = new float[(out_SlidesTransitionRecord.Count-2)/ 6+1];
-                //UnityEngine.Debug.Log("startTimeForThumbnailGroup has " + (out_SlidesTransitionRecord.Count - 2) / 6 + "+1 records");
-                for (int i = 0; i < out_SlidesTransitionRecord.Count-1; i++)
-                {
-                    float time = out_SlidesTransitionRecord[i].Key;
-                    int slideNo = out_SlidesTransitionRecord[i].Value;
-
-                    //get the duration
-                    float dur = out_SlidesTransitionRecord[i + 1].Key - time;
-                    slideTimingRecord.Add(new KeyValuePair<int, float>(slideNo, dur));
-                    if (i % 6 == 0)
-                    {
-                        //Debug.Log("*"+i+"* Group #" + (i / 6) + " starts on " + out_SlidesTransitionRecord[i].Key);
-                        startTimeForThumbnailGroup[i / 6] = out_SlidesTransitionRecord[i].Key;
-                    }
-
-                    //UnityEngine.Debug.Log("transition is picked: " + dur + " (#" + slideNo + ")");
-                }
-
-                //instantiate markers
-                /*if (isTransitionDisplay == true)
-                { 
-                    foreach (KeyValuePair<float, int> transitionRecord in out_SlidesTransitionRecord)
-                    {
-                        var go = Instantiate(prefabTransitionMarker) as GameObject;
-                        go.transform.parent = groupTransitionMarker.transform;
-
-                        //calculate x coord
-                        float xPos = -54f + (379f - (-54f)) * (transitionRecord.Key / totaltime);
-
-                        go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -68.795f, 0f);
-                    }
-                }*/
-
-                /* out_PauseRecord = new List<KeyValuePair<float, int>>();
-                
-                /// No longer using this
-                /// 
-                ///
-
-                if ((PresentationData.out_FluencyRecord != null) && (PresentationData.out_FluencyRecord.Count >= 0))
-                {
-                    //long pause threshold is set to 1.5s
-                    int accumulatedTime = 0; //in ms!
-
-                    for (int j = 0; j < PresentationData.out_FluencyRecord.Count-1; j++)
-                    {
-                        //check the length of current activity
-                        int length = PresentationData.out_FluencyRecord[j].Value - accumulatedTime;
-
-                        if (accumulatedTime != 0) //ignore the first pause
-                        {
-                            //testText.text += PresentationData.out_FluencyRecord[j].Key.ToString() + " " + length + "\n";
-                            if ((PresentationData.out_FluencyRecord[j].Key.ToString() == "False") && (length > 1500))
-                            {
-                                out_PauseRecord.Add(new KeyValuePair<float, int>((float)accumulatedTime / 1000.0f, length));//not speaking
-                            }
-                        }
-
-                        accumulatedTime = PresentationData.out_FluencyRecord[j].Value;
-                    }
-                }
-                else
-                {
-                    //give it some test data
-                    //out_PauseRecord = new List<KeyValuePair<float, int>>();
-                    
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(1.0f, 1000));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(5.0f, 1200));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(10.0f, 1350));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(15.0f, 1400));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(20.0f, 13000));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(35.0f, 1000));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(38.0f, 1200));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(49.0f, 1350));
-                    out_PauseRecord.Add(new KeyValuePair<float, int>(55.0f, 1400));
-                } 
-
-                //instantiate markers
-                /*
-                if (isPauseDisplay == true)
-                {
-                    foreach (KeyValuePair<float, int> pauseRecord in out_PauseRecord)
-                    {
-                        var go = Instantiate(prefabPauseMarker) as GameObject;
-                        go.transform.parent = groupPauseMarker.transform;
-
-                        //calculate x coord
-                        float xPos = -101f + (331f - (-101f)) * (pauseRecord.Key / totaltime);
-
-                        go.GetComponent<RectTransform>().localPosition = new Vector3(xPos, -63f, 0f);
-                        go.GetComponent<PauseController>().time = pauseRecord.Key;
-                    }
-                }
-                */
                 groupReplayObjects.SetActive(true);
             }
             
@@ -784,16 +720,6 @@ public class ReplayController : MonoBehaviour {
             {
                 playbackSlider.value = audioSource.time;
                 
-                //if (audioSource.time!=lastAudioSourceTime)
-                //{ 
-                //    
-                //    lastAudioSourceTime = audioSource.time;
-                //}
-                //else
-                //{
-                //    playbackSlider.value += Time.deltaTime;
-                //}
-
                 if (playbackSlider.value == playbackSlider.maxValue)
                 {
                     audioSource.Stop();
@@ -816,18 +742,31 @@ public class AudioProcessingJob : ThreadedAudioJob
     private string filePath;
     private const int FREQUENCY = 44100;
     private float[] floatArray;
+    private float[] floatForWaves;
     private float floatArrayMaximum = 0.0f;
     public int progress = 0;
+    public int progressWave = 0;
     public int endvalue = 0;
+    private List<KeyValuePair<int, float>> slideTiming;
 
     public void setUpFile(string filename)
     {
         filePath = filename;
     }
 
+    public void setUpSlideTransitionData(List<KeyValuePair<int, float>> data)
+    {
+        slideTiming = data;
+    }
+
     public float[] getArray()
     {
         return floatArray;
+    }
+
+    public float[] getWaveData()
+    {
+        return floatForWaves;
     }
 
     public float getMaximum()
@@ -860,6 +799,20 @@ public class AudioProcessingJob : ThreadedAudioJob
         }
         endvalue = byteArray.Length / 2;
         floatArray = new float[byteArray.Length / 2 + 1];
+        floatForWaves = new float[floatArray.Length];
+
+        int currentSlideIndex = 0;
+        int currentSlideStartFrame = 0;
+        int currentSlideEndFrame = currentSlideStartFrame+(int)(slideTiming[currentSlideIndex].Value*FREQUENCY);
+        //int interval = 0;
+        int noOfWaves = 82;
+
+        int currentWaveStartFrame = 0;
+        int currentWaveEndFrame = currentWaveStartFrame+(currentSlideEndFrame - currentSlideStartFrame) / noOfWaves;
+        int currentWaveFrameIndex = 0;
+
+        float currentSum = 0;
+        int currentCount = 0;
         int i;
         floatArrayMaximum = 0.0f;
         for (i = 0; i < byteArray.Length; i = i + 2)
@@ -885,6 +838,38 @@ public class AudioProcessingJob : ThreadedAudioJob
                 floatArrayMaximum = valueF;
             floatArray[i / 2] = valueF;
             if (i % 100000 == 0) progress = i/2;
+
+            if (currentSlideIndex < slideTiming.Count)
+            {//prepare wave 
+                currentSum += Math.Abs(valueF);
+                currentCount++;
+
+                if ((i / 2 == currentWaveEndFrame) || (i == byteArray.Length - 1) || (i == byteArray.Length - 2)) //end of current wave object
+                {
+                    //get avg
+                    floatForWaves[currentWaveFrameIndex] = currentSum / (float)currentCount;
+                    //reset
+                    currentSum = 0f;
+                    currentCount = 0;
+                    //get next wave start/end
+                    currentWaveStartFrame = currentWaveEndFrame + 1;
+                    currentWaveEndFrame = currentWaveStartFrame + (currentSlideEndFrame - currentSlideStartFrame) / noOfWaves; //start+interval
+                    currentWaveFrameIndex++;
+                    progressWave = currentWaveFrameIndex;
+                }
+
+                if (currentWaveStartFrame > currentSlideEndFrame)
+                {
+                    currentSlideIndex++;
+                    if (currentSlideIndex < slideTiming.Count)
+                    {
+                        currentSlideStartFrame = currentSlideEndFrame + 1;
+                        currentSlideEndFrame = currentSlideStartFrame + (int)(slideTiming[currentSlideIndex].Value * FREQUENCY);
+                        currentWaveStartFrame = currentSlideStartFrame;
+                        currentWaveEndFrame = currentWaveStartFrame + (currentSlideEndFrame - currentSlideStartFrame) / noOfWaves;
+                    }
+                }
+            }
         }
         floatArray[i / 2] = '\0';
     }
