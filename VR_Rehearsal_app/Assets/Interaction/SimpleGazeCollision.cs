@@ -18,6 +18,10 @@ using System.Collections.Generic;
 
 public class SimpleGazeCollision : MonoBehaviour
 {
+    //query external looking direction information? (eye tracking)
+    public bool eyetracking = false;
+    public EyeCoordHandler UpdateEyeCoord;
+
     //utility plane property
     private Plane collisionPlane
     { get { return new Plane(collisionPlaneNormal, collisionPlaneCenter); } }
@@ -45,7 +49,10 @@ public class SimpleGazeCollision : MonoBehaviour
     //Use this to update gaze contact point
     public void UpdateGazeContact()
     {
-        Ray ray = new Ray(presenterHead.position, presenterHead.forward);
+        Ray ray;
+        if (!eyetracking)
+            ray = new Ray(presenterHead.position, presenterHead.forward);
+        else ray = new Ray(presenterHead.position, UpdateEyeCoord().normalized);
         float enter;
         if (collisionPlane.Raycast(ray, out enter))
         {
