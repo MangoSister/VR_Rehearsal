@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class SlidesPlayer : MonoBehaviour
 {
@@ -112,8 +113,63 @@ public class SlidesPlayer : MonoBehaviour
             System.Array.Copy(imgNames_jpg, 0, imgNames, imgNames_png.Length, imgNames_jpg.Length);
             System.Array.Copy(imgNames_bmp, 0, imgNames, imgNames_jpg.Length + imgNames_png.Length, imgNames_bmp.Length);
 #endif
-            _slides = new List<Texture2D>();
-            foreach (string name in imgNames)
+           
+			//****slides need a sorting *****-comment by Byunghwan Lee May 2 2016
+
+			//Classification process for sorting pages
+			List<string> fileList_pptFormat = new List<string>();
+			List<string> fileList_unknownFormat = new List<string>();
+
+#if !UNITY_EDITOR && UNITY_ANDROID
+			string processPathStr= path + "/";
+#else
+			string processPathStr= path + "\\";
+#endif
+
+			for(int i = 0; i < imgNames.Length; ++i){
+				string tempRes = imgNames[i].Replace( processPathStr, "");
+				if (tempRes.Contains ("Slide")) {
+					fileList_pptFormat.Add (imgNames [i]);
+				} else {
+					fileList_unknownFormat.Add (imgNames [i]);
+				}
+			}
+		
+			//when exported Properly by Powerpoint;
+			fileList_pptFormat.Sort( delegate(string x, string y){
+				string result_1;
+				string result_2;
+				string[] result_3;
+				int x_index = 0;
+				int y_index = 0;
+
+				try{
+					 result_1 = x.Replace(processPathStr, "");
+					 result_2 = result_1.Replace("Slide", "");
+					 result_3 = result_2.Split(new char[] {'.'});
+					 x_index = System.Convert.ToInt32(result_3[0]);
+				}catch(System.FormatException e){
+					Debug.Log("format Exception");
+				}
+
+				try{
+					result_1 = y.Replace( processPathStr, "");
+					result_2 = result_1.Replace("Slide", "");
+					result_3 = result_2.Split(new char[] {'.'});
+					y_index = System.Convert.ToInt32(result_3[0]);
+				}catch(System.FormatException e){
+					Debug.Log("format Exception");
+				}
+					
+				return x_index.CompareTo(y_index);
+			});
+
+			//Merging pptFormat slides and unknown Format
+			fileList_pptFormat.AddRange (fileList_unknownFormat);
+		
+			_slides = new List<Texture2D>();
+
+			foreach (string name in fileList_pptFormat)
             {
                 byte[] data = File.ReadAllBytes(name);
                 _slides.Add(new Texture2D(1, 1));

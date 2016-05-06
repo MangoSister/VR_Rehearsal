@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class LocalCaseView : MonoBehaviour {
 
     public static bool isLocalCaseDone;
+    public static bool isDemoClick;
     private SetupManager _setManager;
 
     public List<GameObject> storedShowCase = new List<GameObject>();
@@ -28,15 +29,19 @@ public class LocalCaseView : MonoBehaviour {
     int deleteCount = 0;
 
     public GameObject emptyIcon;
+    public GameObject demoButton;
 
     void Start () {
         Screen.orientation = ScreenOrientation.Portrait;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
         Screen.autorotateToLandscapeLeft = false;
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         isLocalCaseDone = false;
         isCustomizeButtonClicked = false;
+        isDemoClick = false;
         if (deleteCount == 0)
         {
             CheckLocalPPT();
@@ -66,6 +71,38 @@ public class LocalCaseView : MonoBehaviour {
     }
 	
 	void Update () {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) && this.gameObject.activeSelf)
+            {
+                Debug.Log("DOne!!");
+              
+                CustomApplicationQuit();
+            }
+
+        }
+
+        if (storedShowCase.Count <1)
+        {
+            demoButton.SetActive(true);
+        }
+        else
+        {
+            demoButton.SetActive(false);
+        }
+    }
+
+    private void CustomApplicationQuit()
+    {
+#if UNITY_EDITOR
+        Application.Quit();
+#elif UNITY_ANDROID
+         using (AndroidJavaClass javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        {
+            AndroidJavaObject unityActivity = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
+            unityActivity.Call<bool>("moveTaskToBack", true);
+        }
+#endif
     }
 
     public void SetSetupManager(SetupManager mg)
@@ -91,13 +128,13 @@ public class LocalCaseView : MonoBehaviour {
         {
             if (caseDatas.Length < 7)
             {
-                gLayout_showCase.padding.top = -580;
+                gLayout_showCase.padding.top = -560;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
                 showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, originalRect);
             }
             else
             {
-                gLayout_showCase.padding.top = -68;
+                gLayout_showCase.padding.top = -72;
                 showCaseContentRect.offsetMax = new Vector2(showCaseContentRect.offsetMin.x, -12f);
                 showCaseContentRect.offsetMin = new Vector2(showCaseContentRect.offsetMin.x, finalRect);
             }
@@ -156,6 +193,11 @@ public class LocalCaseView : MonoBehaviour {
         customView.GetComponent<CustomizeView>().SetCustomValueFromLocalView(_title, _sizeOfRoom, _audience, _localPath, _time);
         isCustomizeButtonClicked = true;
        
+    }
+
+    public void ClickDemoButtonClick()
+    {
+        isDemoClick = true;
     }
  
 }

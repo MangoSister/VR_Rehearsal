@@ -37,6 +37,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 	//1. Authentication
 	bool _isAuthenticationDone = false;
 	bool _isAuthenticationSucceed = false;
+	int  _AuthenticationResCode = 0;
 	/*Authentication callback*/
 	bhClowdDriveAPI.Authentication_Callback _authen_callback;
 
@@ -63,7 +64,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 	// delegation
 	delegate void funcResult();
-	delegate void boolFuncResult(bool res);
+	delegate void boolFuncResult(bool res, int resCode);
 
 	//4. Revoke
 	bhClowdDriveAPI.revoke_Callback _revoke_callback;
@@ -72,7 +73,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 	void Update(){
 		if (_isAuthenticationDone == true) {
-			_authen_callback (_isAuthenticationSucceed);
+			_authen_callback (_isAuthenticationSucceed, _AuthenticationResCode);
 			_isAuthenticationDone = false;
 		}
 
@@ -134,14 +135,15 @@ public class bGoogleDriveAPI : MonoBehaviour {
 
 		if (_initInProgress == false) { 
 			_isAuthenticationDone = false;
-			StartCoroutine (StartAuthentication_internal (delegate(bool res) {
+			StartCoroutine (StartAuthentication_internal (delegate(bool res, int resCode) {
 				_isAuthenticationDone = true;
+				_AuthenticationResCode = resCode;
 				if(res)
 					_isAuthenticationSucceed = true;
 				else
 					_isAuthenticationSucceed = false;
 
-			}));
+			},0));
 		}
 	}
 		
@@ -276,7 +278,7 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		isRevoked = true;
 	}
 
-	IEnumerator StartAuthentication_internal(boolFuncResult callback){
+	IEnumerator StartAuthentication_internal(boolFuncResult callback ,int trialNumber){
 		_initInProgress = true;
 
 		_drive = new GoogleDrive();
@@ -287,16 +289,24 @@ public class bGoogleDriveAPI : MonoBehaviour {
 		yield return StartCoroutine(authorization);
 
 		if (authorization.Current is Exception) {
+			
 			#if UNITY_EDITOR
-			Debug.LogWarning (authorization.Current as Exception);
-
-			callback (false);
 			#endif
-		} else {
+			Exception temp =(authorization.Current as Exception);
+			string res = temp.ToString();
+		
+			if(res == "GoogleDrive+Exception: Invalid credential."){
+					callback (true, 1);
+				
+			}else{
+				callback (false,0);
+			}
+				
+		}else {
 			#if UNITY_EDITOR
 			Debug.Log("User Account: " + _drive.UserAccount);	
 			#endif
-			callback (true);
+			callback (true,0);
 		}
 			
 		_initInProgress = false;

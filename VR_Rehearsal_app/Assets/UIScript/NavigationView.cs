@@ -86,15 +86,24 @@ public class NavigationView : MonoBehaviour {
     //MemoryCheck
     public GameObject warningMemoryPanel;
 
+    // Credential Error
+    public GameObject credentialError;
+    bool credError;
+    public static bool isCredentialError;
     void Start() {
         Screen.orientation = ScreenOrientation.Portrait;
         Screen.autorotateToLandscapeLeft = false;
         Screen.autorotateToLandscapeRight = false;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
-        ApplicationChrome.statusBarState = ApplicationChrome.navigationBarState = ApplicationChrome.States.TranslucentOverContent;
+        // ApplicationChrome.statusBarState = ApplicationChrome.States.TranslucentOverContent;
+        ApplicationChrome.navigationBarState = ApplicationChrome.States.VisibleOverContent;
+        ApplicationChrome.statusBarState = ApplicationChrome.States.Visible;
 
+        credentialError.SetActive(false);
+        credError = false;
         letsdefault = false;
+        isCredentialError = false;
         originalRect = contentRect.offsetMin.y;
         GetComponent<RectTransform>().SetAsLastSibling();
         isNavigationDone = false;
@@ -138,6 +147,8 @@ public class NavigationView : MonoBehaviour {
 		_isReseting = false;
 		_isCopy = false;
 
+		credentialError.SetActive(false);
+        credError = false;
 		FinishLoading ();
 	}
 	
@@ -147,7 +158,7 @@ public class NavigationView : MonoBehaviour {
 		if(_authCheck == AuthCheck.failed){
 			_timerForAuth += Time.deltaTime;
 
-			if (_timerForAuth > 15.0f) {
+			if (_timerForAuth > 20.0f) {
 				Icon_AuthFailed.SetActive (true);
 			}
 		}
@@ -162,16 +173,22 @@ public class NavigationView : MonoBehaviour {
             ButtonListener();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
-        {	
-
-			if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
+        {
+            Debug.Log(credError);
+            if (!this.gameObject.activeSelf || _NaviStatus == NavigationStatus.Processing)
 				return;
+            Debug.Log("1");
+            _NaviStatus = NavigationStatus.Processing;
+            //credentialError.SetActive(false);
 
-			_NaviStatus = NavigationStatus.Processing;
-			/*navigation back- go to parent paht*/
-			if(_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
-				
+            /*navigation back- go to parent paht*/
+            if (credError)
+            {
+                credentialError.SetActive(false);
+                isCredentialError = true;
 
+            }
+            else if (_userDrive.GetRecentPath() != "/" || _userDrive.GetRecentPath() == _empty) {
                 _userDrive.GetCurrParentFileList(delegate (string resJson)
                 {
                     _isReseting = true;
@@ -184,11 +201,10 @@ public class NavigationView : MonoBehaviour {
                     _userDrive.JobDone();
                     CreatePanels(resJson);
                     _isReseting = false;
-
-
                 });
             }
-        }
+            
+       }
     }
     public string RecentPath()
     {
@@ -227,16 +243,25 @@ public class NavigationView : MonoBehaviour {
 		StartLoading ();
 
 		_NaviStatus = NavigationStatus.Processing;
-        _userDrive.StartAuthentication(delegate (bool res)
+		_userDrive.StartAuthentication(delegate (bool res, int resCode)
         {
 			FinishLoading();
 			_NaviStatus = NavigationStatus.NotProcessing;
 
             if (res)
-            {
+            {	
+				if(resCode == 1){
+					Debug.Log("Credential Error");
+                    credentialError.gameObject.SetActive(true);
+                    credError = true;
+                            // close the application and retry again.
+                }
+                else{
+                    credentialError.gameObject.SetActive(false);
+                    _userDrive.GetFileListFromPath("/", CreatePanels);
+				}
 				_authCheck = AuthCheck.Succeed;
 				_timerForAuth = 0;
-                _userDrive.GetFileListFromPath("/", CreatePanels);
 			}else{
 				_authCheck = AuthCheck.failed;
 				Icon_AuthFailed.SetActive(true);
@@ -328,7 +353,7 @@ public class NavigationView : MonoBehaviour {
         float totalSizeofRect = (cellSize) * parseResult["entries"].Count;
 
 		CheckFileList (parseResult);
-
+       
         //  contentRect.offsetMax = new Vector2(contentRect.offsetMin.x, 0.0f);
         if (parseResult["entries"].Count < 7)
         {
@@ -445,9 +470,11 @@ public class NavigationView : MonoBehaviour {
 
 
 		customView.GetComponent<CustomizeView>().DefaultValueSetting();
-			
+	   
+        /* banned root folder 
 		if (!_selectedButton && !(_selectedButton.GetComponent<ButtonType>().buttonType == "folder") && !(_NaviStatus == NavigationStatus.Processing) )
 			return;
+       */
 			
 		StartLoading ();
 		string str = _userDrive.GetRecentPath();

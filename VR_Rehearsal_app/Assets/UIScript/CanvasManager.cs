@@ -114,9 +114,12 @@ public class CanvasManager : MonoBehaviour {
         NavigationBetweenView();
         ShowCustomViewFromLocalCaseView();
         ShowCustomViewToLocalView();
+        DirectDemoButtonClick();
+        CredentialError();
+
 
     }
-    public void ShowLocalFromReview()
+public void ShowLocalFromReview()
     {
         if (LogoView.isLogoSceneDone)
         {
@@ -145,6 +148,17 @@ public class CanvasManager : MonoBehaviour {
             fileTranser.gameObject.SetActive(true);
             LocalCaseView.isLocalCaseDone = false;
             localShowCase.GetComponent<LocalCaseView>().isFileTransferClicked = false;
+        }
+    }
+    public void CredentialError()
+    {
+        if (NavigationView.isCredentialError)
+        {
+            navigation.gameObject.SetActive(false);
+            FileTransferView.isFileTransferViewDone = false;
+            fileTranser.gameObject.SetActive(true);
+            NavigationView.isCredentialError = false;
+
         }
     }
     public void ShowNavigationView()
@@ -225,24 +239,20 @@ public class CanvasManager : MonoBehaviour {
                 localShowCase.gameObject.SetActive(false);
                 calibration.gameObject.SetActive(true);
             }
-
         }
     }
-    /*
-	public void DirectShowRotationView(){
-        foreach(GameObject temp in localShowCase.GetComponent<LocalCaseView>().storedShowCase)
-        {
-            if(temp.GetComponent<ShowCaseButton>().isShowcaseButtonClicked == true)
-            {
-                localShowCase.SetActive(false);
-                rotation.SetActive(true);
-                rotation.GetComponent<RotationView>().SetRotation(true);
-            }
 
+    public void DirectDemoButtonClick()
+    {
+        if (LocalCaseView.isDemoClick)
+        {
+            rotation.gameObject.SetActive(true);
+            localShowCase.gameObject.SetActive(false);
+            rotation.GetComponent<RotationView>().SetRotation(true);
+            LocalCaseView.isDemoClick = false;
         }
-	}
-    */
-      void NavigationBetweenView()
+    }
+    void NavigationBetweenView()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
