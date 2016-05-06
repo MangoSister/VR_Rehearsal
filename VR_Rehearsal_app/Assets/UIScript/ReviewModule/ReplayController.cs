@@ -87,6 +87,7 @@ public class ReplayController : MonoBehaviour {
     public GameObject PageDotGroup;
     public GameObject pfbPageDot;
     public Image currentSlide;
+    public Text currentSlideStartTime, currentSlideEndTime;
 
     [Header("Mike Christel\'s comment")]
     public GameObject ExitButtonGroup;
@@ -176,6 +177,28 @@ public class ReplayController : MonoBehaviour {
 
         return timestring;
     }
+
+    private String getTimeString2(float time)
+    {
+        string timestring = "";
+
+        //get minute
+        if (time >= 600.0f)
+              timestring = (int)(time / 60.0f) + ":" ;
+        else if (time > 60.0f)
+            timestring = "0" + (int)(time / 60.0f) + ":";
+        else
+            timestring = "00:";
+
+        //get second
+        if (((int)(time) % 60) >= 10)
+            timestring += ((int)(time) % 60).ToString();
+        else
+            timestring += "0" + ((int)(time) % 60);
+
+        return timestring;
+    }
+
 
     public void jumpInPlayback()
     {
@@ -399,6 +422,11 @@ public class ReplayController : MonoBehaviour {
                         //slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText("#" + (slideTimingRecord[indexOfRecord].Key+1) + " (" + getTimeString(slideTimingRecord[indexOfRecord].Value) + ")");
                         slideThumbnails[i].GetComponentInChildren<ChangeSlideText>().UpdateText(getTimeString(slideTimingRecord[indexOfRecord].Value));
 
+                        if (slideTimingRecord[indexOfRecord].Key + 1<10)
+                            slideThumbnails[i].GetComponentInChildren<ChangeSlideNo>().UpdateText("0"+(slideTimingRecord[indexOfRecord].Key + 1).ToString());
+                        else
+                            slideThumbnails[i].GetComponentInChildren<ChangeSlideNo>().UpdateText((slideTimingRecord[indexOfRecord].Key + 1).ToString());
+
                         //if (indexOfRecord <= out_SlidesTransitionRecord.Count - 1)
                         //{
                         //    if ((out_SlidesTransitionRecord[indexOfRecord].Key <= nowTime) && (out_SlidesTransitionRecord[indexOfRecord + 1].Key > nowTime))
@@ -464,6 +492,8 @@ public class ReplayController : MonoBehaviour {
                         if (!currentSlide.gameObject.activeSelf) 
                              currentSlide.gameObject.SetActive(true);
                         nowPageNo = i;
+                        currentSlideStartTime.text = getTimeString2(frameStartTime);
+                        currentSlideEndTime.text = getTimeString2(frameEndTime);
                         //UnityEngine.Debug.Log("now " + nowGroupNo + "-" + nowPageNo);
                         //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
                     }
@@ -738,10 +768,10 @@ public class ReplayController : MonoBehaviour {
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
-                quarterTime.text = getTimeString(totaltime / 4.0f);
-                halfTime.text = getTimeString(totaltime / 2.0f);
-                softTime.text = getTimeString(totaltime * 0.75f);
-                endTime.text = getTimeString(totaltime);
+                quarterTime.text = getTimeString2(totaltime / 4.0f);
+                halfTime.text = getTimeString2(totaltime / 2.0f);
+                softTime.text = getTimeString2(totaltime * 0.75f);
+                endTime.text = getTimeString2(totaltime);
 
                 AudioClip myClip = AudioClip.Create("record", floatArray.Length, 1, FREQUENCY, false, false);
                 myClip.SetData(floatArray, 0);
