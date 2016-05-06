@@ -461,6 +461,8 @@ public class ReplayController : MonoBehaviour {
                             slideTexture = new Texture2D(160, 30);
 
                         currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f));
+                        if (!currentSlide.gameObject.activeSelf) 
+                             currentSlide.gameObject.SetActive(true);
                         nowPageNo = i;
                         //UnityEngine.Debug.Log("now " + nowGroupNo + "-" + nowPageNo);
                         //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
