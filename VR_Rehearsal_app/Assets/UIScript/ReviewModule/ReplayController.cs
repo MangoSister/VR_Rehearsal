@@ -28,7 +28,7 @@ public class ReplayController : MonoBehaviour {
     private int nowGroupNo = 0;
     private int startSlideIndex = 0;
     private float lastAudioSourceTime = -1f;
-    private GameObject[] waves;
+    
 
 
     //for volume control
@@ -90,6 +90,10 @@ public class ReplayController : MonoBehaviour {
 
     [Header("Mike Christel\'s comment")]
     public GameObject ExitButtonGroup;
+
+    //for optimization!
+    private GameObject[] waves;
+    private GameObject[] pauses;
 
     enum PLAY_STATUS
     {
@@ -360,7 +364,7 @@ public class ReplayController : MonoBehaviour {
             if (groupNo<startTimeForThumbnailGroup.Length)
             {
                 nowGroupNo = groupNo;
-                UnityEngine.Debug.Log("now " + nowGroupNo);
+                //UnityEngine.Debug.Log("now " + nowGroupNo);
                 //found the right interval
                 //UnityEngine.Debug.Log("groupNo = " + groupNo);
                 slideStartTime = startTimeForThumbnailGroup[groupNo];
@@ -458,7 +462,7 @@ public class ReplayController : MonoBehaviour {
 
                         currentSlide.sprite = Sprite.Create(slideTexture, new Rect(0, 0, slideTexture.width, slideTexture.height), new Vector2(0.5f, 0.5f));
                         nowPageNo = i;
-                        UnityEngine.Debug.Log("now " + nowGroupNo + "-" + nowPageNo);
+                        //UnityEngine.Debug.Log("now " + nowGroupNo + "-" + nowPageNo);
                         //Debug.Log("(A)updated to slide #" + (startSlideIndex + i) + ": " + frameStartTime + "-" + frameEndTime);
                     }
                     else
@@ -471,18 +475,17 @@ public class ReplayController : MonoBehaviour {
             groupOfPauseMarkers.SetActive(false);
 
             int noOfWaves = 82;
-            float widthOfWaves = 4f;
-
+            float widthOfWaves = 4.01f;
+            float leftMost = -93.3f;
             if (waves == null) //first time
             {
                 waves = new GameObject[noOfWaves+1];
-                float leftMost = -90.5f;
-
+                
                 for (int i=0; i<=noOfWaves; i++)
                 {
                     var go = Instantiate(prefabWave) as GameObject;
                     go.transform.SetParent(groupOfWaves.transform);
-                    go.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves-0.05f) * i, 59.4f, 0f);
+                    go.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves) * i, 58.9f, 0f);
                     go.GetComponent<RectTransform>().sizeDelta = new Vector2(widthOfWaves, 47.5f);
                     go.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
                     go.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
@@ -490,11 +493,49 @@ public class ReplayController : MonoBehaviour {
                 }
             }
 
+            if (pauses == null) //first time
+            {
+                pauses = new GameObject[noOfWaves + 1];
+                for (int i = 0; i <= noOfWaves; i++)
+                {
+                    var go = Instantiate(prefabPauseArea) as GameObject;  
+                    go.transform.SetParent(groupOfPauseMarkers.transform);
+                    go.GetComponent<RectTransform>().localPosition = new Vector3(leftMost + (widthOfWaves) * i, 62.1f, 0f);
+                    go.GetComponent<RectTransform>().sizeDelta = new Vector2(widthOfWaves, 47.5f);
+                    go.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
+                    go.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
+                    pauses[i] = go;
+                }
+            }
+
             //update size
             for (int i = 0; i <= noOfWaves; i++)
             {
                 //UnityEngine.Debug.Log("Draw wave #" + (6 * nowGroupNo + nowPageNo+i) + " (=" + floatWaveData[6 * nowGroupNo + nowPageNo] + ")");
-                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (((float)floatWaveData[(6*nowGroupNo+nowPageNo)*noOfWaves+i]) / floatArrayMaximum) * 1.5f, 1f);
+                float value = (float)floatWaveData[(6*nowGroupNo+nowPageNo)*noOfWaves+i];
+                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, ( value/ floatArrayMaximum) * 1.5f, 1f);
+                if (value / floatArrayMaximum < 0.15f)
+                    pauses[i].SetActive(true);
+                else
+                    pauses[i].SetActive(false);
+            }
+
+            int countPause = 0;
+            //recheck to remove short pauses
+            for (int i = 0; i <= noOfWaves; i++ )
+            {
+                if (pauses[i].activeSelf == true)
+                    countPause++;
+                else
+                {
+                    if (countPause < 4)
+                    {
+                        for (int j = i - countPause; j <= i; j++)
+                            pauses[j].SetActive(false);
+                    }
+
+                    countPause = 0;
+                }
             }
 
             //int startFrame = (int)(frameStartTime * FREQUENCY);
@@ -523,7 +564,11 @@ public class ReplayController : MonoBehaviour {
 
         //now update current played position marker
         float positionMarkerLeftMost = -378.9f, positionMarkerRightMost = 379.2f;
-        currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(0, positionMarkerLeftMost - (nowTime - frameStartTime) * (positionMarkerLeftMost - positionMarkerRightMost) / (frameEndTime - frameStartTime), 0);
+        float newPosY = positionMarkerLeftMost - (nowTime - frameStartTime) * (positionMarkerLeftMost - positionMarkerRightMost) / (frameEndTime - frameStartTime);
+        if (newPosY <= positionMarkerRightMost)
+            currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(0, newPosY, 0);
+        else
+            currentPositionMarker.GetComponent<RectTransform>().localPosition = new Vector3(0, positionMarkerRightMost, 0);
     }
 
 	// Use this for initialization
@@ -640,7 +685,7 @@ public class ReplayController : MonoBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.Escape) && this.gameObject.activeSelf)
             {
-                Debug.Log("DOne!!");
+                Debug.Log("Done!!");
 
                 CustomApplicationQuit();
             }
