@@ -545,7 +545,7 @@ public class ReplayController : MonoBehaviour {
             {
                 //UnityEngine.Debug.Log("Draw wave #" + (6 * nowGroupNo + nowPageNo+i) + " (=" + floatWaveData[6 * nowGroupNo + nowPageNo] + ")");
                 float value = (float)floatWaveData[(6*nowGroupNo+nowPageNo)*noOfWaves+i];
-                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, ( value/ floatArrayMaximum) , 1f);
+                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, (value/ floatArrayMaximum) , 1f);
                 if (value / floatArrayMaximum < 0.15f)
                     pauses[i].SetActive(true);
                 else
@@ -749,22 +749,6 @@ public class ReplayController : MonoBehaviour {
                 //UnityEngine.Debug.Log("maximum is " + floatArrayMaximum);
                 //UnityEngine.Debug.Log(floatArray.Length);
                 UnityEngine.Debug.Log(floatWaveData.Length);
-
-                int interval = 8 * CHART_INTERVAL * FREQUENCY / 763;
-                floatArrayMaximum = 0.0f;
-
-                for (int j = 0; j < floatArray.Length; j += interval)
-                {
-                    float sum = 0;
-
-                    for (int k = j; k < j + interval; k++)
-                    {
-                        if (k >= floatArray.Length) break;
-                        sum += Math.Abs(floatArray[k]);
-                    }
-
-                    if (floatArrayMaximum < sum / interval) floatArrayMaximum = sum / interval;
-                }
 
                 //time stamp update
                 float totaltime = (floatArray.Length) / (float)FREQUENCY;
