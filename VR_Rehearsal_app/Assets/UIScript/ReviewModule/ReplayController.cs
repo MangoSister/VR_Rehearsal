@@ -513,7 +513,7 @@ public class ReplayController : MonoBehaviour {
             {
                 //UnityEngine.Debug.Log("Draw wave #" + (6 * nowGroupNo + nowPageNo+i) + " (=" + floatWaveData[6 * nowGroupNo + nowPageNo] + ")");
                 float value = (float)floatWaveData[(6*nowGroupNo+nowPageNo)*noOfWaves+i];
-                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, ( value/ floatArrayMaximum) * 1.5f, 1f);
+                waves[i].GetComponent<RectTransform>().localScale = new Vector3(1f, ( value/ floatArrayMaximum) , 1f);
                 if (value / floatArrayMaximum < 0.15f)
                     pauses[i].SetActive(true);
                 else
@@ -879,8 +879,8 @@ public class AudioProcessingJob : ThreadedAudioJob
             
             //translate to -1.0~1.0f
             float valueF = ((float)valueS) / 32768.0f;
-            if (valueF > floatArrayMaximum)
-                floatArrayMaximum = valueF;
+            //if (valueF > floatArrayMaximum)
+            //    floatArrayMaximum = valueF;
             floatArray[i / 2] = valueF;
             if (i % 100000 == 0) progress = i/2;
 
@@ -892,7 +892,10 @@ public class AudioProcessingJob : ThreadedAudioJob
                 if ((i / 2 == currentWaveEndFrame) || (i == byteArray.Length - 1) || (i == byteArray.Length - 2)) //end of current wave object
                 {
                     //get avg
-                    floatForWaves[currentWaveFrameIndex] = currentSum / (float)currentCount;
+                    float newValue = currentSum / (float)currentCount;
+                    floatForWaves[currentWaveFrameIndex] = newValue;
+                    if (newValue > floatArrayMaximum)
+                        floatArrayMaximum = newValue;
                     //reset
                     currentSum = 0f;
                     currentCount = 0;
