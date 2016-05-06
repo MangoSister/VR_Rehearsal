@@ -13,7 +13,7 @@ public class ThumbnailFrameController : MonoBehaviour {
     {
         //gameObject.SetActive(flag);
         if (flag == false)
-            gameObject.GetComponent<Transform>().localPosition = new Vector3(500, 0, 0);
+            gameObject.GetComponent<Transform>().localPosition = new Vector3(700, 0, 0);
         else
             gameObject.GetComponent<Transform>().localPosition = new Vector3(0, 0, 0);                
     }
