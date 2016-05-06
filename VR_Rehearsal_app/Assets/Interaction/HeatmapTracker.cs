@@ -21,8 +21,15 @@ public struct GazeSnapshot
     public Vector3 headToBodyDir;
 }
 
+public delegate Vector3 EyeCoordHandler();
+
 public class HeatmapTracker : MonoBehaviour
 {
+    //query external looking direction information? (eye tracking)
+    public bool eyetracking = false;
+    //delegate to receive eye tracking direction 
+    public EyeCoordHandler UpdateEyeCoord;
+
     //updating interval. Accumulate once per updateInterval
     public float updateInteval = 1f;
 
@@ -100,7 +107,11 @@ public class HeatmapTracker : MonoBehaviour
     {
         if (_currUpdateCR == null && SceneController.currRoom != null)
         {
-            _currUpdateCR = StartCoroutine(Update_CR());
+            //toggle eye tracking if supported
+            if (eyetracking && UpdateEyeCoord != null)
+                _currUpdateCR = StartCoroutine(UpdateEye_CR());
+            else //head tracking
+                _currUpdateCR = StartCoroutine(Update_CR());
             return true;
         }
         else return false;
@@ -136,6 +147,24 @@ public class HeatmapTracker : MonoBehaviour
             float y = Vector3.Dot(head.forward, body.up);
             GazeSnapshot snapshot = new GazeSnapshot();
             snapshot.headToBodyDir = new Vector3(x, y, z);
+            snapshot.timeStamp = Time.time;
+            _gazeData.Add(snapshot);
+
+            yield return new WaitForSeconds(updateInteval);
+        }
+    }
+
+    private IEnumerator UpdateEye_CR()
+    {
+        var body = SceneController.currRoom.presenter.transform;
+        while (true)
+        {
+            GazeSnapshot snapshot = new GazeSnapshot();
+            Vector3 eyeDir = UpdateEyeCoord().normalized;
+            float z = Vector3.Dot(eyeDir, body.forward);
+            float x = Vector3.Dot(eyeDir, body.right);
+            float y = Vector3.Dot(eyeDir, body.up);
+            snapshot.headToBodyDir = snapshot.headToBodyDir = new Vector3(x, y, z);
             snapshot.timeStamp = Time.time;
             _gazeData.Add(snapshot);
 

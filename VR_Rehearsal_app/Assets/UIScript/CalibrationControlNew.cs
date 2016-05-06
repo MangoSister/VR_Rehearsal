@@ -26,7 +26,7 @@ public class CalibrationControlNew : MonoBehaviour {
     private AndroidJavaObject currentActivity;
     public GameObject instructionPanel;
     public GameObject xButon;
-    public GameObject questiontext;
+   // public GameObject questiontext;
     public GameObject questionButton;
     public GameObject localview;
     public GameObject customeView;
@@ -64,7 +64,7 @@ public class CalibrationControlNew : MonoBehaviour {
         state = 1;
         isButtonClicked = false;
         xButon.SetActive(false);
-        questiontext.SetActive(false);
+       // questiontext.SetActive(false);
 
     }
 
@@ -179,7 +179,7 @@ public class CalibrationControlNew : MonoBehaviour {
         if (state == 0)
         {
             xButon.SetActive(true);
-            questiontext.SetActive(true);
+          //  questiontext.SetActive(true);
             questionButton.SetActive(true);
 #if USE_ANDROID
             int volume = currentActivity.Call<int>("getNowAvg");
