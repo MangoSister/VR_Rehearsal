@@ -57,7 +57,6 @@ public class FileTransferView : MonoBehaviour {
         
 		bool res = CheckForInternetConnection ();
 		if (!res) {
-            ok_connection.SetActive(false);
 			warningTextUI_connection.SetActive (true);
             warningText.SetActive(true);
 			StartCoroutine(DelayForWarningMessage(1.0f));
@@ -75,8 +74,7 @@ public class FileTransferView : MonoBehaviour {
     {
 		bool res = CheckForInternetConnection ();
 		if (!res) {
-            ok_connection.SetActive(false);
-            warningTextUI_connection.SetActive (true);
+             warningTextUI_connection.SetActive (true);
             warningText.SetActive(true);
             StartCoroutine(DelayForWarningMessage(1.0f));
 			#if UNITY_EDITOR
@@ -100,7 +98,6 @@ public class FileTransferView : MonoBehaviour {
 		yield return new WaitForSeconds (duration);
 		warningTextUI_connection.SetActive (false);
         warningText.SetActive(false);
-        ok_connection.SetActive(true);
     }
 
     public void QuestionButtonClick()
